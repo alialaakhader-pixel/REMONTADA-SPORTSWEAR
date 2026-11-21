@@ -57,14 +57,14 @@ export default function Home() {
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to left, #08090B 0%, rgba(8,9,11,.94) 34%, rgba(8,9,11,.45) 66%, rgba(8,9,11,.82) 100%)",
+                "linear-gradient(to left, #05050F 0%, rgba(5,5,15,.94) 34%, rgba(5,5,15,.45) 66%, rgba(5,5,15,.82) 100%)",
             }}
           />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, #08090B 2%, transparent 42%)",
+                "linear-gradient(to top, #05050F 2%, transparent 42%)",
             }}
           />
           {/* diagonal red beacon */}
@@ -72,7 +72,7 @@ export default function Home() {
             className="absolute inset-y-0 right-[36%] w-[14%] opacity-[0.16]"
             style={{
               background:
-                "linear-gradient(to bottom, transparent, #E6392B 45%, transparent)",
+                "linear-gradient(to bottom, transparent, #00B4FF 45%, transparent)",
               transform: "skewX(-11deg)",
             }}
           />
@@ -102,7 +102,7 @@ export default function Home() {
 
             <p className="mt-7 max-w-xl text-[16px] leading-[1.9] text-mute sm:text-[17px]">
               ملابس، أحذية، ومعدات مصنوعة للرياضيين الذين يرفضون الاستسلام. هندسة دقيقة،
-              أقمشة تنفّس، وتصميم أسود–أحمر لا يُنسى من الملعب.
+              أقمشة تنفّس، وتصميم أسود وأزرق كهربائي لا يُنسى من الملعب.
             </p>
 
             <div className="mt-9 flex flex-wrap gap-3">
@@ -400,7 +400,7 @@ export default function Home() {
               <div
                 className={`relative flex h-full flex-col border p-7 transition-all duration-[400ms] ${
                   c.featured
-                    ? "border-fire bg-gradient-to-b from-fire/[0.12] to-transparent shadow-[0_30px_80px_-40px_rgba(230,57,43,.7)] lg:-translate-y-4"
+                    ? "border-fire bg-gradient-to-b from-fire/[0.12] to-transparent shadow-[0_30px_80px_-40px_rgba(0,180,255,.7)] lg:-translate-y-4"
                     : "border-hair bg-panel hover:border-neon/50"
                 }`}
               >
@@ -544,7 +544,7 @@ export default function Home() {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to left, rgba(8,9,11,.96) 12%, rgba(8,9,11,.78) 55%, rgba(230,57,43,.28) 100%)",
+              "linear-gradient(to left, rgba(5,5,15,.96) 12%, rgba(5,5,15,.78) 55%, rgba(0,180,255,.28) 100%)",
           }}
         />
         <div className="relative mx-auto max-w-[1440px] px-4 py-24 sm:px-6 lg:px-10 lg:py-32">
