@@ -174,7 +174,7 @@ const PAYMENTS = [
 
 export function Checkout() {
   const { cart, go, toast } = useStore();
-  const { subtotal, city, setCity, ship, total } = useTotals();
+  const { subtotal, city, cities, setCity, ship, total } = useTotals();
   const [step, setStep] = useState(0);
   const [pay, setPay] = useState("cod");
   const [done] = useState<string | null>(null);
