@@ -1,11 +1,12 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React,
+  {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+  } from "react";
 import { PRODUCTS, type Product } from "./data";
 
 export type Line = { id: string; qty: number; size: string; color: string };
@@ -33,13 +34,52 @@ type Ctx = {
 };
 
 const StoreCtx = createContext<Ctx | null>(null);
+const CART_KEY = "remontada:cart:v1";
+const WISH_KEY = "remontada:wishlist:v1";
+
+function readCart(): Line[] {
+  try {
+    const raw = window.localStorage.getItem(CART_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.flatMap((item): Line[] => {
+      if (!item || typeof item !== "object") return [];
+      const line = item as Partial<Line>;
+      const product = PRODUCTS.find((p) => p.id === line.id);
+      if (!product) return [];
+      const size = typeof line.size === "string" && product.sizes.includes(line.size)
+        ? line.size
+        : product.sizes[0];
+      const color = typeof line.color === "string" && product.colors.some((c) => c.name === line.color)
+        ? line.color
+        : product.colors[0].name;
+      const qty = Number.isFinite(line.qty) ? Math.max(1, Math.min(9, Math.floor(line.qty as number))) : 1;
+      return [{ id: product.id, qty, size, color }];
+    });
+  } catch {
+    return [];
+  }
+}
+
+function readWishlist(): string[] {
+  try {
+    const raw = window.localStorage.getItem(WISH_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(parsed)) return [];
+    return [...new Set(parsed.filter((id): id is string =>
+      typeof id === "string" && PRODUCTS.some((p) => p.id === id)
+    ))];
+  } catch {
+    return [];
+  }
+}
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [route, setRoute] = useState<string>(
     () => window.location.hash.replace(/^#/, "") || "/"
   );
-  const [cart, setCart] = useState<Line[]>([]);
-  const [wish, setWish] = useState<string[]>([]);
+  const [cart, setCart] = useState<Line[]>(readCart);
+  const [wish, setWish] = useState<string[]>(readWishlist);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -52,6 +92,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    } catch {
+      // Keep the in-memory cart usable when browser storage is unavailable.
+    }
+  }, [cart]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(WISH_KEY, JSON.stringify(wish));
+    } catch {
+      // Keep the in-memory wishlist usable when browser storage is unavailable.
+    }
+  }, [wish]);
 
   const go = useCallback((r: string) => {
     if ((window.location.hash.replace(/^#/, "") || "/") === r) {
@@ -80,7 +136,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           next[i] = { ...next[i], qty: Math.min(9, next[i].qty + qty) };
           return next;
         }
-        return [...prev, { id: p.id, qty, size: s, color: c }];
+        return [...prev, { id: p.id, qty: Math.max(1, Math.min(9, qty)), size: s, color: c }];
       });
       toast("أُضيف إلى السلة", `${p.name} — مقاس ${s}`);
     },
