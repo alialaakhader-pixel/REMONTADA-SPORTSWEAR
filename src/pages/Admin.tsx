@@ -15,7 +15,7 @@ export default function Admin() {
   const [tab, setTab] = useState<"products"|"sports"|"home"|"settings">("products");
   const [editing, setEditing] = useState<Product | null>(null);
   const [query, setQuery] = useState("");
-  const blank: Product = { id:"", name:"", sub:"", brand:"REMONTADA", sport:SPORTS[0], gender:"رجالي", type:"ملابس", price:0, rating:5, reviews:0, img:"", images:[], colors:[{name:"أسود",hex:"#08090B"}], sizes:["S","M","L","XL"], sold:0, desc:"", features:[] };
+  const blank: Product = { id:"", name:"", sub:"", brand:"REMONTADA", sport:SPORTS[0], gender:"رجالي", type:"ملابس", price:0, rating:0, reviews:0, img:"", images:[], colors:[{name:"أسود",hex:"#05050F"}], sizes:["S","M","L","XL"], sold:0, desc:"", features:[] };
   const [draft, setDraft] = useState<Product>(blank);
   const filtered = useMemo(()=>products.filter(p=>p.name.includes(query)||p.sport.includes(query)),[products,query]);
   const [sportVisible,setSportVisible]=useState<Record<string,boolean>>(()=>{try{return JSON.parse(localStorage.getItem("remontada:sports")||"{}")}catch{return {}}});
