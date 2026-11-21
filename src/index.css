@@ -4,14 +4,14 @@
   --font-sans: "Cairo", ui-sans-serif, system-ui, sans-serif;
   --font-tech: "Chakra Petch", ui-monospace, monospace;
 
-  --color-ink: #08090b;
-  --color-panel: #111317;
-  --color-panel2: #16191e;
-  --color-hair: #1e2126;
-  --color-fire: #e6392b;
-  --color-flame: #ff1e1e;
-  --color-neon: #35c8ff;
-  --color-gold: #c9a227;
+  --color-ink: #05050f;
+  --color-panel: #0a0a1a;
+  --color-panel2: #0d1530;
+  --color-hair: #142544;
+  --color-fire: #00b4ff;
+  --color-flame: #00d4ff;
+  --color-neon: #00d4ff;
+  --color-gold: #5fd9ff;
   --color-mute: #9aa1ab;
   --color-paper: #f5f6f7;
 }
@@ -26,7 +26,7 @@ html {
 }
 
 body {
-  background-color: #08090b;
+  background-color: #05050f;
   color: #f5f6f7;
   font-family: "Cairo", system-ui, sans-serif;
   overflow-x: hidden;
@@ -34,7 +34,7 @@ body {
 }
 
 ::selection {
-  background: #e6392b;
+  background: #00b4ff;
   color: #fff;
 }
 
@@ -59,7 +59,7 @@ body {
     font-variant-numeric: tabular-nums;
   }
   .glow-fire {
-    text-shadow: 0 0 28px rgba(230, 57, 43, 0.55);
+    text-shadow: 0 0 28px rgba(0, 180, 255, 0.62), 0 0 52px rgba(0, 180, 255, 0.28);
   }
   .glow-neon {
     text-shadow: 0 0 18px rgba(53, 200, 255, 0.65), 0 0 44px rgba(53, 200, 255, 0.28);
@@ -79,7 +79,7 @@ body {
   .slash {
     background-image: repeating-linear-gradient(
       115deg,
-      #e6392b 0 6px,
+       #00b4ff 0 6px,
       transparent 6px 14px
     );
   }
@@ -173,7 +173,7 @@ body {
 
 /* ---------- range input ---------- */
 input[type="range"] {
-  accent-color: #e6392b;
+  accent-color: #00b4ff;
 }
 
 /* ---------- scrollbar ---------- */
@@ -182,14 +182,14 @@ input[type="range"] {
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #08090b;
+  background: #05050f;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e2126;
+  background: #142544;
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #e6392b;
+  background: #00b4ff;
 }
 
 @media (prefers-reduced-motion: reduce) {
