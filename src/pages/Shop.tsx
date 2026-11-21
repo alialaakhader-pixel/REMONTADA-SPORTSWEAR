@@ -37,7 +37,7 @@ export default function Shop() {
   const [types, setTypes] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
-  const [colors, setColors] = useState<string[]>([]);
+  const [colors, setColors] = useState<string[]>([]);\n  const ALL_SIZES = useMemo(() => Array.from(new Set(products.flatMap(p => p.sizes))), [products]);\n  const ALL_COLORS = useMemo(() => Array.from(new Map(products.flatMap(p => p.colors).map(c => [c.name,c])).values()), [products]);
   const [maxPrice, setMaxPrice] = useState(900);
   const [minRating, setMinRating] = useState(0);
   const [sort, setSort] = useState<Sort>("new");
