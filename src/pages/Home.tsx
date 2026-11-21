@@ -237,11 +237,18 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {shown.map((p, i) => (
-              <ProductCard key={p.id} p={p} index={i} />
-            ))}
-          </div>
+          {shown.length === 0 ? (
+            <div className="border border-dashed border-hair bg-ink/40 px-6 py-14 text-center">
+              <p className="text-lg font-bold text-paper">الكتالوج جاهز لاستقبال منتجاتك</p>
+              <p className="mt-2 text-sm text-mute">ستظهر المنتجات هنا بعد إدخال بياناتها وصورها وأسعارها من لوحة الإدارة.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {shown.map((p, i) => (
+                <ProductCard key={p.id} p={p} index={i} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
