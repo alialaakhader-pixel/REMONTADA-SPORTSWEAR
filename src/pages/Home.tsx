@@ -9,10 +9,9 @@ import {
   Tag,
   Check,
   ChevronDown,
-  Zap,
 } from "lucide-react";
 import { useStore } from "../lib/store";
-import { SPORTS, FAQS, money } from "../lib/data";
+import { SPORTS, FAQS } from "../lib/data";
 import {
   Reveal,
   Micro,
