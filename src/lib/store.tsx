@@ -87,7 +87,7 @@ function readWishlist(): string[] {
 }
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
-  const [products, setProductsState] = useState<Product[]>(readProducts);
+  const [products, setProductsState] = useState<Product[]>(readProducts);\n  const setProducts = useCallback((next: Product[]) => {\n    setProductsState(next);\n    try { window.localStorage.setItem(PRODUCTS_KEY, JSON.stringify(next)); } catch { /* storage quota */ }\n  }, []);
   const [route, setRoute] = useState<string>(
     () => window.location.hash.replace(/^#/, "") || (window.location.pathname !== "/" ? window.location.pathname : "/")
   );
