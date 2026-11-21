@@ -14,7 +14,8 @@ function Router() {
   const path = route.split("?")[0];
 
   let page: React.ReactNode;
-  if (path === "/admin") page = <Admin />;\n  else if (path === "/" || path === "") page = <Home />;
+  if (path === "/admin") page = <Admin />;
+  else if (path === "/" || path === "") page = <Home />;
   else if (path === "/shop") page = <Shop />;
   else if (path.startsWith("/product/")) page = <ProductPage id={path.replace("/product/", "")} />;
   else if (path === "/cart") page = <Cart />;
