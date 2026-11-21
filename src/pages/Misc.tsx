@@ -23,7 +23,7 @@ import { LogoPlate } from "../components/Logo";
 
 /* ================= ABOUT ================= */
 export function About() {
-  const { go } = useStore();
+  const { go, products } = useStore();
   return (
     <div>
       <section className="mx-auto max-w-[1440px] px-4 pt-32 sm:px-6 lg:px-10">
@@ -740,7 +740,7 @@ const moneyS = (n: number) => n.toLocaleString("en-US");
 /* ================= WISHLIST ================= */
 export function Wishlist() {
   const { wish, go } = useStore();
-  const items = PRODUCTS.filter((p) => wish.includes(p.id));
+  const items = products.filter((p) => wish.includes(p.id));
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 pb-24 pt-32 sm:px-6 lg:px-10">
