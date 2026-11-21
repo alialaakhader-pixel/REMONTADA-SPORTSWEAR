@@ -488,7 +488,7 @@ export function Checkout() {
           <h2 className="micro text-fire">ملخص الطلب</h2>
           <div className="mt-5 space-y-3 text-sm">
             <Row label={`المنتجات (${cart.length})`} value={`${money(subtotal)} ج.م`} />
-            <Row label={`الشحن — ${city.name}`} value={city.name ? `${money(ship)} ج.م` : "تُحدد بعد إعداد الشحن"} tone={ship === 0 ? "neon" : undefined} />
+            <Row label={city.name ? `الشحن — ${city.name}` : "الشحن"} value={city.name ? `${money(ship)} ج.م` : "تُحدد بعد إعداد الشحن"} tone={ship === 0 ? "neon" : undefined} />
             
             
           </div>
