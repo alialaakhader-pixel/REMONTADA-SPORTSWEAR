@@ -337,7 +337,7 @@ export function Price({ p, big }: { p: Product; big?: boolean }) {
         className={`tech tnum font-bold text-paper ${big ? "text-3xl" : "text-lg"}`}
       >
         {money(p.price)}
-        <span className="mr-1 text-[0.62em] font-medium text-mute">ر.س</span>
+        <span className="mr-1 text-[0.62em] font-medium text-mute">ج.م</span>
       </span>
       {p.old && (
         <span className="tech tnum text-[13px] text-mute line-through decoration-fire">
