@@ -68,11 +68,8 @@ export default function ProductPage({ id }: { id: string }) {
   const liked = wish.includes(p.id);
   const activeColor = color ?? p.colors[0].name;
 
-  const shots = [
-    { pos: "center", zoom: 1 },
-    { pos: "left top", zoom: 1.7 },
-    { pos: "right bottom", zoom: 1.7 },
-  ];
+  const galleryImages = p.images?.length ? p.images : [p.img];
+  const shots = galleryImages.map((src, i) => ({ src, pos: "center", zoom: i === 0 ? 1 : 1.1 }));
 
   const handleAdd = () => {
     if (!size && p.type !== "إكسسوارات" && p.sizes.length > 1) {
@@ -112,7 +109,7 @@ export default function ProductPage({ id }: { id: string }) {
                 }`}
               >
                 <img
-                  src={p.img}
+                  src={s.src}
                   alt=""
                   loading="lazy"
                   className="h-full w-full object-cover"
@@ -139,7 +136,7 @@ export default function ProductPage({ id }: { id: string }) {
               initial={{ opacity: 0.3, scale: 1.04 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              src={p.img}
+              src={shots[shot]?.src ?? p.img}
               alt={p.name}
               className="h-full w-full object-cover"
               style={{
