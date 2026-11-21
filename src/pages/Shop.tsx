@@ -23,6 +23,7 @@ function toggle(arr: string[], v: string) {
 
 export default function Shop() {
   const { route, toast, products } = useStore();
+  const availableSports = useMemo(() => { try { const cfg = JSON.parse(localStorage.getItem("remontada:sports") || "{}"); return SPORTS.filter((sport) => cfg[sport] !== false); } catch { return [...SPORTS]; } }, []);
   const qs = route.split("?")[1] ?? "";
   const params = new URLSearchParams(qs);
 
@@ -102,7 +103,7 @@ export default function Shop() {
   const filters = (
     <div className="space-y-8">
       <FilterGroup title="الرياضة">
-        {SPORTS.map((s) => (
+        {availableSports.map((s) => (
           <Check
             key={s}
             label={s}
