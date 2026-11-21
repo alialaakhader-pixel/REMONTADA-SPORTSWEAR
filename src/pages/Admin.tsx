@@ -27,7 +27,7 @@ export default function Admin() {
   const unlock=()=>{ toast("تسجيل الإدارة غير مفعّل بعد", "يجب ربط Supabase Auth وصلاحية مدير قبل فتح لوحة الإدارة."); };
   const saveProduct=()=>{
     if(!draft.name.trim()||!draft.price||!draft.img.trim()){toast("أكمل الاسم والسعر ورابط الصورة");return;}
-    const value={...draft,id:draft.id||("rem-"+Date.now()),features:Array.isArray(draft.features)?draft.features:[]};
+    const value={...draft,id:draft.id||("rem-"+Date.now()),rating:0,reviews:0,sold:0,features:Array.isArray(draft.features)?draft.features:[]};
     setProducts(editing?products.map(p=>p.id===value.id?value:p):[value,...products]);
     setEditing(null);setDraft(blank);toast("تم حفظ المنتج","تم تحديث بيانات المنتجات على هذا المتصفح");
   };
@@ -43,13 +43,10 @@ export default function Admin() {
           <label className="sm:col-span-2"><span className={label}>اسم المنتج</span><input className={input} value={draft.name} onChange={e=>setDraft({...draft,name:e.target.value})}/></label>
           <label><span className={label}>السعر الحالي</span><input className={input} type="number" value={draft.price||""} onChange={e=>setDraft({...draft,price:Number(e.target.value)})}/></label>
           <label><span className={label}>السعر القديم</span><input className={input} type="number" value={draft.old||""} onChange={e=>setDraft({...draft,old:Number(e.target.value)||undefined})}/></label>
-          <label><span className={label}>التقييم (من 5)</span><input className={input} type="number" min="0" max="5" step="0.1" value={draft.rating} onChange={e=>setDraft({...draft,rating:Math.max(0,Math.min(5,Number(e.target.value)))})}/></label>
-          <label><span className={label}>عدد التقييمات</span><input className={input} type="number" min="0" value={draft.reviews} onChange={e=>setDraft({...draft,reviews:Math.max(0,Number(e.target.value))})}/></label>
-          <label><span className={label}>عدد المبيعات</span><input className={input} type="number" min="0" value={draft.sold} onChange={e=>setDraft({...draft,sold:Math.max(0,Number(e.target.value))})}/></label>
           <label><span className={label}>الرياضة</span><select className={input} value={draft.sport} onChange={e=>setDraft({...draft,sport:e.target.value})}>{SPORTS.map(s=><option key={s}>{s}</option>)}</select></label>
           <label><span className={label}>النوع</span><select className={input} value={draft.gender} onChange={e=>setDraft({...draft,gender:e.target.value as Product["gender"]})}>{["رجالي","نسائي","أطفال"].map(s=><option key={s}>{s}</option>)}</select></label>
           <label><span className={label}>الفئة</span><select className={input} value={draft.type} onChange={e=>setDraft({...draft,type:e.target.value})}>{["ملابس","أحذية","إكسسوارات","معدات"].map(s=><option key={s}>{s}</option>)}</select></label>
-          <label><span className={label}>شارة المنتج</span><select className={input} value={draft.badge||""} onChange={e=>setDraft({...draft,badge:(e.target.value||undefined) as Product["badge"]})}><option value="">بدون</option>{["جديد","الأكثر مبيعاً","خصم 30%","محدود الكمية"].map(s=><option key={s}>{s}</option>)}</select></label>
+          <label><span className={label}>شارة المنتج</span><select className={input} value={draft.badge||""} onChange={e=>setDraft({...draft,badge:(e.target.value||undefined) as Product["badge"]})}><option value="">بدون</option>{["جديد","محدود الكمية"].map(s=><option key={s}>{s}</option>)}</select></label>
           <label className="sm:col-span-2"><span className={label}>روابط الصور (افصل بينها بفاصلة)</span><input className={input} value={(draft.images?.length ? draft.images : draft.img ? [draft.img] : []).join(", ")} onChange={e=>{const images=e.target.value.split(",").map(x=>x.trim()).filter(Boolean);setDraft({...draft,img:images[0]||"",images})}} placeholder="https://image-1.jpg, https://image-2.jpg"/></label>
           {(draft.images?.length ? draft.images : draft.img ? [draft.img] : []).map((src,i)=><img key={src+i} src={src} alt={`معاينة ${i+1}`} className="h-32 w-full bg-ink object-contain sm:col-span-1"/>)}
           <label className="sm:col-span-2"><span className={label}>المميزات (كل ميزة في سطر)</span><textarea className={input} rows={3} value={draft.features.join("\n")} onChange={e=>setDraft({...draft,features:e.target.value.split("\n").filter(Boolean)})}/></label>
