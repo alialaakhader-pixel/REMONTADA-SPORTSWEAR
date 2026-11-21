@@ -12,7 +12,6 @@ import {
   Star,
 } from "lucide-react";
 import { useStore, findProduct } from "../lib/store";
-import { PRODUCTS } from "../lib/data";
 import { Btn, Price, Stars, Badge, ProductCard, Micro, Reveal } from "../components/ui";
 
 const SIZE_TABLE = [
