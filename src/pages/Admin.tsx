@@ -1,0 +1,64 @@
+import { useMemo, useState } from "react";
+import { LockKeyhole, Plus, Pencil, Trash2, Save, LogOut, Package, LayoutDashboard, Tags, Settings } from "lucide-react";
+import type { Product } from "../lib/data";
+import { SPORTS } from "../lib/data";
+import { useStore } from "../lib/store";
+
+const PASS_KEY = "remontada:admin-unlocked";
+const input = "w-full border border-hair bg-ink px-3 py-3 text-sm text-paper outline-none focus:border-neon";
+const label = "mb-2 block text-xs font-bold text-mute";
+
+export default function Admin() {
+  const { products, setProducts, toast, go } = useStore();
+  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem(PASS_KEY) === "1");
+  const [password, setPassword] = useState("");
+  const [tab, setTab] = useState<"products"|"sports"|"home"|"settings">("products");
+  const [editing, setEditing] = useState<Product | null>(null);
+  const [query, setQuery] = useState("");
+  const blank: Product = { id:"", name:"", sub:"", brand:"REMONTADA", sport:SPORTS[0], gender:"رجالي", type:"ملابس", price:0, rating:5, reviews:0, img:"", colors:[{name:"أسود",hex:"#08090B"}], sizes:["S","M","L","XL"], sold:0, desc:"", features:[] };
+  const [draft, setDraft] = useState<Product>(blank);
+  const filtered = useMemo(()=>products.filter(p=>p.name.includes(query)||p.sport.includes(query)),[products,query]);
+  const [sportVisible,setSportVisible]=useState<Record<string,boolean>>(()=>{try{return JSON.parse(localStorage.getItem("remontada:sports")||"{}")}catch{return {}}});
+  const [hero,setHero]=useState(()=>localStorage.getItem("remontada:hero-title")||"العودة تبدأ من هنا");
+  const [whatsapp,setWhatsapp]=useState(()=>localStorage.getItem("remontada:whatsapp")||"");
+  const [shipping,setShipping]=useState(()=>localStorage.getItem("remontada:shipping")||"");
+
+  const unlock=()=>{ if(password==="REMONTADA-ADMIN-2026"){sessionStorage.setItem(PASS_KEY,"1");setUnlocked(true);} else toast("كلمة المرور غير صحيحة"); };
+  const saveProduct=()=>{
+    if(!draft.name.trim()||!draft.price||!draft.img.trim()){toast("أكمل الاسم والسعر ورابط الصورة");return;}
+    const value={...draft,id:draft.id||("rem-"+Date.now()),features:Array.isArray(draft.features)?draft.features:[]};
+    setProducts(editing?products.map(p=>p.id===value.id?value:p):[value,...products]);
+    setEditing(null);setDraft(blank);toast("تم حفظ المنتج","تم تحديث بيانات المنتجات على هذا المتصفح");
+  };
+  const edit=(p:Product)=>{setEditing(p);setDraft({...p,features:[...p.features],colors:[...p.colors],sizes:[...p.sizes]});window.scrollTo({top:0,behavior:"smooth"});};
+  if(!unlocked)return <div dir="rtl" className="mx-auto grid min-h-[80vh] max-w-md place-items-center px-5 pt-28"><div className="w-full border border-hair bg-panel p-7"><LockKeyhole className="mb-5 text-fire" size={30}/><p className="micro text-fire">REMONTADA / CONTROL</p><h1 className="mt-3 text-3xl font-black">دخول الإدارة</h1><p className="mt-2 text-sm leading-7 text-mute">بوابة تجريبية محلية. غيّر كلمة المرور في الكود قبل الاستخدام الفعلي؛ هذه الحماية ليست بديلاً عن تسجيل دخول آمن على الخادم.</p><input className={input+" mt-5"} type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="كلمة مرور الإدارة" onKeyDown={e=>e.key==="Enter"&&unlock()}/><button onClick={unlock} className="mt-3 w-full bg-fire py-3 font-bold">دخول لوحة التحكم</button><button onClick={()=>go("/")} className="mt-4 w-full text-sm text-mute">العودة للمتجر</button></div></div>;
+  return <div dir="rtl" className="mx-auto min-h-screen max-w-[1500px] px-4 pb-20 pt-28 sm:px-7">
+    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hair pb-6"><div><p className="micro text-fire">REMONTADA / ADMIN</p><h1 className="mt-2 text-3xl font-black">مركز التحكم</h1><p className="mt-1 text-sm text-mute">إدارة المتجر ومحتواه</p></div><div className="flex gap-2"><button onClick={()=>go("/")} className="border border-hair px-4 py-2 text-sm">عرض المتجر</button><button onClick={()=>{sessionStorage.removeItem(PASS_KEY);setUnlocked(false)}} className="flex items-center gap-2 border border-hair px-4 py-2 text-sm"><LogOut size={15}/> خروج</button></div></div>
+    <div className="my-6 grid grid-cols-2 gap-3 md:grid-cols-4">{[{n:products.length,l:"إجمالي المنتجات",i:Package},{n:products.filter(p=>p.old).length,l:"منتجات عليها خصم",i:Tags},{n:new Set(products.map(p=>p.sport)).size,l:"رياضات مفعّلة",i:LayoutDashboard},{n:"محلي",l:"مصدر البيانات",i:Settings}].map(x=><div className="border border-hair bg-panel p-4" key={x.l}><x.i className="mb-3 text-fire" size={18}/><div className="text-2xl font-black">{x.n}</div><div className="text-xs text-mute">{x.l}</div></div>)}</div>
+    <nav className="mb-6 flex flex-wrap gap-2">{([{id:"products",t:"المنتجات"},{id:"sports",t:"الأقسام والرياضات"},{id:"home",t:"الرئيسية"},{id:"settings",t:"إعدادات المتجر"}] as const).map(x=><button key={x.id} onClick={()=>setTab(x.id)} className={"px-4 py-3 text-sm font-bold "+(tab===x.id?"bg-fire text-white":"border border-hair bg-panel text-mute")}>{x.t}</button>)}</nav>
+    {tab==="products"&&<div className="grid gap-6 xl:grid-cols-[minmax(320px,.85fr)_1.15fr]">
+      <section className="h-fit border border-hair bg-panel p-5"><div className="mb-5 flex items-center justify-between"><h2 className="text-xl font-black">{editing?"تعديل منتج":"إضافة منتج"}</h2><Plus className="text-fire"/></div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="sm:col-span-2"><span className={label}>اسم المنتج</span><input className={input} value={draft.name} onChange={e=>setDraft({...draft,name:e.target.value})}/></label>
+          <label><span className={label}>السعر الحالي</span><input className={input} type="number" value={draft.price||""} onChange={e=>setDraft({...draft,price:Number(e.target.value)})}/></label>
+          <label><span className={label}>السعر القديم</span><input className={input} type="number" value={draft.old||""} onChange={e=>setDraft({...draft,old:Number(e.target.value)||undefined})}/></label>
+          <label><span className={label}>الرياضة</span><select className={input} value={draft.sport} onChange={e=>setDraft({...draft,sport:e.target.value})}>{SPORTS.map(s=><option key={s}>{s}</option>)}</select></label>
+          <label><span className={label}>النوع</span><select className={input} value={draft.gender} onChange={e=>setDraft({...draft,gender:e.target.value as Product["gender"]})}>{["رجالي","نسائي","أطفال"].map(s=><option key={s}>{s}</option>)}</select></label>
+          <label><span className={label}>الفئة</span><select className={input} value={draft.type} onChange={e=>setDraft({...draft,type:e.target.value})}>{["ملابس","أحذية","إكسسوارات","معدات"].map(s=><option key={s}>{s}</option>)}</select></label>
+          <label><span className={label}>شارة المنتج</span><select className={input} value={draft.badge||""} onChange={e=>setDraft({...draft,badge:(e.target.value||undefined) as Product["badge"]})}><option value="">بدون</option>{["جديد","الأكثر مبيعاً","خصم 30%","محدود الكمية"].map(s=><option key={s}>{s}</option>)}</select></label>
+          <label className="sm:col-span-2"><span className={label}>رابط الصورة (يمكن إضافة أكثر من رابط بفاصلة)</span><input className={input} value={draft.img} onChange={e=>setDraft({...draft,img:e.target.value.split(",")[0].trim()})} placeholder="https://..."/></label>
+          {draft.img&&<img src={draft.img} alt="معاينة المنتج" className="h-40 w-full bg-ink object-contain sm:col-span-2"/>}
+          <label className="sm:col-span-2"><span className={label}>الوصف</span><textarea className={input} rows={3} value={draft.desc} onChange={e=>setDraft({...draft,desc:e.target.value})}/></label>
+          <label className="sm:col-span-2"><span className={label}>المميزات (كل ميزة في سطر)</span><textarea className={input} rows={3} value={draft.features.join("\n")} onChange={e=>setDraft({...draft,features:e.target.value.split("\n").filter(Boolean)})}/></label>
+          <label className="sm:col-span-2"><span className={label}>المقاسات (افصل بينها بفاصلة)</span><input className={input} value={draft.sizes.join(", ")} onChange={e=>setDraft({...draft,sizes:e.target.value.split(",").map(x=>x.trim()).filter(Boolean)})}/></label>
+          <label className="sm:col-span-2"><span className={label}>الألوان بصيغة الاسم:#HEX، وافصل بفاصلة</span><input className={input} value={draft.colors.map(c=>c.name+":"+c.hex).join(", ")} onChange={e=>setDraft({...draft,colors:e.target.value.split(",").map(x=>{const [name,hex]=x.split(":");return {name:name?.trim()||"",hex:hex?.trim()||"#000000"}}).filter(c=>c.name)})}/></label>
+        </div>
+        <div className="mt-5 flex gap-2"><button onClick={saveProduct} className="flex flex-1 items-center justify-center gap-2 bg-fire py-3 font-bold"><Save size={16}/> حفظ المنتج</button>{editing&&<button onClick={()=>{setEditing(null);setDraft(blank)}} className="border border-hair px-4">إلغاء</button>}</div>
+      </section>
+      <section className="border border-hair bg-panel p-5"><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black">كتالوج المنتجات ({filtered.length})</h2><input className={input+" max-w-xs"} value={query} onChange={e=>setQuery(e.target.value)} placeholder="ابحث عن منتج أو رياضة"/></div><div className="space-y-2">{filtered.map(p=><div key={p.id} className="flex items-center gap-3 border border-hair bg-ink p-3"><img src={p.img} alt="" className="h-16 w-16 object-contain"/><div className="min-w-0 flex-1"><div className="truncate font-bold">{p.name}</div><div className="text-xs text-mute">{p.sport} · {p.price} · {p.gender}</div></div><button aria-label="تعديل" onClick={()=>edit(p)} className="p-2 text-neon"><Pencil size={17}/></button><button aria-label="حذف" onClick={()=>{if(confirm("حذف المنتج؟")){setProducts(products.filter(x=>x.id!==p.id));toast("تم حذف المنتج")}}} className="p-2 text-fire"><Trash2 size={17}/></button></div>)}</div></section>
+    </div>}
+    {tab==="sports"&&<section className="border border-hair bg-panel p-5"><h2 className="mb-4 text-xl font-black">إظهار وإخفاء الرياضات</h2><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{SPORTS.map(s=><label key={s} className="flex items-center justify-between border border-hair bg-ink p-4"><span>{s}</span><input type="checkbox" checked={sportVisible[s]!==false} onChange={e=>{const n={...sportVisible,[s]:e.target.checked};setSportVisible(n);localStorage.setItem("remontada:sports",JSON.stringify(n))}}/></label>)}</div><p className="mt-4 text-xs text-mute">إعدادات الظهور محفوظة محلياً، وربطها بفلترة المتجر خطوة تكامل تالية.</p></section>}
+    {tab==="home"&&<section className="max-w-2xl border border-hair bg-panel p-5"><h2 className="mb-4 text-xl font-black">محتوى الصفحة الرئيسية</h2><label className="mb-4 block"><span className={label}>العنوان الرئيسي</span><input className={input} value={hero} onChange={e=>setHero(e.target.value)}/></label><button onClick={()=>{localStorage.setItem("remontada:hero-title",hero);toast("تم حفظ العنوان")}} className="bg-fire px-5 py-3 font-bold">حفظ التعديلات</button></section>}
+    {tab==="settings"&&<section className="max-w-2xl border border-hair bg-panel p-5"><h2 className="mb-4 text-xl font-black">بيانات التواصل والشحن</h2><label className="mb-4 block"><span className={label}>رقم واتساب (مع مفتاح الدولة)</span><input className={input} value={whatsapp} onChange={e=>setWhatsapp(e.target.value)}/></label><label className="mb-4 block"><span className={label}>سياسة / ملاحظة الشحن</span><textarea className={input} rows={3} value={shipping} onChange={e=>setShipping(e.target.value)}/></label><button onClick={()=>{localStorage.setItem("remontada:whatsapp",whatsapp);localStorage.setItem("remontada:shipping",shipping);toast("تم حفظ الإعدادات")}} className="bg-fire px-5 py-3 font-bold">حفظ الإعدادات</button></section>}
+  </div>;
+}
