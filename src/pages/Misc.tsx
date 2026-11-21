@@ -58,25 +58,7 @@ export function About() {
         </div>
       </section>
 
-      {/* stats band */}
-      <section className="mx-auto mt-24 max-w-[1440px] px-4 sm:px-6 lg:px-10">
-        <div className="grid gap-px border border-hair bg-hair sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            ["2021", "سنة التأسيس"],
-            ["128K", "عميل في المملكة"],
-            ["4.9", "متوسط التقييم"],
-            ["7", "رياضات مدعومة"],
-          ].map(([n, l], i) => (
-            <Reveal key={l} delay={i * 0.07}>
-              <div className="bg-[#0A0B0E] px-6 py-9">
-                <div className="tech tnum text-4xl font-bold text-paper">{n}</div>
-                <div className="mt-2 text-[13px] text-mute">{l}</div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
+      {/* Store metrics are hidden until real business data is connected. */}
       {/* story */}
       <section className="mx-auto max-w-[1440px] px-4 py-24 sm:px-6 lg:px-10">
         <div className="grid gap-12 lg:grid-cols-3">
@@ -377,13 +359,13 @@ export function Contact() {
               <rect x="300" y="240" width="90" height="55" />
             </g>
             <g transform="translate(400,150)">
-              <circle r="34" fill="#E6392B" opacity="0.14" className="beacon" />
-              <circle r="7" fill="#E6392B" />
-              <circle r="13" fill="none" stroke="#E6392B" strokeWidth="2" />
-              <line y1="-30" y2="-16" stroke="#E6392B" strokeWidth="2" />
-              <line y1="16" y2="30" stroke="#E6392B" strokeWidth="2" />
-              <line x1="-30" x2="-16" stroke="#E6392B" strokeWidth="2" />
-              <line x1="16" x2="30" stroke="#E6392B" strokeWidth="2" />
+              <circle r="34" fill="#00B4FF" opacity="0.14" className="beacon" />
+              <circle r="7" fill="#00B4FF" />
+              <circle r="13" fill="none" stroke="#00B4FF" strokeWidth="2" />
+              <line y1="-30" y2="-16" stroke="#00B4FF" strokeWidth="2" />
+              <line y1="16" y2="30" stroke="#00B4FF" strokeWidth="2" />
+              <line x1="-30" x2="-16" stroke="#00B4FF" strokeWidth="2" />
+              <line x1="16" x2="30" stroke="#00B4FF" strokeWidth="2" />
             </g>
             <text x="430" y="146" fill="#F5F6F7" fontSize="13" fontFamily="Cairo, sans-serif">
               مقر REMONTADA — الملقا
@@ -627,7 +609,7 @@ export function Account() {
               />
               {mode === "register" && (
                 <label className="flex items-start gap-3 text-[13px] text-mute">
-                  <input type="checkbox" defaultChecked className="mt-1 accent-[#E6392B]" />
+                  <input type="checkbox" defaultChecked className="mt-1 accent-[#00B4FF]" />
                   أريد الاشتراك في نشرة REMONTADA والعروض الأسبوعية.
                 </label>
               )}
