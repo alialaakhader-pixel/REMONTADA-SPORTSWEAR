@@ -218,4 +218,12 @@ export function useStore() {
   return c;
 }
 
-export const findProduct = (id: string) => {\n  try {\n    const raw = window.localStorage.getItem(PRODUCTS_KEY);\n    const products: Product[] = raw ? JSON.parse(raw) : PRODUCTS;\n    return products.find((p) => p.id === id);\n  } catch {\n    return PRODUCTS.find((p) => p.id === id);\n  }\n};
+export const findProduct = (id: string) => {
+  try {
+    const raw = window.localStorage.getItem(PRODUCTS_KEY);
+    const products: Product[] = raw ? JSON.parse(raw) : PRODUCTS;
+    return products.find((p) => p.id === id);
+  } catch {
+    return PRODUCTS.find((p) => p.id === id);
+  }
+};
