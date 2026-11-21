@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { SlidersHorizontal, X, LayoutGrid, List, ArrowLeft } from "lucide-react";
 import { useStore } from "../lib/store";
-import { PRODUCTS, SPORTS, BRANDS, type Product } from "../lib/data";
+import { SPORTS, BRANDS, type Product } from "../lib/data";
 import { Btn, ProductCard, Micro, Stars } from "../components/ui";
 
 const GENDERS = ["رجالي", "نسائي", "أطفال"];
