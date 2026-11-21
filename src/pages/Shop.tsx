@@ -187,7 +187,7 @@ export default function Shop() {
         </div>
       </FilterGroup>
 
-      <FilterGroup title={`السعر — حتى ${maxPrice} ر.س`}>
+      <FilterGroup title={`السعر — حتى ${maxPrice} ج.م`}>
         <input
           type="range"
           min={100}
@@ -199,8 +199,8 @@ export default function Shop() {
           aria-label="أعلى سعر"
         />
         <div className="tech tnum mt-1 flex justify-between text-[11px] text-mute">
-          <span>100 ر.س</span>
-          <span>900 ر.س</span>
+          <span>100 ج.م</span>
+          <span>900 ج.م</span>
         </div>
       </FilterGroup>
 
