@@ -12,14 +12,13 @@ function useTotals() {
   const [cities] = useState(() => { try { const saved = JSON.parse(localStorage.getItem("remontada:cities") || "null"); return Array.isArray(saved) && saved.length ? saved : CITIES; } catch { return CITIES; } });
   const [city, setCity] = useState(() => cities[0] ?? { name: "", ship: 0, eta: "" });
   const ship = city.name ? city.ship : 0;
-  const tax = 0;
-  return { subtotal, cart, city, cities, setCity, ship, tax, total: subtotal + ship };
+  return { subtotal, cart, city, cities, setCity, ship, total: subtotal + ship };
 }
 
 /* ================= CART ================= */
 export function Cart() {
   const { cart, setQty, remove, go, subtotal } = useStore();
-  const { ship, tax, total, city, cities } = useTotals();
+  const { ship, total, city, cities } = useTotals();
 
   if (cart.length === 0)
     return (
@@ -29,7 +28,7 @@ export function Cart() {
             <Package size={54} className="mx-auto text-hair" />
             <h1 className="display mt-6 text-4xl text-paper">سلتك فارغة</h1>
             <p className="mt-4 leading-relaxed text-mute">
-              لم تضف أي قطعة بعد. ابدأ من أحدث الوصولات — هناك عرض خصم 30% هذا الأسبوع.
+              لم تضف أي منتجات بعد. تصفّح الكتالوج عندما يضيف المتجر منتجاته.
             </p>
             <Btn className="mt-7" size="lg" onClick={() => go("/shop")}>
               تصفح المتجر <ArrowLeft size={17} />
@@ -148,7 +147,7 @@ export function Cart() {
 
           <div className="mt-5 flex items-center justify-center gap-4 text-[11.5px] text-mute">
             <span className="flex items-center gap-1.5"><ShieldCheck size={13} className="text-neon" /> دفع آمن</span>
-            <span className="flex items-center gap-1.5"><Truck size={13} className="text-neon" /> توصيل لكل المملكة</span>
+            <span className="flex items-center gap-1.5"><Truck size={13} className="text-neon" /> توصيل حسب المحافظة</span>
           </div>
         </aside>
       </div>
@@ -174,8 +173,8 @@ const PAYMENTS = [
 ];
 
 export function Checkout() {
-  const { cart, go, clear, toast } = useStore();
-  const { subtotal, city, setCity, ship, tax, total } = useTotals();
+  const { cart, go, toast } = useStore();
+  const { subtotal, city, setCity, ship, total } = useTotals();
   const [step, setStep] = useState(0);
   const [pay, setPay] = useState("cod");
   const [done] = useState<string | null>(null);
@@ -323,7 +322,7 @@ export function Checkout() {
                       >
                         {cities.map((c) => (
                           <option key={c.name} value={c.name}>
-                            {c.name} — {c.ship === 0 ? "شحن مجاني" : `${c.ship} ج.م`}
+                            {c.name} — ${c.ship} ج.م
                           </option>
                         ))}
                       </select>
@@ -461,7 +460,7 @@ export function Checkout() {
                             </span>
                           </span>
                           <span className="tech tnum text-sm font-bold text-paper">
-                            {money(p.price * l.qty)} ر.س
+                            {money(p.price * l.qty)} ج.م
                           </span>
                         </div>
                       );
@@ -480,7 +479,7 @@ export function Checkout() {
               <ArrowRight size={16} /> {step === 0 ? "العودة للسلة" : "رجوع"}
             </button>
             <Btn size="lg" onClick={next}>
-              {step === 2 ? `ادفع ${money(grand)} ر.س` : "متابعة"} <ArrowLeft size={17} />
+              {step === 2 ? `ادفع ${money(grand)} ج.م` : "متابعة"} <ArrowLeft size={17} />
             </Btn>
           </div>
         </div>
@@ -489,15 +488,15 @@ export function Checkout() {
         <aside className="h-fit border border-hair bg-[#0A0B0E] p-6 lg:sticky lg:top-28">
           <h2 className="micro text-fire">ملخص الطلب</h2>
           <div className="mt-5 space-y-3 text-sm">
-            <Row label={`المنتجات (${cart.length})`} value={`${money(subtotal)} ر.س`} />
-            <Row label={`الشحن — ${city.name}`} value={ship === 0 ? "مجاني" : `${money(ship)} ر.س`} tone={ship === 0 ? "neon" : undefined} />
-            <Row label="ضريبة 15%" value={`${money(tax)} ر.س`} />
-            {codFee > 0 && <Row label="رسوم الدفع عند الاستلام" value={`${money(codFee)} ر.س`} />}
+            <Row label={`المنتجات (${cart.length})`} value={`${money(subtotal)} ج.م`} />
+            <Row label={`الشحن — ${city.name}`} value={city.name ? `${money(ship)} ج.م` : "تُحدد بعد إعداد الشحن"} tone={ship === 0 ? "neon" : undefined} />
+            
+            
           </div>
           <div className="mt-5 flex items-baseline justify-between border-t border-hair pt-5">
             <span className="text-sm font-bold text-mute">الإجمالي</span>
             <span className="tech tnum text-3xl font-bold text-paper">
-              {money(grand)}<span className="mr-1 text-sm font-medium text-mute">ر.س</span>
+              {money(grand)}<span className="mr-1 text-sm font-medium text-mute">ج.م</span>
             </span>
           </div>
           <div className="mt-5 space-y-2.5 border-t border-hair pt-5 text-[12.5px] text-mute">
