@@ -32,12 +32,12 @@ const STATS = [
 ];
 
 export default function Home() {
-  const { go } = useStore();
+  const { go, products } = useStore();
   const [tab, setTab] = useState<"new" | "offers">("new");
   const [faq, setFaq] = useState<number | null>(0);
 
-  const newest = PRODUCTS.filter((p) => p.badge === "جديد" || p.badge === "الأكثر مبيعاً").slice(0, 4);
-  const offers = PRODUCTS.filter((p) => p.old).slice(0, 4);
+  const newest = products.filter((p) => p.badge === "جديد" || p.badge === "الأكثر مبيعاً").slice(0, 4);
+  const offers = products.filter((p) => p.old).slice(0, 4);
   const shown = tab === "new" ? newest : offers;
 
   return (
