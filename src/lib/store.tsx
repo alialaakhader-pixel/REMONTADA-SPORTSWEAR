@@ -57,7 +57,7 @@ function readCart(): Line[] {
     return parsed.flatMap((item): Line[] => {
       if (!item || typeof item !== "object") return [];
       const line = item as Partial<Line>;
-      const product = PRODUCTS.find((p) => p.id === line.id);
+      const product = readProducts().find((p) => p.id === line.id);
       if (!product) return [];
       const size = typeof line.size === "string" && product.sizes.includes(line.size)
         ? line.size
@@ -79,7 +79,7 @@ function readWishlist(): string[] {
     const parsed: unknown = raw ? JSON.parse(raw) : [];
     if (!Array.isArray(parsed)) return [];
     return [...new Set(parsed.filter((id): id is string =>
-      typeof id === "string" && PRODUCTS.some((p) => p.id === id)
+      typeof id === "string" && readProducts().some((p) => p.id === id)
     ))];
   } catch {
     return [];
@@ -89,7 +89,7 @@ function readWishlist(): string[] {
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [products, setProductsState] = useState<Product[]>(readProducts);
   const [route, setRoute] = useState<string>(
-    () => window.location.hash.replace(/^#/, "") || "/"
+    () => window.location.hash.replace(/^#/, "") || (window.location.pathname !== "/" ? window.location.pathname : "/")
   );
   const [cart, setCart] = useState<Line[]>(readCart);
   const [wish, setWish] = useState<string[]>(readWishlist);
@@ -183,7 +183,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const subtotal = useMemo(
     () =>
       cart.reduce((a, l) => {
-        const p = PRODUCTS.find((x) => x.id === l.id);
+        const p = products.find((x) => x.id === l.id);
         return a + (p ? p.price * l.qty : 0);
       }, 0),
     [cart]
