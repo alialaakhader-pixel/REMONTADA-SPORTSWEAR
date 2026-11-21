@@ -79,7 +79,7 @@ export default function Home() {
           >
             <div className="flex items-center gap-4">
               <span className="beacon h-2.5 w-2.5 rotate-45 bg-fire" />
-              <span className="micro text-fire">موسم 2026 — الإصدار الثاني</span>
+              <span className="micro text-fire">REMONTADA SPORTSWEAR</span>
             </div>
 
             <h1 className="display mt-6 text-[clamp(2.9rem,8.4vw,6.6rem)] text-paper">
@@ -259,16 +259,8 @@ export default function Home() {
               <span className="text-fire">نبيع فرقاً.</span>
             </h2>
             <p className="mt-6 max-w-md text-[15px] leading-[1.95] text-mute">
-              كل قطعة تمر بأربع نقاط فحص قبل أن تصل إليك. إن لم تُقنعك في أول تمرين،
-              نستبدلها — بلا أسئلة.
+              تجربة تسوق رياضية بهوية واضحة، وكتالوج يُدار مباشرة من لوحة المتجر.
             </p>
-            <div className="mt-8 inline-flex items-center gap-3 border border-hair px-5 py-3">
-              <Zap size={16} className="text-gold" />
-              <span className="text-[13px] text-mute">
-                معدّل رضا العملاء هذا الشهر:{" "}
-                <span className="tech tnum font-bold text-paper">97.4%</span>
-              </span>
-            </div>
           </div>
 
           <ul className="divide-y divide-hair border-y border-hair">
@@ -280,18 +272,18 @@ export default function Home() {
               },
               {
                 I: Truck,
-                t: "توصيل سريع لكل المملكة",
-                d: "الرياض خلال 24 ساعة، وباقي المدن خلال 48–72 ساعة مع تتبّع لحظي.",
+                t: "توصيل مدفوع حسب المحافظة",
+                d: "تُعرض تكلفة التوصيل والمدة المتاحة لكل محافظة قبل تأكيد الطلب.",
               },
               {
                 I: RotateCcw,
                 t: "إرجاع واستبدال بلا تعقيد",
-                d: "14 يوماً لإرجاع أي قطعة، واستبدال المقاس مجاناً في أول طلب.",
+                d: "تُعرض شروط الاستبدال والاسترجاع بوضوح قبل إتمام الطلب.",
               },
               {
                 I: Tag,
                 t: "أسعار تنافسية وعدسة خصم",
-                d: "عروض أسبوعية حقيقية لا تُلغى بعد يوم، ونقاط تُجمع مع كل عملية شراء.",
+                d: "تظهر العروض والنقاط فقط بعد تفعيلها من لوحة إدارة المتجر.",
               },
             ].map((f, i) => (
               <Reveal key={f.t} delay={i * 0.08}>
@@ -427,8 +419,7 @@ export default function Home() {
               <span className="text-fire glow-fire">العودة قرار.</span>
             </h2>
             <p className="mt-6 max-w-lg text-[16px] leading-[1.9] text-paper/75">
-              اطلب اليوم واستلم خلال 24 ساعة داخل الرياض. سياسة إرجاع واضحة، واستبدال مقاس
-              بدون رسوم في أول طلب.
+              اكتشف الكتالوج الرياضي. تظهر تكلفة التوصيل والسياسات المعتمدة بوضوح قبل تأكيد أي طلب.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Btn size="lg" onClick={() => go("/shop")}>
@@ -439,7 +430,7 @@ export default function Home() {
               </Btn>
             </div>
             <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-[13px] text-mute">
-              {["توصيل مدفوع حسب المحافظة", "ضمان أصلي 12 شهراً", "دفع عند الاستلام"].map((x) => (
+              {["توصيل مدفوع حسب المحافظة", "سياسات واضحة قبل الطلب", "خيارات دفع بعد التفعيل"].map((x) => (
                 <span key={x} className="flex items-center gap-2">
                   <Check size={14} className="text-fire" /> {x}
                 </span>
@@ -461,7 +452,7 @@ export default function Home() {
                 >
                   اكتشف مجموعات REMONTADA
                   <span className="h-2 w-2 rotate-45 bg-ink/70" />
-                  {money(400)} ر.س للشحن المجاني
+                  توصيل مدفوع حسب المحافظة
                   <span className="h-2 w-2 rotate-45 bg-ink/70" />
                 </span>
               ))}
