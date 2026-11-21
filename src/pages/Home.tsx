@@ -24,13 +24,6 @@ import {
   Stars,
 } from "../components/ui";
 
-const STATS = [
-  { n: "4.9", l: "تقييم العملاء", s: "/5" },
-  { n: "128", l: "عميل نشط", s: "ألف" },
-  { n: "24", l: "ساعة للتوصيل", s: "س" },
-  { n: "12", l: "شهر ضمان", s: "شهر" },
-];
-
 export default function Home() {
   const { go, products } = useStore();
   const [tab, setTab] = useState<"new" | "offers">("new");
@@ -114,17 +107,6 @@ export default function Home() {
               </Btn>
             </div>
 
-            <div className="mt-12 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-6 border-t border-hair pt-7 sm:grid-cols-4">
-              {STATS.map((s) => (
-                <div key={s.l}>
-                  <div className="tech tnum text-3xl font-bold text-paper">
-                    {s.n}
-                    <span className="mr-1 text-sm font-medium text-fire">{s.s}</span>
-                  </div>
-                  <div className="mt-1 text-[12px] text-mute">{s.l}</div>
-                </div>
-              ))}
-            </div>
           </motion.div>
         </div>
 
@@ -147,30 +129,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============ SOCIAL PROOF ============ */}
-      <section className="border-y border-hair bg-panel/70">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-px bg-hair md:grid-cols-4">
-          {[
-            ["شحن مجاني", "فوق 400 ر.س"],
-            ["إرجاع مجاني", "خلال 14 يوماً"],
-            ["ضمان أصلي", "12 شهراً"],
-            ["دفع آمن", "مدى · أبل باي"],
-          ].map(([a, b], i) => (
-            <Reveal key={a} delay={i * 0.07}>
-              <div className="flex h-full items-center gap-3 bg-[#0A0B0E] px-5 py-5">
-                <span className="grid h-9 w-9 shrink-0 place-items-center border border-fire/40 text-fire">
-                  <Check size={15} />
-                </span>
-                <span>
-                  <span className="block text-[14px] font-bold text-paper">{a}</span>
-                  <span className="block text-[12px] text-mute">{b}</span>
-                </span>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
+      {/* Verified store benefits will be configured from the admin dashboard. */}
       {/* ============ FEATURED COLLECTIONS ============ */}
       <section className="mx-auto max-w-[1440px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
         <SectionHead
@@ -194,19 +153,19 @@ export default function Home() {
           {[
             {
               t: "كرة القدم",
-              s: "18 قطعة",
+              s: "اكتشف المجموعة",
               img: IMG.football,
               d: "أطقم مبارات، سترات تدريب، وأحذية عشب.",
             },
             {
               t: "الجري",
-              s: "24 قطعة",
+              s: "اكتشف المجموعة",
               img: IMG.running,
               d: "أحذية طريق، طبقات ليلية، وقطع عاكسة.",
             },
             {
               t: "الجيم",
-              s: "31 قطعة",
+              s: "اكتشف المجموعة",
               img: IMG.gym,
               d: "ملابس حديد، قفازات، ومعدات صلبة.",
             },
@@ -319,7 +278,7 @@ export default function Home() {
               {
                 I: ShieldCheck,
                 t: "جودة عالية وضمان أصلي",
-                d: "قطع موثّقة من موزّعين رسميين مع ضمان 12 شهراً على عيوب التصنيع.",
+                d: "قطع موثّقة من موزّعين رسميين مع ضمان حسب سياسة المتجر على عيوب التصنيع.",
               },
               {
                 I: Truck,
@@ -382,94 +341,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============ CLUB PRICING ============ */}
-      <section className="mx-auto max-w-[1440px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
-        <SectionHead
-          kicker="عضوية REMONTADA CLUB"
-          title={
-            <>
-              اختر مستوى
-              <span className="text-gold"> انطلاقيك</span>
-            </>
-          }
-          sub="ثلاث عضويات، بلا عقود طويلة. ألغِ في أي وقت من حسابك."
-        />
-        <div className="grid gap-5 lg:grid-cols-3">
-          {CLUB.map((c, i) => (
-            <Reveal key={c.name} delay={i * 0.09} className="h-full">
-              <div
-                className={`relative flex h-full flex-col border p-7 transition-all duration-[400ms] ${
-                  c.featured
-                    ? "border-fire bg-gradient-to-b from-fire/[0.12] to-transparent shadow-[0_30px_80px_-40px_rgba(0,180,255,.7)] lg:-translate-y-4"
-                    : "border-hair bg-panel hover:border-neon/50"
-                }`}
-              >
-                {c.featured && (
-                  <span className="tech absolute -top-3 right-7 bg-fire px-3 py-1 text-[11px] font-bold tracking-widest text-white">
-                    الأكثر اختياراً
-                  </span>
-                )}
-                <h3 className="text-lg font-bold text-paper">{c.name}</h3>
-                <p className="mt-1.5 text-[13px] text-mute">{c.desc}</p>
-                <div className="mt-6 flex items-baseline gap-2">
-                  <span className="tech tnum text-5xl font-bold text-paper">{c.price}</span>
-                  <span className="tech text-[12px] tracking-widest text-mute">{c.period}</span>
-                </div>
-                <ul className="mt-7 flex-1 space-y-3.5">
-                  {c.features.map((f) => (
-                    <li key={f} className="flex items-start gap-3 text-[14px] text-mute">
-                      <Check size={16} className="mt-0.5 shrink-0 text-fire" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-8">
-                  <Btn
-                    full
-                    variant={c.featured ? "fire" : "ghost"}
-                    onClick={() => go("/account")}
-                  >
-                    {c.cta}
-                  </Btn>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-        <p className="mt-6 text-center text-[13px] text-mute">
-          الأسعار شاملة ضريبة القيمة المضافة · إلغاء فوري · ترقية في أي وقت
-        </p>
-      </section>
-
-      {/* ============ TESTIMONIALS ============ */}
-      <section className="border-y border-hair bg-[#0A0B0E]">
-        <div className="mx-auto max-w-[1440px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
-          <SectionHead
-            kicker="شهادات العملاء"
-            title="قالوا عنّا بعد أول تمرين"
-          />
-          <div className="grid gap-5 md:grid-cols-3">
-            {TESTIMONIALS.map((t, i) => (
-              <Reveal key={t.name} delay={i * 0.09} className="h-full">
-                <figure className="relative flex h-full flex-col border border-hair bg-panel p-7 transition-all duration-[400ms] hover:border-fire/60 hover:-translate-y-1">
-                  <Quote size={34} className="text-fire/35" />
-                  <blockquote className="mt-5 flex-1 text-[15px] leading-[1.95] text-paper/90">
-                    «{t.text}»
-                  </blockquote>
-                  <figcaption className="mt-6 flex items-center justify-between gap-3 border-t border-hair pt-5">
-                    <span>
-                      <span className="block font-bold text-paper">{t.name}</span>
-                      <span className="block text-[12px] text-mute">{t.role}</span>
-                    </span>
-                    <Stars value={t.rating} />
-                  </figcaption>
-                </figure>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      {/* Membership plans are hidden until configured by the store owner. */}
+      {/* Customer testimonials will appear after verified reviews are collected. */}
       {/* ============ FAQ ============ */}
       <section className="mx-auto max-w-[1440px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
         <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
@@ -556,7 +429,7 @@ export default function Home() {
               <span className="text-fire glow-fire">العودة قرار.</span>
             </h2>
             <p className="mt-6 max-w-lg text-[16px] leading-[1.9] text-paper/75">
-              اطلب اليوم واستلم خلال 24 ساعة داخل الرياض. إرجاع مجاني، واستبدال مقاس
+              اطلب اليوم واستلم خلال 24 ساعة داخل الرياض. سياسة إرجاع واضحة، واستبدال مقاس
               بدون رسوم في أول طلب.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
@@ -568,7 +441,7 @@ export default function Home() {
               </Btn>
             </div>
             <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-[13px] text-mute">
-              {["شحن مجاني فوق 400 ر.س", "ضمان أصلي 12 شهراً", "دفع عند الاستلام"].map((x) => (
+              {["توصيل مدفوع حسب المحافظة", "ضمان أصلي 12 شهراً", "دفع عند الاستلام"].map((x) => (
                 <span key={x} className="flex items-center gap-2">
                   <Check size={14} className="text-fire" /> {x}
                 </span>
