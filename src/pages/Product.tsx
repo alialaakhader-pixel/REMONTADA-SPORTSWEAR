@@ -317,9 +317,9 @@ export default function ProductPage({ id }: { id: string }) {
           {/* trust row */}
           <div className="mt-7 grid grid-cols-1 gap-px border border-hair bg-hair sm:grid-cols-3">
             {[
-              [Truck, "شحن سريع", "الرياض 24 ساعة"],
-              [RotateCcw, "إرجاع مجاني", "خلال 14 يوماً"],
-              [ShieldCheck, "ضمان أصلي", "12 شهراً"],
+              [Truck, "التوصيل", "الرسوم حسب المحافظة"],
+              [RotateCcw, "الاستبدال والاسترجاع", "وفق السياسة المعتمدة"],
+              [ShieldCheck, "الضمان", "حسب تفاصيل المنتج"],
             ].map(([I, t, d]: any) => (
               <div key={t} className="flex items-center gap-3 bg-[#0A0B0E] px-4 py-4">
                 <I size={17} className="text-neon" />
