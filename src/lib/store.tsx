@@ -190,7 +190,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const p = products.find((x) => x.id === l.id);
         return a + (p ? p.price * l.qty : 0);
       }, 0),
-    [cart]
+    [cart, products]
   );
 
   const value: Ctx = {
