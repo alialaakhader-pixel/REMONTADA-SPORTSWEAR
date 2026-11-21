@@ -46,7 +46,8 @@ export const FAQS = [
   { q: "ما سياسة الاستبدال والاسترجاع؟", a: "تُنشر السياسة النهائية للمتجر قبل بدء استقبال الطلبات." },
 ];
 
-export const ARTICLES = [];
+export type Article = { id: string; title: string; excerpt: string; tag: string; date: string; read: string; img: string };
+export const ARTICLES: Article[] = [];
 
 export const CLUB = [];
 
