@@ -196,7 +196,7 @@ export default function ProductPage({ id }: { id: string }) {
                   aria-label={c.name}
                   className={`h-10 w-10 rounded-full border-2 transition-all ${
                     activeColor === c.name
-                      ? "border-fire scale-110 shadow-[0_0_0_3px_rgba(230,57,43,.25)]"
+                      ? "border-fire scale-110 shadow-[0_0_0_3px_rgba(0,180,255,.25)]"
                       : "border-white/25 hover:scale-105"
                   }`}
                   style={{ background: c.hex }}
