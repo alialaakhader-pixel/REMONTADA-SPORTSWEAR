@@ -5,16 +5,15 @@ import { useStore, findProduct } from "../lib/store";
 import { CITIES, money } from "../lib/data";
 import { Btn, Micro, Price, Reveal } from "../components/ui";
 
-const TAX = 0.15;
-const FREE_SHIP = 400;
+
 
 function useTotals() {
   const { subtotal, cart } = useStore();
   const [cities] = useState(() => { try { const saved = JSON.parse(localStorage.getItem("remontada:cities") || "null"); return Array.isArray(saved) && saved.length ? saved : CITIES; } catch { return CITIES; } });
-  const [city, setCity] = useState(() => cities[0] ?? CITIES[0]);
-  const ship = subtotal === 0 || subtotal >= FREE_SHIP ? 0 : city.ship;
-  const tax = Math.round(subtotal * TAX);
-  return { subtotal, cart, city, cities, setCity, ship, tax, total: subtotal + ship + tax };
+  const [city, setCity] = useState(() => cities[0] ?? { name: "", ship: 0, eta: "" });
+  const ship = city.name ? city.ship : 0;
+  const tax = 0;
+  return { subtotal, cart, city, cities, setCity, ship, tax, total: subtotal + ship };
 }
 
 /* ================= CART ================= */
@@ -130,32 +129,16 @@ export function Cart() {
           <h2 className="micro text-fire">ملخص الطلب</h2>
 
           <div className="mt-5 space-y-3 text-sm">
-            <Row label="المجموع الفرعي" value={`${money(subtotal)} ر.س`} />
-            <Row label={`الشحن — ${city.name}`} value={ship === 0 ? "مجاني" : `${money(ship)} ر.س`} tone={ship === 0 ? "neon" : undefined} />
-            <Row label="ضريبة القيمة المضافة 15%" value={`${money(tax)} ر.س`} />
+            <Row label="المجموع الفرعي" value={`${money(subtotal)} ج.م`} />
+            <Row label={`الشحن — ${city.name}`} value={city.name ? `${money(ship)} ج.م` : "تُحدد بعد إعداد الشحن"} tone={ship === 0 ? "neon" : undefined} />
+            
           </div>
-
-          {subtotal < FREE_SHIP && (
-            <div className="mt-5 border border-fire/40 bg-fire/5 p-3">
-              <p className="text-[13px] leading-relaxed text-paper/85">
-                أضف بقيمة{" "}
-                <span className="tech tnum font-bold text-fire">{money(FREE_SHIP - subtotal)} ر.س</span>{" "}
-                للحصول على شحن مجاني.
-              </p>
-              <div className="mt-2 h-1 w-full bg-hair">
-                <div
-                  className="h-full bg-fire transition-all duration-700"
-                  style={{ width: `${Math.min(100, (subtotal / FREE_SHIP) * 100)}%` }}
-                />
-              </div>
-            </div>
-          )}
 
           <div className="mt-5 flex items-baseline justify-between border-t border-hair pt-5">
             <span className="text-sm font-bold text-mute">الإجمالي</span>
             <span className="tech tnum text-3xl font-bold text-paper">
               {money(total)}
-              <span className="mr-1 text-sm font-medium text-mute">ر.س</span>
+              <span className="mr-1 text-sm font-medium text-mute">ج.م</span>
             </span>
           </div>
 
@@ -187,17 +170,15 @@ function Row({ label, value, tone }: { label: string; value: string; tone?: "neo
 /* ================= CHECKOUT ================= */
 const STEPS = ["معلومات الشحن", "طريقة الدفع", "المراجعة والتأكيد"];
 const PAYMENTS = [
-  { k: "card", t: "بطاقة ائتمانية / مدى", d: "فيزا · ماستركارد · مدى · أبل باي" },
-  { k: "wallet", t: "محفظة إلكترونية", d: "STC Pay · تابي · تمارا" },
-  { k: "cod", t: "الدفع عند الاستلام", d: "رسوم إضافية 15 ر.س" },
+  { k: "cod", t: "الدفع عند الاستلام", d: "سيتم تفعيله بعد ربط نظام الطلبات." },
 ];
 
 export function Checkout() {
   const { cart, go, clear, toast } = useStore();
   const { subtotal, city, setCity, ship, tax, total } = useTotals();
   const [step, setStep] = useState(0);
-  const [pay, setPay] = useState("card");
-  const [done, setDone] = useState<string | null>(null);
+  const [pay, setPay] = useState("cod");
+  const [done] = useState<string | null>(null);
   const [f, setF] = useState({
     name: "",
     phone: "",
@@ -208,8 +189,8 @@ export function Checkout() {
     cvc: "",
   });
 
-  const codFee = pay === "cod" ? 15 : 0;
-  const grand = total + codFee;
+  const codFee = 0;
+  const grand = total;
 
   if (done)
     return (
@@ -250,15 +231,21 @@ export function Checkout() {
     );
   }
 
+  if (!city.name) return (
+    <div className="mx-auto grid min-h-[70vh] max-w-xl place-items-center px-6 pt-32 pb-24 text-center">
+      <div><h1 className="display text-3xl text-paper">التوصيل غير مُعدّ بعد</h1><p className="mt-4 leading-8 text-mute">لم يحدد المتجر تكاليف التوصيل للمحافظات بعد. لن نعرض سعراً تقديرياً أو نستقبل طلباً قبل ضبط رسوم الشحن من لوحة الإدارة.</p><Btn className="mt-7" onClick={() => go("/cart")}>العودة للسلة</Btn></div>
+    </div>
+  );
+
   const validate = () => {
     if (step === 0) {
-      if (!f.name.trim() || f.phone.trim().length < 9 || !f.address.trim()) {
-        toast("أكمل معلومات الشحن", "الاسم، رقم الجوال (9 أرقام على الأقل، والعنوان مطلوبة");
+      if (!f.name.trim() || !/^01[0-2,5]{1}[0-9]{8}$/.test(f.phone.replace(/\s/g, "")) || !f.address.trim()) {
+        toast("أكمل معلومات الشحن", "الاسم، رقم هاتف مصري صحيح، والعنوان مطلوبة");
         return false;
       }
     }
-    if (step === 1 && pay === "card" && f.card.replace(/\s/g, "").length < 12) {
-      toast("رقم البطاقة غير مكتمل", "أدخل 16 رقماً للمتابعة");
+    if (step === 1 && pay !== "cod") {
+      toast("طريقة الدفع غير متاحة", "الدفع الإلكتروني لم يتم ربطه ببوابة دفع بعد.");
       return false;
     }
     return true;
@@ -268,8 +255,7 @@ export function Checkout() {
     if (!validate()) return;
     if (step < 2) setStep(step + 1);
     else {
-      setDone(String(Math.floor(100000 + Math.random() * 899999)));
-      clear();
+      toast("استقبال الطلبات غير مفعّل بعد", "لن نؤكد طلباً أو ننشئ رقماً وهمياً قبل ربط قاعدة البيانات.");
     }
   };
 
@@ -323,7 +309,7 @@ export function Checkout() {
                       label="رقم الجوال"
                       value={f.phone}
                       onChange={(v) => setF({ ...f, phone: v })}
-                      placeholder="05xxxxxxxx"
+                      placeholder="01xxxxxxxxx"
                       dir="ltr"
                     />
                     <div>
@@ -337,7 +323,7 @@ export function Checkout() {
                       >
                         {cities.map((c) => (
                           <option key={c.name} value={c.name}>
-                            {c.name} — {c.ship === 0 ? "شحن مجاني" : `${c.ship} ر.س`}
+                            {c.name} — {c.ship === 0 ? "شحن مجاني" : `${c.ship} ج.م`}
                           </option>
                         ))}
                       </select>
@@ -346,10 +332,10 @@ export function Checkout() {
                       </p>
                     </div>
                     <Field
-                      label="الحي"
+                      label="المدينة / الحي"
                       value={f.note}
                       onChange={(v) => setF({ ...f, note: v })}
-                      placeholder="الملقا"
+                      placeholder="اكتب المدينة أو الحي"
                     />
                   </div>
                   <div>
