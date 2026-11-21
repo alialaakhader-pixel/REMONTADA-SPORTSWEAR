@@ -19,7 +19,8 @@ export default function Admin() {
   const [draft, setDraft] = useState<Product>(blank);
   const filtered = useMemo(()=>products.filter(p=>p.name.includes(query)||p.sport.includes(query)),[products,query]);
   const [sportVisible,setSportVisible]=useState<Record<string,boolean>>(()=>{try{return JSON.parse(localStorage.getItem("remontada:sports")||"{}")}catch{return {}}});
-  const [hero,setHero]=useState(()=>localStorage.getItem("remontada:hero-title")||"العودة قرار.");\n  const [heroImage,setHeroImage]=useState(()=>localStorage.getItem("remontada:hero-image")||"");
+  const [hero,setHero]=useState(()=>localStorage.getItem("remontada:hero-title")||"العودة قرار.");
+  const [heroImage,setHeroImage]=useState(()=>localStorage.getItem("remontada:hero-image")||"");
   const [whatsapp,setWhatsapp]=useState(()=>localStorage.getItem("remontada:whatsapp")||"");
   const [shipping,setShipping]=useState(()=>localStorage.getItem("remontada:shipping")||"");
 
@@ -41,7 +42,10 @@ export default function Admin() {
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="sm:col-span-2"><span className={label}>اسم المنتج</span><input className={input} value={draft.name} onChange={e=>setDraft({...draft,name:e.target.value})}/></label>
           <label><span className={label}>السعر الحالي</span><input className={input} type="number" value={draft.price||""} onChange={e=>setDraft({...draft,price:Number(e.target.value)})}/></label>
-          <label><span className={label}>السعر القديم</span><input className={input} type="number" value={draft.old||""} onChange={e=>setDraft({...draft,old:Number(e.target.value)||undefined})}/></label>\n          <label><span className={label}>التقييم (من 5)</span><input className={input} type="number" min="0" max="5" step="0.1" value={draft.rating} onChange={e=>setDraft({...draft,rating:Math.max(0,Math.min(5,Number(e.target.value)))})}/></label>\n          <label><span className={label}>عدد التقييمات</span><input className={input} type="number" min="0" value={draft.reviews} onChange={e=>setDraft({...draft,reviews:Math.max(0,Number(e.target.value))})}/></label>\n          <label><span className={label}>عدد المبيعات</span><input className={input} type="number" min="0" value={draft.sold} onChange={e=>setDraft({...draft,sold:Math.max(0,Number(e.target.value))})}/></label>
+          <label><span className={label}>السعر القديم</span><input className={input} type="number" value={draft.old||""} onChange={e=>setDraft({...draft,old:Number(e.target.value)||undefined})}/></label>
+          <label><span className={label}>التقييم (من 5)</span><input className={input} type="number" min="0" max="5" step="0.1" value={draft.rating} onChange={e=>setDraft({...draft,rating:Math.max(0,Math.min(5,Number(e.target.value)))})}/></label>
+          <label><span className={label}>عدد التقييمات</span><input className={input} type="number" min="0" value={draft.reviews} onChange={e=>setDraft({...draft,reviews:Math.max(0,Number(e.target.value))})}/></label>
+          <label><span className={label}>عدد المبيعات</span><input className={input} type="number" min="0" value={draft.sold} onChange={e=>setDraft({...draft,sold:Math.max(0,Number(e.target.value))})}/></label>
           <label><span className={label}>الرياضة</span><select className={input} value={draft.sport} onChange={e=>setDraft({...draft,sport:e.target.value})}>{SPORTS.map(s=><option key={s}>{s}</option>)}</select></label>
           <label><span className={label}>النوع</span><select className={input} value={draft.gender} onChange={e=>setDraft({...draft,gender:e.target.value as Product["gender"]})}>{["رجالي","نسائي","أطفال"].map(s=><option key={s}>{s}</option>)}</select></label>
           <label><span className={label}>الفئة</span><select className={input} value={draft.type} onChange={e=>setDraft({...draft,type:e.target.value})}>{["ملابس","أحذية","إكسسوارات","معدات"].map(s=><option key={s}>{s}</option>)}</select></label>
