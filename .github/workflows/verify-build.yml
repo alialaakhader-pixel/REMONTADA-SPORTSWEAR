@@ -1,7 +1,7 @@
 name: Verify build
 on:
   push:
-    branches: [main]
+    branches: [main, "feature/electric-blue-rebrand"]
   workflow_dispatch:
 jobs:
   build:

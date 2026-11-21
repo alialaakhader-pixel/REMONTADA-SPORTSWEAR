@@ -20,7 +20,7 @@ const F = {
   base: "#0A84FF",
   deep: "#0B4F9E",
   dark: "#08305E",
-  hot: "#E6392B",
+  hot: "#00B4FF",
 };
 
 export function IbexMark({
@@ -189,7 +189,7 @@ export function Wordmark({
 /** Full logo plate — the neon presentation lockup (About + hero badge) */
 export function LogoPlate({ scale = 1 }: { scale?: number }) {
   return (
-    <div className="relative w-full overflow-hidden rounded-sm border border-hair bg-[#050608] grain">
+    <div className="relative w-full overflow-hidden rounded-sm border border-hair bg-[#05050F] grain">
       {/* diagonal light streaks */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-10 top-0 h-full w-24 -skew-x-[24deg] bg-gradient-to-b from-transparent via-neon/25 to-transparent" />

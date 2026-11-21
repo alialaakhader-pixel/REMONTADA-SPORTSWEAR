@@ -12,7 +12,6 @@ import {
   Star,
 } from "lucide-react";
 import { useStore, findProduct } from "../lib/store";
-import { PRODUCTS } from "../lib/data";
 import { Btn, Price, Stars, Badge, ProductCard, Micro, Reveal } from "../components/ui";
 
 const SIZE_TABLE = [
@@ -196,7 +195,7 @@ export default function ProductPage({ id }: { id: string }) {
                   aria-label={c.name}
                   className={`h-10 w-10 rounded-full border-2 transition-all ${
                     activeColor === c.name
-                      ? "border-fire scale-110 shadow-[0_0_0_3px_rgba(230,57,43,.25)]"
+                      ? "border-fire scale-110 shadow-[0_0_0_3px_rgba(0,180,255,.25)]"
                       : "border-white/25 hover:scale-105"
                   }`}
                   style={{ background: c.hex }}
@@ -318,9 +317,9 @@ export default function ProductPage({ id }: { id: string }) {
           {/* trust row */}
           <div className="mt-7 grid grid-cols-1 gap-px border border-hair bg-hair sm:grid-cols-3">
             {[
-              [Truck, "شحن سريع", "الرياض 24 ساعة"],
-              [RotateCcw, "إرجاع مجاني", "خلال 14 يوماً"],
-              [ShieldCheck, "ضمان أصلي", "12 شهراً"],
+              [Truck, "التوصيل", "الرسوم حسب المحافظة"],
+              [RotateCcw, "الاستبدال والاسترجاع", "وفق السياسة المعتمدة"],
+              [ShieldCheck, "الضمان", "حسب تفاصيل المنتج"],
             ].map(([I, t, d]: any) => (
               <div key={t} className="flex items-center gap-3 bg-[#0A0B0E] px-4 py-4">
                 <I size={17} className="text-neon" />

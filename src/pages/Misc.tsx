@@ -17,13 +17,13 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { useStore } from "../lib/store";
-import { ARTICLES, FAQS, PRODUCTS } from "../lib/data";
+import { ARTICLES, FAQS } from "../lib/data";
 import { Btn, Micro, Reveal, ProductCard, Stars, SectionHead } from "../components/ui";
 import { LogoPlate } from "../components/Logo";
 
 /* ================= ABOUT ================= */
 export function About() {
-  const { go, products } = useStore();
+  const { go } = useStore();
   return (
     <div>
       <section className="mx-auto max-w-[1440px] px-4 pt-32 sm:px-6 lg:px-10">
@@ -58,25 +58,7 @@ export function About() {
         </div>
       </section>
 
-      {/* stats band */}
-      <section className="mx-auto mt-24 max-w-[1440px] px-4 sm:px-6 lg:px-10">
-        <div className="grid gap-px border border-hair bg-hair sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            ["2021", "سنة التأسيس"],
-            ["128K", "عميل في المملكة"],
-            ["4.9", "متوسط التقييم"],
-            ["7", "رياضات مدعومة"],
-          ].map(([n, l], i) => (
-            <Reveal key={l} delay={i * 0.07}>
-              <div className="bg-[#0A0B0E] px-6 py-9">
-                <div className="tech tnum text-4xl font-bold text-paper">{n}</div>
-                <div className="mt-2 text-[13px] text-mute">{l}</div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
+      {/* Store metrics are hidden until real business data is connected. */}
       {/* story */}
       <section className="mx-auto max-w-[1440px] px-4 py-24 sm:px-6 lg:px-10">
         <div className="grid gap-12 lg:grid-cols-3">
@@ -326,11 +308,11 @@ export function Contact() {
 
         <aside className="space-y-4">
           {[
-            { I: MessageCircle, t: "واتساب", v: "+966 50 000 0000", d: "الأسرع — من 9ص حتى 11م" },
-            { I: Phone, t: "هاتف", v: "+966 11 000 0000", d: "خدمة العملاء يومياً" },
-            { I: Mail, t: "البريد", v: "care@remontada.sa", d: "نرد خلال 12 ساعة" },
-            { I: MapPin, t: "المقر", v: "حي الملقا، الرياض", d: "ال المملكة العربية السعودية" },
-            { I: Clock, t: "أوقات العمل", v: "السبت – الخميس", d: "9:00 ص – 11:00 م" },
+            { I: MessageCircle, t: "واتساب", v: "يُضاف من لوحة الإدارة", d: "رقم واتساب الرسمي للمتجر" },
+            { I: Phone, t: "هاتف", v: "يُضاف من لوحة الإدارة", d: "رقم الهاتف الرسمي للمتجر" },
+            { I: Mail, t: "البريد", v: "يُضاف من لوحة الإدارة", d: "البريد الرسمي لخدمة العملاء" },
+            { I: MapPin, t: "المقر", v: "يُضاف من لوحة الإدارة", d: "عنوان الفرع الرسمي" },
+            { I: Clock, t: "أوقات العمل", v: "يُضاف من لوحة الإدارة", d: "مواعيد العمل الرسمية" },
           ].map((c) => (
             <Reveal key={c.t}>
               <div className="flex items-start gap-4 border border-hair bg-panel p-5 transition-colors hover:border-fire/60">
@@ -377,13 +359,13 @@ export function Contact() {
               <rect x="300" y="240" width="90" height="55" />
             </g>
             <g transform="translate(400,150)">
-              <circle r="34" fill="#E6392B" opacity="0.14" className="beacon" />
-              <circle r="7" fill="#E6392B" />
-              <circle r="13" fill="none" stroke="#E6392B" strokeWidth="2" />
-              <line y1="-30" y2="-16" stroke="#E6392B" strokeWidth="2" />
-              <line y1="16" y2="30" stroke="#E6392B" strokeWidth="2" />
-              <line x1="-30" x2="-16" stroke="#E6392B" strokeWidth="2" />
-              <line x1="16" x2="30" stroke="#E6392B" strokeWidth="2" />
+              <circle r="34" fill="#00B4FF" opacity="0.14" className="beacon" />
+              <circle r="7" fill="#00B4FF" />
+              <circle r="13" fill="none" stroke="#00B4FF" strokeWidth="2" />
+              <line y1="-30" y2="-16" stroke="#00B4FF" strokeWidth="2" />
+              <line y1="16" y2="30" stroke="#00B4FF" strokeWidth="2" />
+              <line x1="-30" x2="-16" stroke="#00B4FF" strokeWidth="2" />
+              <line x1="16" x2="30" stroke="#00B4FF" strokeWidth="2" />
             </g>
             <text x="430" y="146" fill="#F5F6F7" fontSize="13" fontFamily="Cairo, sans-serif">
               مقر REMONTADA — الملقا
@@ -486,29 +468,26 @@ export function Returns() {
       I: Truck,
       t: "الشحن والتوصيل",
       rows: [
-        ["الرياض", "24 ساعة — مجاني فوق 400 ر.س"],
-        ["جدة والدمام ومكة", "48 ساعة — 15 ر.س"],
-        ["باقي مدن المملكة", "48–72 ساعة — 20 إلى 25 ر.س"],
-        ["دول الخليج", "3–6 أيام عمل — يُحسب عند الدفع"],
+        ["جميع المحافظات", "تُحدد تكلفة التوصيل حسب المحافظة وتُعرض قبل تأكيد الطلب"],
       ],
     },
     {
       I: RotateCcw,
       t: "الإرجاع والاستبدال",
       rows: [
-        ["مدة الإرجاع", "14 يوماً من تاريخ الاستلام"],
-        ["شرط الإرجاع", "القطعة بحالتها الأصلية مع العلبة والبطاقة"],
-        ["رسوم الإرجاع", "مجاني في أول طلب داخل المملكة"],
-        ["استبدال المقاس", "مجاني مرة واحدة لكل طلب"],
-        ["استرداد المبلغ", "3–7 أيام عمل لنفس وسيلة الدفع"],
+        ["مدة الإرجاع", "تُحدد وتُعلن قبل بدء استقبال الطلبات"],
+        ["شرط الإرجاع", "تُنشر الشروط المعتمدة من إدارة المتجر"],
+        ["رسوم الإرجاع", "تُوضح قبل إطلاق المتجر وفق السياسة المعتمدة"],
+        ["استبدال المقاس", "تُحدد الشروط في السياسة المعتمدة للمتجر"],
+        ["استرداد المبلغ", "تُحدد المدة وفق وسيلة الدفع والسياسة المعتمدة"],
       ],
     },
     {
       I: Package,
       t: "الضمان والأصالة",
       rows: [
-        ["ضمان الجودة", "12 شهراً على عيوب التصنيع"],
-        ["الأصالة", "فحص من الموزّع الرسمي قبل الشحن"],
+        ["ضمان الجودة", "تُحدد تفاصيل الضمان لكل منتج"],
+        ["الأصالة", "تُعرض بيانات العلامة والمصدر مع تفاصيل المنتج"],
         ["الاستثناءات", "ملابس السباحة والملابس الداخلية لأسباب صحية"],
       ],
     },
@@ -521,8 +500,7 @@ export function Returns() {
         الشحن، الإرجاع، <span className="text-fire">والضمان.</span>
       </h1>
       <p className="mt-6 max-w-2xl text-[16px] leading-[2] text-mute">
-        قواعد واضحة بلا بنود مخفية. هذه السياسة سارية اعتباراً من فبراير 2026 وتسري على
-        جميع الطلبات داخل المملكة العربية السعودية ودول مجلس التعاون.
+        سيتم نشر السياسات النهائية للمتجر هنا قبل تفعيل استقبال الطلبات، وتُحدّث من لوحة الإدارة.
       </p>
 
       <div className="mt-14 space-y-6">
@@ -627,7 +605,7 @@ export function Account() {
               />
               {mode === "register" && (
                 <label className="flex items-start gap-3 text-[13px] text-mute">
-                  <input type="checkbox" defaultChecked className="mt-1 accent-[#E6392B]" />
+                  <input type="checkbox" defaultChecked className="mt-1 accent-[#00B4FF]" />
                   أريد الاشتراك في نشرة REMONTADA والعروض الأسبوعية.
                 </label>
               )}
@@ -698,7 +676,7 @@ export function Account() {
                     >
                       {o.status}
                     </span>
-                    <span className="tech tnum text-lg font-bold text-paper">{moneyS(o.total)} ر.س</span>
+                    <span className="tech tnum text-lg font-bold text-paper">{moneyS(o.total)} ج.م</span>
                     <Btn size="sm" variant="ghost" onClick={() => go("/shop")}>
                       إعادة الطلب
                     </Btn>

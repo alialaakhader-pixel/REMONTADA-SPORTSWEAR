@@ -122,7 +122,7 @@ export function Btn({
   }[size];
   const variants = {
     fire:
-      "bg-fire text-white hover:bg-flame shadow-[0_0_0_0_rgba(230,57,43,0)] hover:shadow-[0_10px_34px_-12px_rgba(230,57,43,.9)]",
+      "bg-fire text-white hover:bg-flame shadow-[0_0_0_0_rgba(0,180,255,0)] hover:shadow-[0_10px_34px_-12px_rgba(0,180,255,.9)]",
     solid: "bg-paper text-ink hover:bg-white",
     ghost:
       "border border-hair bg-white/[0.02] text-paper hover:border-fire hover:text-fire hover:bg-fire/5",
@@ -337,7 +337,7 @@ export function Price({ p, big }: { p: Product; big?: boolean }) {
         className={`tech tnum font-bold text-paper ${big ? "text-3xl" : "text-lg"}`}
       >
         {money(p.price)}
-        <span className="mr-1 text-[0.62em] font-medium text-mute">ر.س</span>
+        <span className="mr-1 text-[0.62em] font-medium text-mute">ج.م</span>
       </span>
       {p.old && (
         <span className="tech tnum text-[13px] text-mute line-through decoration-fire">

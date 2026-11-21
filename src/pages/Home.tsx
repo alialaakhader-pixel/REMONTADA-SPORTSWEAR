@@ -9,11 +9,9 @@ import {
   Tag,
   Check,
   ChevronDown,
-  Quote,
-  Zap,
 } from "lucide-react";
 import { useStore } from "../lib/store";
-import { PRODUCTS, SPORTS, TESTIMONIALS, FAQS, CLUB, money } from "../lib/data";
+import { SPORTS, FAQS } from "../lib/data";
 import {
   Reveal,
   Micro,
@@ -21,15 +19,7 @@ import {
   Btn,
   ProductCard,
   SportIcon,
-  Stars,
 } from "../components/ui";
-
-const STATS = [
-  { n: "4.9", l: "تقييم العملاء", s: "/5" },
-  { n: "128", l: "عميل نشط", s: "ألف" },
-  { n: "24", l: "ساعة للتوصيل", s: "س" },
-  { n: "12", l: "شهر ضمان", s: "شهر" },
-];
 
 export default function Home() {
   const { go, products } = useStore();
@@ -57,14 +47,14 @@ export default function Home() {
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to left, #08090B 0%, rgba(8,9,11,.94) 34%, rgba(8,9,11,.45) 66%, rgba(8,9,11,.82) 100%)",
+                "linear-gradient(to left, #05050F 0%, rgba(5,5,15,.94) 34%, rgba(5,5,15,.45) 66%, rgba(5,5,15,.82) 100%)",
             }}
           />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(to top, #08090B 2%, transparent 42%)",
+                "linear-gradient(to top, #05050F 2%, transparent 42%)",
             }}
           />
           {/* diagonal red beacon */}
@@ -72,7 +62,7 @@ export default function Home() {
             className="absolute inset-y-0 right-[36%] w-[14%] opacity-[0.16]"
             style={{
               background:
-                "linear-gradient(to bottom, transparent, #E6392B 45%, transparent)",
+                "linear-gradient(to bottom, transparent, #00B4FF 45%, transparent)",
               transform: "skewX(-11deg)",
             }}
           />
@@ -88,7 +78,7 @@ export default function Home() {
           >
             <div className="flex items-center gap-4">
               <span className="beacon h-2.5 w-2.5 rotate-45 bg-fire" />
-              <span className="micro text-fire">موسم 2026 — الإصدار الثاني</span>
+              <span className="micro text-fire">REMONTADA SPORTSWEAR</span>
             </div>
 
             <h1 className="display mt-6 text-[clamp(2.9rem,8.4vw,6.6rem)] text-paper">
@@ -102,7 +92,7 @@ export default function Home() {
 
             <p className="mt-7 max-w-xl text-[16px] leading-[1.9] text-mute sm:text-[17px]">
               ملابس، أحذية، ومعدات مصنوعة للرياضيين الذين يرفضون الاستسلام. هندسة دقيقة،
-              أقمشة تنفّس، وتصميم أسود–أحمر لا يُنسى من الملعب.
+              أقمشة تنفّس، وتصميم أسود وأزرق كهربائي لا يُنسى من الملعب.
             </p>
 
             <div className="mt-9 flex flex-wrap gap-3">
@@ -114,17 +104,6 @@ export default function Home() {
               </Btn>
             </div>
 
-            <div className="mt-12 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-6 border-t border-hair pt-7 sm:grid-cols-4">
-              {STATS.map((s) => (
-                <div key={s.l}>
-                  <div className="tech tnum text-3xl font-bold text-paper">
-                    {s.n}
-                    <span className="mr-1 text-sm font-medium text-fire">{s.s}</span>
-                  </div>
-                  <div className="mt-1 text-[12px] text-mute">{s.l}</div>
-                </div>
-              ))}
-            </div>
           </motion.div>
         </div>
 
@@ -147,30 +126,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============ SOCIAL PROOF ============ */}
-      <section className="border-y border-hair bg-panel/70">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-px bg-hair md:grid-cols-4">
-          {[
-            ["شحن مجاني", "فوق 400 ر.س"],
-            ["إرجاع مجاني", "خلال 14 يوماً"],
-            ["ضمان أصلي", "12 شهراً"],
-            ["دفع آمن", "مدى · أبل باي"],
-          ].map(([a, b], i) => (
-            <Reveal key={a} delay={i * 0.07}>
-              <div className="flex h-full items-center gap-3 bg-[#0A0B0E] px-5 py-5">
-                <span className="grid h-9 w-9 shrink-0 place-items-center border border-fire/40 text-fire">
-                  <Check size={15} />
-                </span>
-                <span>
-                  <span className="block text-[14px] font-bold text-paper">{a}</span>
-                  <span className="block text-[12px] text-mute">{b}</span>
-                </span>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
+      {/* Verified store benefits will be configured from the admin dashboard. */}
       {/* ============ FEATURED COLLECTIONS ============ */}
       <section className="mx-auto max-w-[1440px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
         <SectionHead
@@ -194,19 +150,19 @@ export default function Home() {
           {[
             {
               t: "كرة القدم",
-              s: "18 قطعة",
+              s: "اكتشف المجموعة",
               img: IMG.football,
               d: "أطقم مبارات، سترات تدريب، وأحذية عشب.",
             },
             {
               t: "الجري",
-              s: "24 قطعة",
+              s: "اكتشف المجموعة",
               img: IMG.running,
               d: "أحذية طريق، طبقات ليلية، وقطع عاكسة.",
             },
             {
               t: "الجيم",
-              s: "31 قطعة",
+              s: "اكتشف المجموعة",
               img: IMG.gym,
               d: "ملابس حديد، قفازات، ومعدات صلبة.",
             },
@@ -281,11 +237,18 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {shown.map((p, i) => (
-              <ProductCard key={p.id} p={p} index={i} />
-            ))}
-          </div>
+          {shown.length === 0 ? (
+            <div className="border border-dashed border-hair bg-ink/40 px-6 py-14 text-center">
+              <p className="text-lg font-bold text-paper">الكتالوج جاهز لاستقبال منتجاتك</p>
+              <p className="mt-2 text-sm text-mute">ستظهر المنتجات هنا بعد إدخال بياناتها وصورها وأسعارها من لوحة الإدارة.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {shown.map((p, i) => (
+                <ProductCard key={p.id} p={p} index={i} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -302,16 +265,8 @@ export default function Home() {
               <span className="text-fire">نبيع فرقاً.</span>
             </h2>
             <p className="mt-6 max-w-md text-[15px] leading-[1.95] text-mute">
-              كل قطعة تمر بأربع نقاط فحص قبل أن تصل إليك. إن لم تُقنعك في أول تمرين،
-              نستبدلها — بلا أسئلة.
+              تجربة تسوق رياضية بهوية واضحة، وكتالوج يُدار مباشرة من لوحة المتجر.
             </p>
-            <div className="mt-8 inline-flex items-center gap-3 border border-hair px-5 py-3">
-              <Zap size={16} className="text-gold" />
-              <span className="text-[13px] text-mute">
-                معدّل رضا العملاء هذا الشهر:{" "}
-                <span className="tech tnum font-bold text-paper">97.4%</span>
-              </span>
-            </div>
           </div>
 
           <ul className="divide-y divide-hair border-y border-hair">
@@ -319,22 +274,22 @@ export default function Home() {
               {
                 I: ShieldCheck,
                 t: "جودة عالية وضمان أصلي",
-                d: "قطع موثّقة من موزّعين رسميين مع ضمان 12 شهراً على عيوب التصنيع.",
+                d: "قطع موثّقة من موزّعين رسميين مع ضمان حسب سياسة المتجر على عيوب التصنيع.",
               },
               {
                 I: Truck,
-                t: "توصيل سريع لكل المملكة",
-                d: "الرياض خلال 24 ساعة، وباقي المدن خلال 48–72 ساعة مع تتبّع لحظي.",
+                t: "توصيل مدفوع حسب المحافظة",
+                d: "تُعرض تكلفة التوصيل والمدة المتاحة لكل محافظة قبل تأكيد الطلب.",
               },
               {
                 I: RotateCcw,
                 t: "إرجاع واستبدال بلا تعقيد",
-                d: "14 يوماً لإرجاع أي قطعة، واستبدال المقاس مجاناً في أول طلب.",
+                d: "تُعرض شروط الاستبدال والاسترجاع بوضوح قبل إتمام الطلب.",
               },
               {
                 I: Tag,
                 t: "أسعار تنافسية وعدسة خصم",
-                d: "عروض أسبوعية حقيقية لا تُلغى بعد يوم، ونقاط تُجمع مع كل عملية شراء.",
+                d: "تظهر العروض والنقاط فقط بعد تفعيلها من لوحة إدارة المتجر.",
               },
             ].map((f, i) => (
               <Reveal key={f.t} delay={i * 0.08}>
@@ -382,94 +337,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============ CLUB PRICING ============ */}
-      <section className="mx-auto max-w-[1440px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
-        <SectionHead
-          kicker="عضوية REMONTADA CLUB"
-          title={
-            <>
-              اختر مستوى
-              <span className="text-gold"> انطلاقيك</span>
-            </>
-          }
-          sub="ثلاث عضويات، بلا عقود طويلة. ألغِ في أي وقت من حسابك."
-        />
-        <div className="grid gap-5 lg:grid-cols-3">
-          {CLUB.map((c, i) => (
-            <Reveal key={c.name} delay={i * 0.09} className="h-full">
-              <div
-                className={`relative flex h-full flex-col border p-7 transition-all duration-[400ms] ${
-                  c.featured
-                    ? "border-fire bg-gradient-to-b from-fire/[0.12] to-transparent shadow-[0_30px_80px_-40px_rgba(230,57,43,.7)] lg:-translate-y-4"
-                    : "border-hair bg-panel hover:border-neon/50"
-                }`}
-              >
-                {c.featured && (
-                  <span className="tech absolute -top-3 right-7 bg-fire px-3 py-1 text-[11px] font-bold tracking-widest text-white">
-                    الأكثر اختياراً
-                  </span>
-                )}
-                <h3 className="text-lg font-bold text-paper">{c.name}</h3>
-                <p className="mt-1.5 text-[13px] text-mute">{c.desc}</p>
-                <div className="mt-6 flex items-baseline gap-2">
-                  <span className="tech tnum text-5xl font-bold text-paper">{c.price}</span>
-                  <span className="tech text-[12px] tracking-widest text-mute">{c.period}</span>
-                </div>
-                <ul className="mt-7 flex-1 space-y-3.5">
-                  {c.features.map((f) => (
-                    <li key={f} className="flex items-start gap-3 text-[14px] text-mute">
-                      <Check size={16} className="mt-0.5 shrink-0 text-fire" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-8">
-                  <Btn
-                    full
-                    variant={c.featured ? "fire" : "ghost"}
-                    onClick={() => go("/account")}
-                  >
-                    {c.cta}
-                  </Btn>
-                </div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-        <p className="mt-6 text-center text-[13px] text-mute">
-          الأسعار شاملة ضريبة القيمة المضافة · إلغاء فوري · ترقية في أي وقت
-        </p>
-      </section>
-
-      {/* ============ TESTIMONIALS ============ */}
-      <section className="border-y border-hair bg-[#0A0B0E]">
-        <div className="mx-auto max-w-[1440px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
-          <SectionHead
-            kicker="شهادات العملاء"
-            title="قالوا عنّا بعد أول تمرين"
-          />
-          <div className="grid gap-5 md:grid-cols-3">
-            {TESTIMONIALS.map((t, i) => (
-              <Reveal key={t.name} delay={i * 0.09} className="h-full">
-                <figure className="relative flex h-full flex-col border border-hair bg-panel p-7 transition-all duration-[400ms] hover:border-fire/60 hover:-translate-y-1">
-                  <Quote size={34} className="text-fire/35" />
-                  <blockquote className="mt-5 flex-1 text-[15px] leading-[1.95] text-paper/90">
-                    «{t.text}»
-                  </blockquote>
-                  <figcaption className="mt-6 flex items-center justify-between gap-3 border-t border-hair pt-5">
-                    <span>
-                      <span className="block font-bold text-paper">{t.name}</span>
-                      <span className="block text-[12px] text-mute">{t.role}</span>
-                    </span>
-                    <Stars value={t.rating} />
-                  </figcaption>
-                </figure>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      {/* Membership plans are hidden until configured by the store owner. */}
+      {/* Customer testimonials will appear after verified reviews are collected. */}
       {/* ============ FAQ ============ */}
       <section className="mx-auto max-w-[1440px] px-4 py-20 sm:px-6 lg:px-10 lg:py-28">
         <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
@@ -544,7 +413,7 @@ export default function Home() {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to left, rgba(8,9,11,.96) 12%, rgba(8,9,11,.78) 55%, rgba(230,57,43,.28) 100%)",
+              "linear-gradient(to left, rgba(5,5,15,.96) 12%, rgba(5,5,15,.78) 55%, rgba(0,180,255,.28) 100%)",
           }}
         />
         <div className="relative mx-auto max-w-[1440px] px-4 py-24 sm:px-6 lg:px-10 lg:py-32">
@@ -556,8 +425,7 @@ export default function Home() {
               <span className="text-fire glow-fire">العودة قرار.</span>
             </h2>
             <p className="mt-6 max-w-lg text-[16px] leading-[1.9] text-paper/75">
-              اطلب اليوم واستلم خلال 24 ساعة داخل الرياض. إرجاع مجاني، واستبدال مقاس
-              بدون رسوم في أول طلب.
+              اكتشف الكتالوج الرياضي. تظهر تكلفة التوصيل والسياسات المعتمدة بوضوح قبل تأكيد أي طلب.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Btn size="lg" onClick={() => go("/shop")}>
@@ -568,7 +436,7 @@ export default function Home() {
               </Btn>
             </div>
             <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-[13px] text-mute">
-              {["شحن مجاني فوق 400 ر.س", "ضمان أصلي 12 شهراً", "دفع عند الاستلام"].map((x) => (
+              {["توصيل مدفوع حسب المحافظة", "سياسات واضحة قبل الطلب", "خيارات دفع بعد التفعيل"].map((x) => (
                 <span key={x} className="flex items-center gap-2">
                   <Check size={14} className="text-fire" /> {x}
                 </span>
@@ -588,9 +456,9 @@ export default function Home() {
                   key={`${k}-${i}`}
                   className="tech flex items-center gap-6 whitespace-nowrap px-6 text-[13px] font-bold tracking-[0.2em] text-white"
                 >
-                  خصم 30% على مجموعة الجري
+                  اكتشف مجموعات REMONTADA
                   <span className="h-2 w-2 rotate-45 bg-ink/70" />
-                  {money(400)} ر.س للشحن المجاني
+                  توصيل مدفوع حسب المحافظة
                   <span className="h-2 w-2 rotate-45 bg-ink/70" />
                 </span>
               ))}
