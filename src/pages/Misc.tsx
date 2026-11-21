@@ -739,7 +739,7 @@ const moneyS = (n: number) => n.toLocaleString("en-US");
 
 /* ================= WISHLIST ================= */
 export function Wishlist() {
-  const { wish, go } = useStore();
+  const { wish, go, products } = useStore();
   const items = products.filter((p) => wish.includes(p.id));
 
   return (
