@@ -10,16 +10,17 @@ const FREE_SHIP = 400;
 
 function useTotals() {
   const { subtotal, cart } = useStore();
-  const [city, setCity] = useState(CITIES[0]);
+  const [cities] = useState(() => { try { const saved = JSON.parse(localStorage.getItem("remontada:cities") || "null"); return Array.isArray(saved) && saved.length ? saved : CITIES; } catch { return CITIES; } });
+  const [city, setCity] = useState(() => cities[0] ?? CITIES[0]);
   const ship = subtotal === 0 || subtotal >= FREE_SHIP ? 0 : city.ship;
   const tax = Math.round(subtotal * TAX);
-  return { subtotal, cart, city, setCity, ship, tax, total: subtotal + ship + tax };
+  return { subtotal, cart, city, cities, setCity, ship, tax, total: subtotal + ship + tax };
 }
 
 /* ================= CART ================= */
 export function Cart() {
   const { cart, setQty, remove, go, subtotal } = useStore();
-  const { ship, tax, total, city } = useTotals();
+  const { ship, tax, total, city, cities } = useTotals();
 
   if (cart.length === 0)
     return (
@@ -330,11 +331,11 @@ export function Checkout() {
                       <select
                         value={city.name}
                         onChange={(e) =>
-                          setCity(CITIES.find((c) => c.name === e.target.value) ?? CITIES[0])
+                          setCity(cities.find((c) => c.name === e.target.value) ?? cities[0])
                         }
                         className="w-full border border-hair bg-ink px-4 py-3 text-sm text-paper focus:border-fire focus:outline-none"
                       >
-                        {CITIES.map((c) => (
+                        {cities.map((c) => (
                           <option key={c.name} value={c.name}>
                             {c.name} — {c.ship === 0 ? "شحن مجاني" : `${c.ship} ر.س`}
                           </option>
