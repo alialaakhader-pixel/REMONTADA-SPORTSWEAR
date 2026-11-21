@@ -48,7 +48,7 @@ export default function ProductPage({ id }: { id: string }) {
     [id, p]
   );
   const alsoBought = useMemo(
-    () => PRODUCTS.filter((x) => x.id !== id && x.type !== p?.type).slice(0, 4),
+    () => products.filter((x) => x.id !== id && x.type !== p?.type).slice(0, 4),
     [id, p]
   );
 
