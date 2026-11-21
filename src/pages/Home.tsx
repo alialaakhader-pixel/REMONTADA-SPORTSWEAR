@@ -459,7 +459,7 @@ export default function Home() {
                   key={`${k}-${i}`}
                   className="tech flex items-center gap-6 whitespace-nowrap px-6 text-[13px] font-bold tracking-[0.2em] text-white"
                 >
-                  خصم 30% على مجموعة الجري
+                  اكتشف مجموعات REMONTADA
                   <span className="h-2 w-2 rotate-45 bg-ink/70" />
                   {money(400)} ر.س للشحن المجاني
                   <span className="h-2 w-2 rotate-45 bg-ink/70" />
