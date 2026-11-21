@@ -9,7 +9,7 @@ import { Btn, Micro, Price, Reveal } from "../components/ui";
 
 function useTotals() {
   const { subtotal, cart } = useStore();
-  const [cities] = useState(() => { try { const saved = JSON.parse(localStorage.getItem("remontada:cities") || "null"); return Array.isArray(saved) && saved.length ? saved : CITIES; } catch { return CITIES; } });
+  const [cities] = useState(() => { try { const saved = JSON.parse(localStorage.getItem("remontada:cities:v2") || "null"); return Array.isArray(saved) && saved.length ? saved : CITIES; } catch { return CITIES; } });
   const [city, setCity] = useState(() => cities[0] ?? { name: "", ship: 0, eta: "" });
   const ship = city.name ? city.ship : 0;
   return { subtotal, cart, city, cities, setCity, ship, total: subtotal + ship };
