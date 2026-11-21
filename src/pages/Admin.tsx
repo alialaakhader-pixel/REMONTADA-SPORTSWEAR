@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { LockKeyhole, Plus, Pencil, Trash2, Save, LogOut, Package, LayoutDashboard, Tags, Settings } from "lucide-react";
 import type { Product } from "../lib/data";
-import { SPORTS } from "../lib/data";
+import { SPORTS, CITIES } from "../lib/data";
 import { useStore } from "../lib/store";
 
 const PASS_KEY = "remontada:admin-unlocked";
@@ -23,6 +23,7 @@ export default function Admin() {
   const [heroImage,setHeroImage]=useState(()=>localStorage.getItem("remontada:hero-image")||"");
   const [whatsapp,setWhatsapp]=useState(()=>localStorage.getItem("remontada:whatsapp")||"");
   const [shipping,setShipping]=useState(()=>localStorage.getItem("remontada:shipping")||"");
+  const [cityText,setCityText]=useState(()=>{try{return (JSON.parse(localStorage.getItem("remontada:cities")||"null")||CITIES).map((c:any)=>`${c.name}|${c.ship}|${c.eta}`).join("\n")}catch{return CITIES.map(c=>`${c.name}|${c.ship}|${c.eta}`).join("\n")}});
 
   const unlock=()=>{ if(password==="REMONTADA-ADMIN-2026"){sessionStorage.setItem(PASS_KEY,"1");setUnlocked(true);} else toast("كلمة المرور غير صحيحة"); };
   const saveProduct=()=>{
@@ -62,6 +63,6 @@ export default function Admin() {
     </div>}
     {tab==="sports"&&<section className="border border-hair bg-panel p-5"><h2 className="mb-4 text-xl font-black">إظهار وإخفاء الرياضات</h2><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{SPORTS.map(s=><label key={s} className="flex items-center justify-between border border-hair bg-ink p-4"><span>{s}</span><input type="checkbox" checked={sportVisible[s]!==false} onChange={e=>{const n={...sportVisible,[s]:e.target.checked};setSportVisible(n);localStorage.setItem("remontada:sports",JSON.stringify(n))}}/></label>)}</div><p className="mt-4 text-xs text-mute">إعدادات الظهور محفوظة محلياً، وربطها بفلترة المتجر خطوة تكامل تالية.</p></section>}
     {tab==="home"&&<section className="max-w-2xl border border-hair bg-panel p-5"><h2 className="mb-4 text-xl font-black">محتوى الصفحة الرئيسية</h2><label className="mb-4 block"><span className={label}>العنوان الرئيسي</span><input className={input} value={hero} onChange={e=>setHero(e.target.value)}/></label><label className="mb-4 block"><span className={label}>رابط صورة الغلاف</span><input className={input} value={heroImage} onChange={e=>setHeroImage(e.target.value)} placeholder="https://..."/></label><button onClick={()=>{localStorage.setItem("remontada:hero-title",hero);localStorage.setItem("remontada:hero-image",heroImage);toast("تم حفظ محتوى الرئيسية")}} className="bg-fire px-5 py-3 font-bold">حفظ التعديلات</button></section>}
-    {tab==="settings"&&<section className="max-w-2xl border border-hair bg-panel p-5"><h2 className="mb-4 text-xl font-black">بيانات التواصل والشحن</h2><label className="mb-4 block"><span className={label}>رقم واتساب (مع مفتاح الدولة)</span><input className={input} value={whatsapp} onChange={e=>setWhatsapp(e.target.value)}/></label><label className="mb-4 block"><span className={label}>سياسة / ملاحظة الشحن</span><textarea className={input} rows={3} value={shipping} onChange={e=>setShipping(e.target.value)}/></label><button onClick={()=>{localStorage.setItem("remontada:whatsapp",whatsapp);localStorage.setItem("remontada:shipping",shipping);toast("تم حفظ الإعدادات")}} className="bg-fire px-5 py-3 font-bold">حفظ الإعدادات</button></section>}
+    {tab==="settings"&&<section className="max-w-2xl border border-hair bg-panel p-5"><h2 className="mb-4 text-xl font-black">بيانات التواصل والشحن</h2><label className="mb-4 block"><span className={label}>رقم واتساب (مع مفتاح الدولة)</span><input className={input} value={whatsapp} onChange={e=>setWhatsapp(e.target.value)}/></label><label className="mb-4 block"><span className={label}>سياسة / ملاحظة الشحن</span><textarea className={input} rows={3} value={shipping} onChange={e=>setShipping(e.target.value)}/></label><label className="mb-4 block"><span className={label}>المدن وتكلفة الشحن — كل سطر: المدينة | السعر | مدة التوصيل</span><textarea className={input} rows={6} value={cityText} onChange={e=>setCityText(e.target.value)} placeholder="الرياض | 0 | خلال 24 ساعة"/></label><button onClick={()=>{localStorage.setItem("remontada:whatsapp",whatsapp);localStorage.setItem("remontada:shipping",shipping);const cities=cityText.split("\n").map(line=>{const [name,ship,eta]=line.split("|").map(x=>x.trim());return {name,ship:Number(ship),eta:eta||"حسب المنطقة"}}).filter(c=>c.name&&Number.isFinite(c.ship)&&c.ship>=0);localStorage.setItem("remontada:cities",JSON.stringify(cities));toast("تم حفظ الإعدادات")}} className="bg-fire px-5 py-3 font-bold">حفظ الإعدادات</button></section>}
   </div>;
 }
