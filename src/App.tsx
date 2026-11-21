@@ -7,13 +7,14 @@ import Shop from "./pages/Shop";
 import ProductPage from "./pages/Product";
 import { Cart, Checkout } from "./pages/CartCheckout";
 import { About, Journal, Contact, Faq, Returns, Account, Wishlist } from "./pages/Misc";
+import Admin from "./pages/Admin";
 
 function Router() {
   const { route, go } = useStore();
   const path = route.split("?")[0];
 
   let page: React.ReactNode;
-  if (path === "/" || path === "") page = <Home />;
+  if (path === "/admin") page = <Admin />;\n  else if (path === "/" || path === "") page = <Home />;
   else if (path === "/shop") page = <Shop />;
   else if (path.startsWith("/product/")) page = <ProductPage id={path.replace("/product/", "")} />;
   else if (path === "/cart") page = <Cart />;
