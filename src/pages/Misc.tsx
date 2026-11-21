@@ -17,13 +17,13 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { useStore } from "../lib/store";
-import { ARTICLES, FAQS, PRODUCTS } from "../lib/data";
+import { ARTICLES, FAQS } from "../lib/data";
 import { Btn, Micro, Reveal, ProductCard, Stars, SectionHead } from "../components/ui";
 import { LogoPlate } from "../components/Logo";
 
 /* ================= ABOUT ================= */
 export function About() {
-  const { go, products } = useStore();
+  const { go } = useStore();
   return (
     <div>
       <section className="mx-auto max-w-[1440px] px-4 pt-32 sm:px-6 lg:px-10">
