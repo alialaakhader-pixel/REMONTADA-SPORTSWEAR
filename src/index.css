@@ -208,3 +208,84 @@ input[type="range"] {
     transform: none;
   }
 }
+
+
+/* ---------- responsive layout hardening ---------- */
+html, body, #root {
+  width: 100%;
+  min-width: 0;
+}
+body {
+  min-height: 100%;
+  overflow-x: clip;
+}
+#root, main, main > *, section, article, aside, footer, header {
+  min-width: 0;
+}
+img, video, canvas, svg {
+  max-width: 100%;
+}
+img {
+  height: auto;
+}
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+:where(h1, h2, h3, h4, p, span, a, button) {
+  overflow-wrap: break-word;
+}
+.display {
+  line-height: 1.12;
+  max-width: 100%;
+}
+.marquee-track {
+  will-change: transform;
+}
+header {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+@media (max-width: 639px) {
+  .display {
+    letter-spacing: -0.015em;
+  }
+  main .mx-auto {
+    max-width: 100%;
+  }
+  input, select, textarea {
+    max-width: 100%;
+    min-width: 0;
+  }
+  .marquee-track span {
+    padding-inline: 0.85rem;
+    font-size: 11px;
+  }
+}
+@media (max-width: 380px) {
+  header > div.mx-auto {
+    height: 62px;
+    gap: 5px;
+    padding-inline: 9px;
+  }
+  header > div.mx-auto > button:first-child {
+    transform: scale(.86);
+    transform-origin: right center;
+    margin-left: -8px;
+  }
+  header > div.mx-auto > div {
+    gap: 1px;
+  }
+  header > div.mx-auto > div > button {
+    width: 34px;
+    height: 36px;
+  }
+}
+@media (max-width: 340px) {
+  header > div.mx-auto > div > button[aria-label="المفضلة"] {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
