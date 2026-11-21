@@ -9,7 +9,7 @@ import React,
   } from "react";
 import { PRODUCTS, type Product } from "./data";
 
-const PRODUCTS_KEY = "remontada:products:v1";
+const PRODUCTS_KEY = "remontada:products:v2";
 function readProducts(): Product[] {
   try {
     const raw = window.localStorage.getItem(PRODUCTS_KEY);
