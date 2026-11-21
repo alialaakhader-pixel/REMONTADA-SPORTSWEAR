@@ -11,7 +11,6 @@ import {
   Phone,
 } from "lucide-react";
 import { useStore } from "../lib/store";
-import { PRODUCTS } from "../lib/data";
 import { Wordmark, IbexMark } from "./Logo";
 import { Btn } from "./ui";
 
