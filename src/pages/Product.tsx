@@ -24,7 +24,7 @@ const SIZE_TABLE = [
 ];
 
 export default function ProductPage({ id }: { id: string }) {
-  const { add, go, wish, toggleWish, toast } = useStore();
+  const { add, go, wish, toggleWish, toast, products } = useStore();
   const p = findProduct(id);
 
   const [size, setSize] = useState<string | null>(null);
@@ -44,7 +44,7 @@ export default function ProductPage({ id }: { id: string }) {
   const galleryRef = useRef<HTMLDivElement>(null);
 
   const related = useMemo(
-    () => PRODUCTS.filter((x) => x.id !== id && x.sport === p?.sport).slice(0, 4),
+    () => products.filter((x) => x.id !== id && x.sport === p?.sport).slice(0, 4),
     [id, p]
   );
   const alsoBought = useMemo(
