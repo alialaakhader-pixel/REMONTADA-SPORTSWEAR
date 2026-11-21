@@ -1,4 +1,3 @@
-import { IMG } from "./img";
 export type Product = {
   id: string;
   name: string;
@@ -34,10 +33,6 @@ export const SPORTS = [
 export const BRANDS: string[] = [];
 
 export const CITIES: { name: string; ship: number; eta: string }[] = [];
-
-const S_SHOE = ["39", "40", "41", "42", "43", "44", "45"];
-const S_APP = ["S", "M", "L", "XL", "XXL"];
-const S_ONE = ["مقاس واحد"];
 
 export const PRODUCTS: Product[] = [];
 
