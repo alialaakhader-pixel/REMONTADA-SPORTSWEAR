@@ -24,11 +24,11 @@ const NAV = [
 ];
 
 const TICKER = [
-  "شحن مجاني للطلبات فوق 400 ر.س",
-  "إرجاع مجاني خلال 14 يوماً",
-  "خصم 30% على مجموعة الجري",
-  "توصيل الرياض خلال 24 ساعة",
-  "دفع آمن — مدى · فيزا · أبل باي",
+  "التوصيل مدفوع ويُحسب حسب المحافظة",
+  "سياسة الاستبدال والاسترجاع واضحة",
+  "اكتشف المجموعات الرياضية",
+  "رسوم التوصيل تظهر قبل تأكيد الطلب",
+  "طرق الدفع تُعلن عند تفعيلها",
 ];
 
 export function Ticker() {
@@ -317,7 +317,7 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
                     <span className="block font-bold text-paper group-hover:text-fire">{p.name}</span>
                     <span className="tech block text-[11px] tracking-widest text-mute">{p.sub}</span>
                   </span>
-                  <span className="tech tnum font-bold text-paper">{p.price} ر.س</span>
+                  <span className="tech tnum font-bold text-paper">{p.price} ج.م</span>
                 </button>
               ))}
             </div>
@@ -505,7 +505,7 @@ export function Footer() {
           </div>
           <div className="flex items-center gap-2 text-sm text-mute">
             <Truck size={15} className="text-neon" />
-            شحن سريع لكل المملكة
+            توصيل مدفوع حسب المحافظة
           </div>
         </div>
       </div>
