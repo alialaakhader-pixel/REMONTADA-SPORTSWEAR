@@ -231,7 +231,7 @@ function IconBtn({
 
 /* ---------------- instant search ---------------- */
 function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { go, setSearch, search } = useStore();
+  const { go, setSearch, search, products } = useStore();
 
   useEffect(() => {
     const esc = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -242,7 +242,7 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
   const results = useMemo(() => {
     const q = search.trim();
     if (!q) return [];
-    return PRODUCTS.filter(
+    return products.filter(
       (p) =>
         p.name.includes(q) ||
         p.sport.includes(q) ||
