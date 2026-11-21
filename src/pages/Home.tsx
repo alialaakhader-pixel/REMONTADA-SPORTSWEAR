@@ -34,7 +34,7 @@ const STATS = [
 export default function Home() {
   const { go, products } = useStore();
   const [tab, setTab] = useState<"new" | "offers">("new");
-  const [faq, setFaq] = useState<number | null>(0);
+  const [faq, setFaq] = useState<number | null>(0);\n  const [heroTitle] = useState(() => localStorage.getItem("remontada:hero-title") || "العودة قرار.");\n  const [heroImage] = useState(() => localStorage.getItem("remontada:hero-image") || IMG.hero);\n  const [visibleSports] = useState<string[]>(() => { try { const cfg = JSON.parse(localStorage.getItem("remontada:sports") || "{}"); return SPORTS.filter(s => cfg[s] !== false); } catch { return [...SPORTS]; } });
 
   const newest = products.filter((p) => p.badge === "جديد" || p.badge === "الأكثر مبيعاً").slice(0, 4);
   const offers = products.filter((p) => p.old).slice(0, 4);
@@ -46,7 +46,7 @@ export default function Home() {
       <section className="relative isolate overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={IMG.hero}
+            src={heroImage}
             alt="رياضي في حالة انطلاق داخل ملعب ليلي"
             className="h-full w-full object-cover object-[28%_center]"
           />
@@ -360,7 +360,7 @@ export default function Home() {
             sub="اختر رياضتك وسنوجّهك مباشرة إلى المجموعة المناسبة."
           />
           <div className="grid grid-cols-2 gap-px bg-hair sm:grid-cols-3 lg:grid-cols-7">
-            {SPORTS.map((s, i) => (
+            {visibleSports.map((s, i) => (
               <Reveal key={s} delay={i * 0.05}>
                 <button
                   onClick={() => go(`/shop?s=${encodeURIComponent(s)}`)}
@@ -550,7 +550,7 @@ export default function Home() {
             <h2 className="display mt-6 text-[clamp(2.2rem,6vw,4.6rem)] text-paper">
               الخسارة اختيار.
               <br />
-              <span className="text-fire glow-fire">العودة قرار.</span>
+              <span className="text-fire glow-fire">{heroTitle}</span>
             </h2>
             <p className="mt-6 max-w-lg text-[16px] leading-[1.9] text-paper/75">
               اطلب اليوم واستلم خلال 24 ساعة داخل الرياض. إرجاع مجاني، واستبدال مقاس
