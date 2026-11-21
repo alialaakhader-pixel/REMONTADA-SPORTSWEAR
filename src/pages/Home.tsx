@@ -9,11 +9,10 @@ import {
   Tag,
   Check,
   ChevronDown,
-  Quote,
   Zap,
 } from "lucide-react";
 import { useStore } from "../lib/store";
-import { PRODUCTS, SPORTS, TESTIMONIALS, FAQS, CLUB, money } from "../lib/data";
+import { SPORTS, FAQS, money } from "../lib/data";
 import {
   Reveal,
   Micro,
@@ -21,7 +20,6 @@ import {
   Btn,
   ProductCard,
   SportIcon,
-  Stars,
 } from "../components/ui";
 
 export default function Home() {
