@@ -34,7 +34,10 @@ const STATS = [
 export default function Home() {
   const { go, products } = useStore();
   const [tab, setTab] = useState<"new" | "offers">("new");
-  const [faq, setFaq] = useState<number | null>(0);\n  const [heroTitle] = useState(() => localStorage.getItem("remontada:hero-title") || "العودة قرار.");\n  const [heroImage] = useState(() => localStorage.getItem("remontada:hero-image") || IMG.hero);\n  const [visibleSports] = useState<string[]>(() => { try { const cfg = JSON.parse(localStorage.getItem("remontada:sports") || "{}"); return SPORTS.filter(s => cfg[s] !== false); } catch { return [...SPORTS]; } });
+  const [faq, setFaq] = useState<number | null>(0);
+  const [heroTitle] = useState(() => localStorage.getItem("remontada:hero-title") || "العودة قرار.");
+  const [heroImage] = useState(() => localStorage.getItem("remontada:hero-image") || IMG.hero);
+  const [visibleSports] = useState<string[]>(() => { try { const cfg = JSON.parse(localStorage.getItem("remontada:sports") || "{}"); return SPORTS.filter(s => cfg[s] !== false); } catch { return [...SPORTS]; } });
 
   const newest = products.filter((p) => p.badge === "جديد" || p.badge === "الأكثر مبيعاً").slice(0, 4);
   const offers = products.filter((p) => p.old).slice(0, 4);
