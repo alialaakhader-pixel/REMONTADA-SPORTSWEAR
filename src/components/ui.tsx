@@ -301,8 +301,8 @@ export function ProductCard({
           </div>
         </div>
 
-        <div className="p-4">
-          <div className="flex items-start justify-between gap-3">
+        <div className="p-3 sm:p-4">
+          <div className="flex items-start justify-between gap-2 sm:gap-3">
             <div className="min-w-0">
               <div className="micro truncate text-mute">{p.sub}</div>
               <h3 className="mt-1.5 truncate text-[15px] font-bold text-paper transition-colors group-hover:text-fire">
@@ -320,8 +320,8 @@ export function ProductCard({
               ))}
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between gap-3">
-            <Stars value={p.rating} showNum reviews={p.reviews} />
+          <div className="mt-3 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+            <Stars value={p.rating} size={11} />
             <Price p={p} />
           </div>
         </div>
