@@ -18,7 +18,7 @@ function useTotals() {
 /* ================= CART ================= */
 export function Cart() {
   const { cart, setQty, remove, go, subtotal } = useStore();
-  const { ship, total, city, cities } = useTotals();
+  const { ship, total, city } = useTotals();
 
   if (cart.length === 0)
     return (
@@ -129,7 +129,7 @@ export function Cart() {
 
           <div className="mt-5 space-y-3 text-sm">
             <Row label="المجموع الفرعي" value={`${money(subtotal)} ج.م`} />
-            <Row label={`الشحن — ${city.name}`} value={city.name ? `${money(ship)} ج.م` : "تُحدد بعد إعداد الشحن"} tone={ship === 0 ? "neon" : undefined} />
+            <Row label={city.name ? `الشحن — ${city.name}` : "الشحن"} value={city.name ? `${money(ship)} ج.م` : "تُحدد بعد إعداد الشحن"} tone={ship === 0 ? "neon" : undefined} />
             
           </div>
 
@@ -146,7 +146,7 @@ export function Cart() {
           </Btn>
 
           <div className="mt-5 flex items-center justify-center gap-4 text-[11.5px] text-mute">
-            <span className="flex items-center gap-1.5"><ShieldCheck size={13} className="text-neon" /> دفع آمن</span>
+            <span className="flex items-center gap-1.5"><ShieldCheck size={13} className="text-neon" /> طرق الدفع قيد التفعيل</span>
             <span className="flex items-center gap-1.5"><Truck size={13} className="text-neon" /> توصيل حسب المحافظة</span>
           </div>
         </aside>
@@ -188,7 +188,6 @@ export function Checkout() {
     cvc: "",
   });
 
-  const codFee = 0;
   const grand = total;
 
   if (done)
@@ -238,7 +237,7 @@ export function Checkout() {
 
   const validate = () => {
     if (step === 0) {
-      if (!f.name.trim() || !/^01[0-2,5]{1}[0-9]{8}$/.test(f.phone.replace(/\s/g, "")) || !f.address.trim()) {
+      if (!f.name.trim() || !/^01[0125][0-9]{8}$/.test(f.phone.replace(/\s/g, "")) || !f.address.trim()) {
         toast("أكمل معلومات الشحن", "الاسم، رقم هاتف مصري صحيح، والعنوان مطلوبة");
         return false;
       }
@@ -312,7 +311,7 @@ export function Checkout() {
                       dir="ltr"
                     />
                     <div>
-                      <Label>المدينة</Label>
+                      <Label>المحافظة</Label>
                       <select
                         value={city.name}
                         onChange={(e) =>
@@ -322,7 +321,7 @@ export function Checkout() {
                       >
                         {cities.map((c) => (
                           <option key={c.name} value={c.name}>
-                            {c.name} — ${c.ship} ج.م
+                            {c.name} — {money(c.ship)} ج.م
                           </option>
                         ))}
                       </select>
@@ -479,7 +478,7 @@ export function Checkout() {
               <ArrowRight size={16} /> {step === 0 ? "العودة للسلة" : "رجوع"}
             </button>
             <Btn size="lg" onClick={next}>
-              {step === 2 ? `ادفع ${money(grand)} ج.م` : "متابعة"} <ArrowLeft size={17} />
+              {step === 2 ? "تأكيد الطلب" : "متابعة"} <ArrowLeft size={17} />
             </Btn>
           </div>
         </div>
@@ -500,9 +499,9 @@ export function Checkout() {
             </span>
           </div>
           <div className="mt-5 space-y-2.5 border-t border-hair pt-5 text-[12.5px] text-mute">
-            <p className="flex items-center gap-2"><ShieldCheck size={14} className="text-neon" /> ضمان أصلي 12 شهراً</p>
+            <p className="flex items-center gap-2"><ShieldCheck size={14} className="text-neon" /> بيانات الضمان حسب المنتج</p>
             <p className="flex items-center gap-2"><Truck size={14} className="text-neon" /> {city.eta}</p>
-            <p className="flex items-center gap-2"><Package size={14} className="text-neon" /> إرجاع مجاني خلال 14 يوماً</p>
+            <p className="flex items-center gap-2"><Package size={14} className="text-neon" /> سياسة الإرجاع تُعلن قبل الطلب</p>
           </div>
         </aside>
       </div>
