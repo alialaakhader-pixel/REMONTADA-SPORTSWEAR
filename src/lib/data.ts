@@ -13,6 +13,7 @@ export type Product = {
   reviews: number;
   badge?: "جديد" | "الأكثر مبيعاً" | "خصم 30%" | "محدود الكمية";
   img: string;
+  images?: string[];
   colors: { name: string; hex: string }[];
   sizes: string[];
   sold: number;
