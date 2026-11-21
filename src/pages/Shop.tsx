@@ -28,7 +28,7 @@ function toggle(arr: string[], v: string) {
 }
 
 export default function Shop() {
-  const { route, toast } = useStore();
+  const { route, toast, products } = useStore();
   const qs = route.split("?")[1] ?? "";
   const params = new URLSearchParams(qs);
 
@@ -75,7 +75,7 @@ export default function Shop() {
     (minRating > 0 ? 1 : 0);
 
   const results = useMemo(() => {
-    let out: Product[] = PRODUCTS.filter((p) => {
+    let out: Product[] = products.filter((p) => {
       if (sports.length && !sports.includes(p.sport)) return false;
       if (genders.length && !genders.includes(p.gender)) return false;
       if (types.length && !types.includes(p.type)) return false;
