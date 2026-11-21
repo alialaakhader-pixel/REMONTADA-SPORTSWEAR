@@ -112,7 +112,7 @@ export default function Shop() {
             label={s}
             checked={sports.includes(s)}
             onChange={() => setSports((p) => toggle(p, s))}
-            count={PRODUCTS.filter((p) => p.sport === s).length}
+            count={products.filter((p) => p.sport === s).length}
           />
         ))}
       </FilterGroup>
@@ -124,7 +124,7 @@ export default function Shop() {
             label={g}
             checked={genders.includes(g)}
             onChange={() => setGenders((p) => toggle(p, g))}
-            count={PRODUCTS.filter((p) => p.gender === g).length}
+            count={products.filter((p) => p.gender === g).length}
           />
         ))}
       </FilterGroup>
@@ -136,7 +136,7 @@ export default function Shop() {
             label={t}
             checked={types.includes(t)}
             onChange={() => setTypes((p) => toggle(p, t))}
-            count={PRODUCTS.filter((p) => p.type === t).length}
+            count={products.filter((p) => p.type === t).length}
           />
         ))}
       </FilterGroup>
@@ -148,7 +148,7 @@ export default function Shop() {
             label={b}
             checked={brands.includes(b)}
             onChange={() => setBrands((p) => toggle(p, b))}
-            count={PRODUCTS.filter((p) => p.brand === b).length}
+            count={products.filter((p) => p.brand === b).length}
           />
         ))}
       </FilterGroup>
