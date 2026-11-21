@@ -259,7 +259,7 @@ export function Checkout() {
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 pb-24 pt-32 sm:px-6 lg:px-10">
-      <Micro>الدفع الآمن</Micro>
+      <Micro>مراجعة الطلب</Micro>
       <h1 className="display mt-5 text-[clamp(2.2rem,6vw,4rem)] text-paper">إتمام الطلب</h1>
 
       {/* stepper */}
@@ -315,7 +315,7 @@ export function Checkout() {
                       <select
                         value={city.name}
                         onChange={(e) =>
-                          setCity(cities.find((c) => c.name === e.target.value) ?? cities[0])
+                          setCity(cities.find((c) => c.name === e.target.value) ?? { name: "", ship: 0, eta: "" })
                         }
                         className="w-full border border-hair bg-ink px-4 py-3 text-sm text-paper focus:border-fire focus:outline-none"
                       >
