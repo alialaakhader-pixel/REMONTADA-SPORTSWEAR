@@ -97,7 +97,7 @@ export default function Shop() {
       }
     });
     return out;
-  }, [sports, genders, types, brands, sizes, colors, maxPrice, minRating, sort]);
+  }, [products, sports, genders, types, brands, sizes, colors, maxPrice, minRating, sort]);
 
   const filters = (
     <div className="space-y-8">
