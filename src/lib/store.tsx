@@ -9,11 +9,23 @@ import React,
   } from "react";
 import { PRODUCTS, type Product } from "./data";
 
+const PRODUCTS_KEY = "remontada:products:v1";
+function readProducts(): Product[] {
+  try {
+    const raw = window.localStorage.getItem(PRODUCTS_KEY);
+    if (!raw) return PRODUCTS;
+    const value: unknown = JSON.parse(raw);
+    return Array.isArray(value) ? value as Product[] : PRODUCTS;
+  } catch { return PRODUCTS; }
+}
+
 export type Line = { id: string; qty: number; size: string; color: string };
 
 type Toast = { id: number; title: string; body?: string };
 
 type Ctx = {
+  products: Product[];
+  setProducts: (products: Product[]) => void;
   route: string;
   go: (r: string) => void;
   cart: Line[];
@@ -75,6 +87,7 @@ function readWishlist(): string[] {
 }
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
+  const [products, setProductsState] = useState<Product[]>(readProducts);
   const [route, setRoute] = useState<string>(
     () => window.location.hash.replace(/^#/, "") || "/"
   );
@@ -205,4 +218,4 @@ export function useStore() {
   return c;
 }
 
-export const findProduct = (id: string) => PRODUCTS.find((p) => p.id === id);
+export const findProduct = (id: string) => {\n  try {\n    const raw = window.localStorage.getItem(PRODUCTS_KEY);\n    const products: Product[] = raw ? JSON.parse(raw) : PRODUCTS;\n    return products.find((p) => p.id === id);\n  } catch { return PRODUCTS.find((p) => p.id === id); }\n};
