@@ -2,6 +2,7 @@ import { Component, StrictMode, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
+import TabletPos from "./pos/TabletPos";
 
 class AppErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; errorMessage: string }> {
   state = { hasError: false, errorMessage: "" };
@@ -41,10 +42,14 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, { hasError: bo
   }
 }
 
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("/pos-sw.js").catch((error) => console.warn("POS offline cache unavailable:", error)));
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AppErrorBoundary>
-      <App />
+      {window.location.pathname.startsWith("/pos-tablet") ? <TabletPos /> : <App />}
     </AppErrorBoundary>
   </StrictMode>
 );
