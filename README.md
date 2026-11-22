@@ -1,18 +1,20 @@
 # REMONTADA SPORTSWEAR
 
-Website design for REMONTADA SPORTSWEAR, built with React 19, Vite, Tailwind CSS 4 and Framer Motion.
+منصة متجر رياضي متكاملة (واجهة المتجر + حساب العميل + تطبيق المندوب + لوحة تحكم الإدارة) مبنية بـ React 19 و Vite و Tailwind CSS 4.
+كل شيء داخل `src/App.tsx`، والبيانات تُحفظ في `localStorage` والمتجر يبدأ فارغاً بدون بيانات وهمية.
 
-## Run locally
-
+## التشغيل
 ```bash
 npm install
 npm run dev
 ```
 
-## Build
-
+## البناء
 ```bash
 npm run build
 ```
+الناتج في `dist/` ملف HTML واحد (`vite-plugin-singlefile`).
 
-The build uses `vite-plugin-singlefile`, so the output in `dist/` is a single self-contained HTML file.
+## ملاحظات
+- كلمة سر الإدارة الافتراضية موجودة في الثابت `DEFAULT_ADMIN_PASSWORD` داخل `src/App.tsx` — غيّرها من تبويب الأمان في لوحة الإدارة قبل النشر.
+- البيانات محلية في متصفح كل مستخدم (لا يوجد خادم)، فالطلبات والمنتجات لا تتشارك بين الأجهزة.
