@@ -2255,6 +2255,7 @@ function CartDrawer({
       notify('يرجى إدخال جميع بيانات التوصيل');
       return;
     }
+    if (printingTotal > 0 && namePrintingFee <= 0) { notify('الإدارة لم تحدد سعر طباعة الاسم بعد'); return; }
     const missingPrintName = cartDetails.some((item) => {
       const option = getPrintOption(item);
       return item.product.supportsNamePrinting && option.enabled && Array.from({ length: item.qty }, (_, i) => String(option.names?.[i] || '').trim()).some((name) => !name);
@@ -2371,7 +2372,7 @@ function CartDrawer({
                       {item.product.supportsNamePrinting && (
                         <div className="mt-2 space-y-2 rounded-xl border border-[#00D4FF]/25 bg-[#0A1A3A]/60 p-2">
                           <label className="flex items-center gap-2 text-[11px] font-bold text-[#00D4FF]">
-                            <input type="checkbox" checked={Boolean(getPrintOption(item).enabled)} onChange={(e) => setPrintOptions((prev) => { const key = `${item.productId}-${item.variantId}`; const current = prev[key] || { names: Array.from({ length: item.qty }, () => '') }; return { ...prev, [key]: { ...current, enabled: e.target.checked, names: Array.from({ length: item.qty }, (_, i) => current.names?.[i] || '') } }; })} className="accent-[#00B4FF]" />
+                            <input type="checkbox" checked={Boolean(getPrintOption(item).enabled)} onChange={(e) => { if (e.target.checked && namePrintingFee <= 0) { notify('الإدارة لم تحدد سعر طباعة الاسم بعد'); return; } setPrintOptions((prev) => { const key = `${item.productId}-${item.variantId}`; const current = prev[key] || { names: Array.from({ length: item.qty }, () => '') }; return { ...prev, [key]: { ...current, enabled: e.target.checked, names: Array.from({ length: item.qty }, (_, i) => current.names?.[i] || '') } }; }); }} className="accent-[#00B4FF]" />
                             <span>طباعة اسم على التيشيرت (+{formatEGP(namePrintingFee)} للقطعة)</span>
                           </label>
                           {getPrintOption(item).enabled && Array.from({ length: item.qty }, (_, i) => (
