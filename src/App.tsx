@@ -41,6 +41,7 @@ const INITIAL_STATE = {
     walletEnabled: false,
     metaPixelId: '',
     gaMeasurementId: '',
+    namePrintingFee: 0,
   },
   // تكاليف الشحن المدفوع حسب المحافظة (إلزامي > 0 ج.م - لا يوجد شحن مجاني)
   governorates: [
@@ -2216,6 +2217,13 @@ function CartDrawer({
   const [city, setCity] = useState(store.customerProfile?.city || '');
   const [address, setAddress] = useState(store.customerProfile?.address || '');
   const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [printOptions, setPrintOptions] = useState({});
+  const namePrintingFee = Math.max(0, Number(store.settings?.namePrintingFee || 0));
+  const getPrintOption = (item) => printOptions[`${item.productId}-${item.variantId}`] || { enabled: false, names: Array.from({ length: item.qty }, () => '') };
+  const printingTotal = cartDetails.reduce((sum, item) => {
+    const option = getPrintOption(item);
+    return sum + (item.product.supportsNamePrinting && option.enabled ? item.qty * namePrintingFee : 0);
+  }, 0);
 
   const selectedGov = activeGovs.find((g) => g.id === govId) || activeGovs[0];
   const shippingFee = Math.max(1, Number(selectedGov?.fee || 65));
@@ -2227,7 +2235,7 @@ function CartDrawer({
       : Math.min(cartSubtotal, Number(appliedCoupon.discountValue));
   }, [appliedCoupon, cartSubtotal]);
 
-  const grandTotal = Math.max(0, cartSubtotal - couponDiscount) + shippingFee;
+  const grandTotal = Math.max(0, cartSubtotal - couponDiscount) + shippingFee + printingTotal;
 
   const handleApplyCoupon = () => {
     const found = store.coupons.find(
@@ -2245,6 +2253,14 @@ function CartDrawer({
     e.preventDefault();
     if (!customerName.trim() || !customerPhone.trim() || !city.trim() || !address.trim()) {
       notify('يرجى إدخال جميع بيانات التوصيل');
+      return;
+    }
+    const missingPrintName = cartDetails.some((item) => {
+      const option = getPrintOption(item);
+      return item.product.supportsNamePrinting && option.enabled && Array.from({ length: item.qty }, (_, i) => String(option.names?.[i] || '').trim()).some((name) => !name);
+    });
+    if (missingPrintName) {
+      notify('اكتب الاسم المطلوب طباعته لكل قطعة اخترت لها الطباعة');
       return;
     }
 
@@ -2269,16 +2285,13 @@ function CartDrawer({
       discount: couponDiscount,
       shippingFee,
       total: grandTotal,
-      items: cartDetails.map((d) => ({
-        productId: d.product.id,
-        variantId: d.variant.id,
-        productTitle: d.product.title,
-        size: d.variant.size,
-        colorName: d.variant.colorName,
-        qty: d.qty,
-        lineTotal: d.lineTotal,
-        rated: false,
-      })),
+      printingTotal,
+      items: cartDetails.map((d) => {
+        const option = getPrintOption(d);
+        const shouldPrint = Boolean(d.product.supportsNamePrinting && option.enabled);
+        const names = shouldPrint ? Array.from({ length: d.qty }, (_, i) => String(option.names?.[i] || '').trim()) : [];
+        return { productId: d.product.id, variantId: d.variant.id, productTitle: d.product.title, size: d.variant.size, colorName: d.variant.colorName, qty: d.qty, lineTotal: d.lineTotal, printNames: names, printingQty: shouldPrint ? d.qty : 0, printingFee: shouldPrint ? namePrintingFee : 0, printingTotal: shouldPrint ? d.qty * namePrintingFee : 0, rated: false };
+      }),
       createdAt: new Date().toISOString(),
     };
 
@@ -2355,6 +2368,17 @@ function CartDrawer({
                         {item.variant?.size} — {item.variant?.colorName}
                       </div>
                       <div className="mt-1 text-xs font-black text-[#00D4FF]">{formatEGP(item.lineTotal)}</div>
+                      {item.product.supportsNamePrinting && (
+                        <div className="mt-2 space-y-2 rounded-xl border border-[#00D4FF]/25 bg-[#0A1A3A]/60 p-2">
+                          <label className="flex items-center gap-2 text-[11px] font-bold text-[#00D4FF]">
+                            <input type="checkbox" checked={Boolean(getPrintOption(item).enabled)} onChange={(e) => setPrintOptions((prev) => { const key = `${item.productId}-${item.variantId}`; const current = prev[key] || { names: Array.from({ length: item.qty }, () => '') }; return { ...prev, [key]: { ...current, enabled: e.target.checked, names: Array.from({ length: item.qty }, (_, i) => current.names?.[i] || '') } }; })} className="accent-[#00B4FF]" />
+                            <span>طباعة اسم على التيشيرت (+{formatEGP(namePrintingFee)} للقطعة)</span>
+                          </label>
+                          {getPrintOption(item).enabled && Array.from({ length: item.qty }, (_, i) => (
+                            <input key={i} type="text" maxLength={18} required value={getPrintOption(item).names?.[i] || ''} onChange={(e) => setPrintOptions((prev) => { const key = `${item.productId}-${item.variantId}`; const current = prev[key] || { enabled: true, names: Array.from({ length: item.qty }, () => '') }; const names = Array.from({ length: item.qty }, (_, index) => current.names?.[index] || ''); names[i] = e.target.value; return { ...prev, [key]: { ...current, enabled: true, names } }; })} placeholder={`اسم القطعة ${i + 1} للطباعة`} className="w-full rounded-lg border border-[#00D4FF]/30 bg-[#05050F] px-2.5 py-2 text-[11px] text-white outline-none" />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <button
@@ -2496,6 +2520,7 @@ function CartDrawer({
                 <span>- {formatEGP(couponDiscount)}</span>
               </div>
             )}
+            {printingTotal > 0 && <div className="flex justify-between font-bold"><span>طباعة الأسماء:</span><span className="text-[#00D4FF]">{formatEGP(printingTotal)}</span></div>}
             <div className="flex justify-between font-bold">
               <span>تكلفة التوصيل ({selectedGov?.name}) — مدفوع:</span>
               <span className="text-[#00D4FF]">{formatEGP(shippingFee)}</span>
@@ -3402,6 +3427,7 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
   const [gender, setGender] = useState('unisex');
   const [basePrice, setBasePrice] = useState('');
   const [description, setDescription] = useState('');
+  const [supportsNamePrinting, setSupportsNamePrinting] = useState(false);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [variants, setVariants] = useState([
@@ -3454,6 +3480,7 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
       gender,
       basePrice: Number(basePrice),
       description: description.trim(),
+      supportsNamePrinting,
       images: uploadedImages,
       isActive: true,
       variants: cleanVariants,
@@ -3479,6 +3506,7 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
     setTitle('');
     setBasePrice('');
     setDescription('');
+    setSupportsNamePrinting(false);
     setUploadedImages([]);
   };
 
@@ -3634,6 +3662,10 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
           )}
         </div>
 
+        <label className={`flex items-center gap-2 rounded-xl border border-[#00D4FF]/30 p-3 text-xs font-bold ${isLight ? 'bg-[#F3F8FF]' : 'bg-[#05050F]/60'}`}>
+          <input type="checkbox" checked={supportsNamePrinting} onChange={(e) => setSupportsNamePrinting(e.target.checked)} className="accent-[#00B4FF]" />
+          <span>السماح بطباعة اسم على هذا المنتج (مثل تيشيرتات الكورة)</span>
+        </label>
         <textarea
           rows={2}
           placeholder="وصف المنتج (اختياري)..."
@@ -3807,6 +3839,7 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
                         setGender(p.gender || 'unisex');
                         setBasePrice(String(p.basePrice));
                         setDescription(p.description || '');
+                        setSupportsNamePrinting(Boolean(p.supportsNamePrinting));
                         setUploadedImages(p.images || []);
                         setVariants(p.variants || []);
                       }}
@@ -4350,6 +4383,9 @@ function AdminOrdersList({ store, setStore, isLight, onViewReceipt, notify }) {
               </div>
             </div>
 
+            <div className="rounded-xl border border-[#00D4FF]/20 bg-[#0A1A3A]/40 p-3 text-[11px]">
+              {(ord.items || []).map((it, idx) => <div key={idx} className="mb-1"><b>{it.productTitle}</b> — {it.size}/{it.colorName} × {it.qty}{it.printNames?.length ? <div className="font-bold text-[#00D4FF]">أسماء الطباعة: {it.printNames.map((name, i) => `${i + 1}) ${name}`).join(' | ')}</div> : null}</div>)}
+            </div>
             {ord.deliveryPhoto && (
               <div className="flex items-center gap-3 border-t border-[#00D4FF]/15 pt-3">
                 <img src={ord.deliveryPhoto} alt="إثبات التوصيل" className="h-16 w-16 rounded-xl border border-[#00D4FF]/40 object-cover" />
@@ -4371,6 +4407,8 @@ function AdminOrdersList({ store, setStore, isLight, onViewReceipt, notify }) {
 // ============================================================================
 
 function AdminShippingAndBrand({ store, setStore, isLight, notify }) {
+  const [newGovernorateName, setNewGovernorateName] = useState('');
+  const [newGovernorateFee, setNewGovernorateFee] = useState('');
   const logoUploadRef = useRef(null);
   const backupImportRef = useRef(null);
 
@@ -4536,7 +4574,19 @@ function AdminShippingAndBrand({ store, setStore, isLight, notify }) {
       </div>
 
       <div className={`space-y-3 rounded-3xl border border-[#00D4FF]/30 p-6 ${isLight ? 'bg-white' : 'bg-[#0A1A3A]/50'}`}>
+        <h3 className="text-base font-black text-[#00B4FF]">إعدادات طباعة أسماء تيشيرتات الكورة</h3>
+        <label className="block text-xs font-bold text-[#00B4FF]">سعر طباعة الاسم على القطعة الواحدة (ج.م)</label>
+        <input type="number" min={0} step="1" value={store.settings.namePrintingFee ?? 0} onChange={(e) => setStore((prev) => ({ ...prev, settings: { ...prev.settings, namePrintingFee: Math.max(0, Number(e.target.value) || 0) } }))} className={`w-full max-w-xs rounded-xl border border-[#00D4FF]/35 px-3.5 py-2.5 text-xs outline-none ${isLight ? 'bg-[#F3F8FF] text-[#05050F]' : 'bg-[#05050F] text-white'}`} placeholder="مثال: 50 جنيه" />
+        <p className="text-[11px] text-[#A0AEC0]">السعر بيتحسب لكل قطعة عليها طباعة، وتقدر تغيّره في أي وقت.</p>
+      </div>
+
+      <div className={`space-y-3 rounded-3xl border border-[#00D4FF]/30 p-6 ${isLight ? 'bg-white' : 'bg-[#0A1A3A]/50'}`}>
         <h3 className="text-base font-black text-[#00B4FF]">تكاليف الشحن المدفوع حسب المحافظة (ج.م)</h3>
+        <form onSubmit={(e) => { e.preventDefault(); const name = newGovernorateName.trim(); const fee = Number(newGovernorateFee); if (!name || !Number.isFinite(fee) || fee < 1) { notify('اكتب اسم المحافظة ورسوم شحن صحيحة'); return; } if (store.governorates.some((g) => g.name.trim() === name)) { notify('المحافظة موجودة بالفعل'); return; } setStore((prev) => ({ ...prev, governorates: [...prev.governorates, { id: `gov-${Date.now()}`, name, fee, active: true }] })); setNewGovernorateName(''); setNewGovernorateFee(''); notify('تمت إضافة المحافظة ورسوم الشحن'); }} className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <input required value={newGovernorateName} onChange={(e) => setNewGovernorateName(e.target.value)} placeholder="اسم المحافظة الجديدة" className={`rounded-xl border border-[#00D4FF]/35 px-3 py-2 text-xs ${isLight ? 'bg-[#F3F8FF] text-[#05050F]' : 'bg-[#05050F] text-white'}`} />
+          <input required type="number" min={1} value={newGovernorateFee} onChange={(e) => setNewGovernorateFee(e.target.value)} placeholder="رسوم الشحن (ج.م)" className={`rounded-xl border border-[#00D4FF]/35 px-3 py-2 text-xs ${isLight ? 'bg-[#F3F8FF] text-[#05050F]' : 'bg-[#05050F] text-white'}`} />
+          <button type="submit" className="rounded-xl bg-[#00B4FF] px-4 py-2 text-xs font-black text-[#05050F]">+ إضافة محافظة</button>
+        </form>
         {store.governorates.map((g) => (
           <div
             key={g.id}
@@ -4563,6 +4613,7 @@ function AdminShippingAndBrand({ store, setStore, isLight, notify }) {
                 }`}
               />
               <span className="text-[#00B4FF]">ج.م</span>
+              <button type="button" onClick={() => { if (store.governorates.length <= 1) { notify('لازم تسيب محافظة واحدة على الأقل'); return; } if (window.confirm(`حذف محافظة ${g.name}؟`)) { setStore((prev) => ({ ...prev, governorates: prev.governorates.filter((x) => x.id !== g.id) })); notify('تم حذف المحافظة'); } }} className="rounded-lg border border-red-400/40 px-2 py-1 text-[10px] font-bold text-red-400">حذف</button>
             </div>
           </div>
         ))}
@@ -4600,7 +4651,7 @@ function OrderReceiptModal({ order, onClose }) {
           <div className="space-y-1.5 border-y border-[#00D4FF]/20 py-3">
             {order.items.map((it, idx) => (
               <div key={idx} className="flex justify-between">
-                <span>{it.productTitle} ({it.size} / {it.colorName}) × {it.qty}</span>
+                <span>{it.productTitle} ({it.size} / {it.colorName}) × {it.qty}{it.printNames?.length ? <span className="mt-1 block text-[11px] font-bold text-[#00D4FF]">أسماء الطباعة: {it.printNames.map((name, i) => `قطعة ${i + 1}: ${name}`).join(' — ')}</span> : null}</span>
                 <span className="font-bold text-[#00D4FF]">{formatEGP(it.lineTotal)}</span>
               </div>
             ))}
