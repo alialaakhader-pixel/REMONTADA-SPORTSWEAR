@@ -8,7 +8,7 @@ import {
   Lock, KeyRound, Camera, CheckSquare, Copy, Download,
   AlertTriangle, Clock, Footprints, Shirt, UserCheck, FileUp
 } from 'lucide-react';
-import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStoreState, saveStoreState, changeAdminPassword, reserveOnlineInventory, releaseOnlineInventory } from './lib/supabase';
+import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStoreState, saveStoreState, changeAdminPassword, reserveOnlineInventory, releaseOnlineInventory, setInventoryVariantStock } from './lib/supabase';
 
 // ============================================================================
 // 1. الإعدادات الافتراضية النظيفة 100% (بدون أي بيانات وهمية - بداية فارغة)
@@ -3843,6 +3843,7 @@ function AdminStockManager({ store, setStore, isLight, notify }) {
   const [query, setQuery] = useState('');
   const [onlyLow, setOnlyLow] = useState(false);
   const [drafts, setDrafts] = useState({});
+  const [savingRows, setSavingRows] = useState({});
   const products = (store.products || []).filter((p) =>
     String(p.title || '').toLowerCase().includes(query.toLowerCase())
   );
@@ -3853,16 +3854,29 @@ function AdminStockManager({ store, setStore, isLight, notify }) {
   }))).filter((row) => !onlyLow || row.qty <= row.threshold);
   const totalUnits = (store.products || []).reduce((sum, p) =>
     sum + (p.variants || []).reduce((n, v) => n + Math.max(0, Number(v.stockQty || 0)), 0), 0);
-  const updateQty = (productId, variantId, value) => {
-    const qty = Math.max(0, Math.floor(Number(value) || 0));
-    setDrafts((prev) => ({ ...prev, [variantId]: qty }));
-    setStore((prev) => ({
-      ...prev,
-      products: prev.products.map((p) => p.id !== productId ? p : ({
-        ...p,
-        variants: (p.variants || []).map((v) => v.id !== variantId ? v : { ...v, stockQty: qty }),
-      })),
-    }));
+  const updateQty = (variantId, value) => {
+    setDrafts((prev) => ({ ...prev, [variantId]: Math.max(0, Math.floor(Number(value) || 0)) }));
+  };
+  const saveRow = async (product, variant) => {
+    const qty = Math.max(0, Math.floor(Number(drafts[variant.id] ?? variant.stockQty ?? 0)));
+    const threshold = Math.max(0, Math.floor(Number(variant.lowStockThreshold ?? 3)));
+    setSavingRows((prev) => ({ ...prev, [variant.id]: true }));
+    try {
+      await setInventoryVariantStock(readAdminSession(), product, variant, qty, threshold);
+      setStore((prev) => ({
+        ...prev,
+        products: prev.products.map((p) => p.id !== product.id ? p : ({
+          ...p,
+          variants: (p.variants || []).map((v) => v.id !== variant.id ? v : { ...v, stockQty: qty, lowStockThreshold: threshold }),
+        })),
+      }));
+      setDrafts((prev) => { const next = { ...prev }; delete next[variant.id]; return next; });
+      notify("تم تحديث المخزون المركزي بنجاح");
+    } catch (error) {
+      notify(error?.message || "تعذر حفظ كمية المخزون");
+    } finally {
+      setSavingRows((prev) => ({ ...prev, [variant.id]: false }));
+    }
   };
   const updateThreshold = (productId, variantId, value) => {
     const threshold = Math.max(0, Math.floor(Number(value) || 0));
@@ -3896,16 +3910,17 @@ function AdminStockManager({ store, setStore, isLight, notify }) {
         <div className="overflow-x-auto rounded-2xl border border-[#00D4FF]/20">
           <table className="w-full min-w-[620px] text-right text-xs">
             <thead className={isLight ? 'bg-[#EAF4FF]' : 'bg-[#05050F]'}>
-              <tr className="text-[#00B4FF]"><th className="p-3">المنتج</th><th className="p-3">المقاس / اللون</th><th className="p-3">الكمية المتاحة</th><th className="p-3">حد التنبيه</th><th className="p-3">الحالة</th></tr>
+              <tr className="text-[#00B4FF]"><th className="p-3">المنتج</th><th className="p-3">المقاس / اللون</th><th className="p-3">الكمية المتاحة</th><th className="p-3">حد التنبيه</th><th className="p-3">الحالة</th><th className="p-3">حفظ</th></tr>
             </thead>
             <tbody>
               {rows.map(({ product, variant, qty, threshold }) => (
                 <tr key={product.id + '-' + variant.id} className="border-t border-[#00D4FF]/15">
                   <td className="p-3 font-bold">{product.title}</td>
                   <td className="p-3">{variant.size || '—'} / {variant.colorName || '—'}</td>
-                  <td className="p-3"><input aria-label="الكمية المتاحة" type="number" min="0" value={qty} onChange={(e) => updateQty(product.id, variant.id, e.target.value)} className={`w-24 rounded-lg border border-[#00D4FF]/40 px-3 py-2 text-center font-black ${isLight ? 'bg-white text-[#05050F]' : 'bg-[#05050F] text-white'}`} /></td>
+                  <td className="p-3"><input aria-label="الكمية المتاحة" type="number" min="0" value={qty} onChange={(e) => updateQty(variant.id, e.target.value)} className={`w-24 rounded-lg border border-[#00D4FF]/40 px-3 py-2 text-center font-black ${isLight ? 'bg-white text-[#05050F]' : 'bg-[#05050F] text-white'}`} /></td>
                   <td className="p-3"><input aria-label="حد تنبيه المخزون" type="number" min="0" value={threshold} onChange={(e) => updateThreshold(product.id, variant.id, e.target.value)} className={`w-20 rounded-lg border border-[#00D4FF]/30 px-2 py-2 text-center ${isLight ? 'bg-white text-[#05050F]' : 'bg-[#05050F] text-white'}`} /></td>
                   <td className="p-3"><span className={qty === 0 ? 'font-bold text-red-500' : qty <= threshold ? 'font-bold text-amber-500' : 'font-bold text-emerald-500'}>{qty === 0 ? 'نفد' : qty <= threshold ? 'منخفض' : 'متوفر'}</span></td>
+                  <td className="p-3"><button type="button" disabled={!!savingRows[variant.id]} onClick={() => saveRow(product, variant)} className="rounded-lg bg-[#00B4FF] px-3 py-2 font-black text-[#05050F] disabled:opacity-50">{savingRows[variant.id] ? 'جارٍ الحفظ' : 'حفظ'}</button></td>
                 </tr>
               ))}
             </tbody>
