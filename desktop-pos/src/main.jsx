@@ -119,7 +119,10 @@ function App() {
       const {data:rows,error}=await supabase.from('inventory_stock').select('*');
       if(error) throw error;
       const snap=await desktop.replaceCatalog({products:enriched,stockRows:rows||[]});
-      applySnapshot(snap); setOfflineMode(false); setMessage('تم تحديث المنتجات والمخزون والمزامنة بنجاح.');
+      applySnapshot(snap);
+      const {error:heartbeatError}=await supabase.rpc('pos_device_heartbeat');
+      if(heartbeatError) throw heartbeatError;
+      setOfflineMode(false); setMessage('تم تحديث المنتجات والمخزون والمزامنة بنجاح.');
     } catch(err) {
       const local=await desktop?.init(); applySnapshot(local); setOfflineMode(true);
       setMessage('تعذر الاتصال بالمخزون المركزي؛ تم الاحتفاظ بالبيانات المحلية. '+(err.message||''));
@@ -149,9 +152,18 @@ function App() {
     const payload={sale_id:saleId,event_id:eventId,receipt_number:receiptNumber,subtotal:cartTotal,discount:0,total:cartTotal,payment_method:payment,cashier_note:null,
       items:cart.map(x=>({product_id:x.productId,variant_id:x.variantId,product_title:x.title,variant_label:x.label,quantity:x.qty,unit_price:x.price}))};
     try {
+      let centrallyApplied=false;
+      if(session && navigator.onLine) {
+        await refreshData(session);
+        const {error:centralError}=await supabase.rpc('pos_apply_offline_event',{p_event_id:eventId,p_event_type:'sale',p_payload:payload});
+        if(!centralError) centrallyApplied=true;
+        else if(/رصيد المخزون|الكمية المطلوبة|مخزون/i.test(centralError.message||'')) throw centralError;
+      }
       const snap=await desktop.createSale(payload); applySnapshot(snap);
+      if(centrallyApplied) { const synced=await desktop.markSynced(eventId); applySnapshot(synced); }
       setLastReceipt({receiptNumber,items:cart,total:cartTotal,date:new Date().toLocaleString('ar-EG')});setCart([]);
-      if(session && navigator.onLine) { await syncPending(session); setMessage('تم حفظ الفاتورة ومزامنتها مع مخزون الموقع.'); }
+      if(centrallyApplied) { await refreshData(session); setMessage('تم تسجيل البيع في المخزون المركزي وحفظ الفاتورة محليًا.'); }
+      else if(session && navigator.onLine) { await syncPending(session); setMessage('تم حفظ الفاتورة محليًا، وستُرفع عند استقرار الاتصال.'); }
       else setMessage('تم حفظ الفاتورة محليًا دون إنترنت. ستُرفع تلقائيًا عند عودة الاتصال.');
     } catch(err){setMessage(err.message||'تعذر حفظ الفاتورة محليًا');}
     finally{setBusy(false);}
