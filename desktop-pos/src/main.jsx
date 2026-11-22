@@ -72,9 +72,15 @@ function App() {
         if(error) throw error;
         if(data.user?.app_metadata?.role!=='admin') { await supabase.auth.signOut(); throw new Error('الحساب غير مصرح له باستخدام الكاشير'); }
         setSession(data.session); setAuthorized(true); setOfflineMode(false);
-        await desktop?.saveOfflineCredentials({email:email.trim(),password});
+        setMessage('تم تسجيل الدخول. جارٍ تنزيل المنتجات والمخزون لأول مرة.');
+        const ready=await refreshData(data.session);
+        if(ready) {
+          await desktop?.saveOfflineCredentials({email:email.trim(),password});
+          setMessage('تم تفعيل جهاز المحل. يمكنك الآن العمل دون إنترنت بعد تحميل المخزون.');
+        } else {
+          setMessage('تم تسجيل الدخول، لكن لم يكتمل تحميل المخزون. أعد المزامنة قبل الاعتماد على وضع عدم الاتصال.');
+        }
         setPassword('');
-        setMessage('تم تسجيل الدخول وتجهيز نسخة العمل المحلية للمحل.'); await refreshData(data.session);
       } catch(onlineError) {
         const valid=await desktop?.verifyOfflinePassword(password);
         if(!valid) throw onlineError;
@@ -142,9 +148,11 @@ function App() {
       const {error:heartbeatError}=await supabase.rpc('pos_device_heartbeat');
       if(heartbeatError) throw heartbeatError;
       setOfflineMode(false); setMessage('تم تحديث المنتجات والمخزون والمزامنة بنجاح.');
+      return true;
     } catch(err) {
       const local=await desktop?.init(); applySnapshot(local); setOfflineMode(true);
       setMessage('تعذر الاتصال بالمخزون المركزي؛ تم الاحتفاظ بالبيانات المحلية. '+(err.message||''));
+      return false;
     } finally { setBusy(false); }
   }
 
