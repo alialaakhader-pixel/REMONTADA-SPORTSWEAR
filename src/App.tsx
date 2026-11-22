@@ -3555,11 +3555,12 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
               <option key={s.id} value={s.id}>{s.name}</option>
             ))}
           </select>
+          <label className="block text-[11px] font-bold text-[#00B4FF]">سعر بيع القطعة الواحدة (ج.م)</label>
           <input
             type="number"
             required
             min={1}
-            placeholder="السعر بالجنيه المصري (ج.م) *"
+            placeholder="مثال: 850 جنيه"
             value={basePrice}
             onChange={(e) => setBasePrice(e.target.value)}
             className={`rounded-xl border border-[#00D4FF]/35 px-3.5 py-2.5 text-xs outline-none focus:border-[#00D4FF] ${
@@ -3709,10 +3710,11 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
                 }}
                 className="h-9 w-full cursor-pointer rounded-xl border border-[#00D4FF]/30 bg-transparent"
               />
+              <label className="text-[10px] font-bold text-[#00B4FF]">عدد القطع المتاحة</label>
               <input
                 type="number"
                 min={0}
-                placeholder="الكمية"
+                placeholder="مثال: 12 قطعة"
                 value={v.stockQty}
                 onChange={(e) => {
                   const copy = [...variants];
@@ -3723,10 +3725,11 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
                   isLight ? 'bg-white text-[#05050F]' : 'bg-[#0A1A3A]/50 text-white'
                 }`}
               />
+              <label className="text-[10px] font-bold text-[#00B4FF]">حد التنبيه (قطعة)</label>
               <input
                 type="number"
                 min={0}
-                placeholder="حد التنبيه"
+                placeholder="مثال: 3 قطع"
                 value={v.lowStockThreshold ?? 3}
                 onChange={(e) => {
                   const copy = [...variants];
@@ -3910,7 +3913,7 @@ function AdminStockManager({ store, setStore, isLight, notify }) {
         <div className="overflow-x-auto rounded-2xl border border-[#00D4FF]/20">
           <table className="w-full min-w-[620px] text-right text-xs">
             <thead className={isLight ? 'bg-[#EAF4FF]' : 'bg-[#05050F]'}>
-              <tr className="text-[#00B4FF]"><th className="p-3">المنتج</th><th className="p-3">المقاس / اللون</th><th className="p-3">الكمية المتاحة</th><th className="p-3">حد التنبيه</th><th className="p-3">الحالة</th><th className="p-3">حفظ</th></tr>
+              <tr className="text-[#00B4FF]"><th className="p-3">المنتج</th><th className="p-3">المقاس / اللون</th><th className="p-3">عدد القطع المتاحة</th><th className="p-3">حد تنبيه النقص (قطعة)</th><th className="p-3">الحالة</th><th className="p-3">حفظ</th></tr>
             </thead>
             <tbody>
               {rows.map(({ product, variant, qty, threshold }) => (
@@ -4037,6 +4040,7 @@ function AdminPromotionsEngine({ store, setStore, isLight, notify }) {
             <option value="percentage">نسبة مئوية (%)</option>
             <option value="fixed">مبلغ ثابت (ج.م)</option>
           </select>
+          <label className="block text-[11px] font-bold text-[#00B4FF]">قيمة الخصم ({discountType === "percentage" ? "نسبة مئوية %" : "جنيه مصري"})</label>
           <input
             type="number"
             required
@@ -4205,6 +4209,7 @@ function AdminPromotionsEngine({ store, setStore, isLight, notify }) {
             <option value="percentage">نسبة (%)</option>
             <option value="fixed">مبلغ (ج.م)</option>
           </select>
+          <label className="block text-[11px] font-bold text-[#00B4FF]">قيمة الكوبون ({couponType === "percentage" ? "نسبة مئوية %" : "جنيه مصري"})</label>
           <input
             type="number"
             min={1}
@@ -4541,6 +4546,7 @@ function AdminShippingAndBrand({ store, setStore, isLight, notify }) {
           >
             <span className="font-bold">{g.name}</span>
             <div className="flex items-center gap-2">
+              <label className="text-[10px] font-bold text-[#00B4FF]">رسوم الشحن (ج.م)</label>
               <input
                 type="number"
                 min={1}
