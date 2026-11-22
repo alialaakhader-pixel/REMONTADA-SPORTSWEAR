@@ -3102,6 +3102,7 @@ function AdminGateAndDashboard({
         <div className="flex flex-wrap gap-2">
           {[
             { id: 'products', label: 'المنتجات والمخزون', icon: Package },
+            { id: 'stock', label: 'تعديل الكميات', icon: Package },
             { id: 'promotions', label: 'العروض الخاصة', icon: Percent },
             { id: 'orders', label: 'الطلبات وإثبات التوصيل', icon: BarChart3 },
             { id: 'agents', label: 'مناديب التوصيل', icon: UserCheck },
@@ -3186,6 +3187,10 @@ function AdminGateAndDashboard({
 
       {adminTab === 'products' && (
         <AdminProductsWithFileUpload store={store} setStore={setStore} isLight={isLight} notify={notify} />
+      )}
+
+      {adminTab === 'stock' && (
+        <AdminStockManager store={store} setStore={setStore} isLight={isLight} notify={notify} />
       )}
 
       {adminTab === 'promotions' && (
@@ -3828,6 +3833,87 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
         )}
       </div>
     </div>
+  );
+}
+
+// ============================================================================
+// إدارة المخزون السريعة — تعديل الكميات مباشرة من لوحة الموقع
+// ============================================================================
+function AdminStockManager({ store, setStore, isLight, notify }) {
+  const [query, setQuery] = useState('');
+  const [onlyLow, setOnlyLow] = useState(false);
+  const [drafts, setDrafts] = useState({});
+  const products = (store.products || []).filter((p) =>
+    String(p.title || '').toLowerCase().includes(query.toLowerCase())
+  );
+  const rows = products.flatMap((p) => (p.variants || []).map((v) => ({
+    product: p, variant: v,
+    qty: Number(drafts[v.id] ?? v.stockQty ?? 0),
+    threshold: Number(v.lowStockThreshold ?? 3),
+  }))).filter((row) => !onlyLow || row.qty <= row.threshold);
+  const totalUnits = (store.products || []).reduce((sum, p) =>
+    sum + (p.variants || []).reduce((n, v) => n + Math.max(0, Number(v.stockQty || 0)), 0), 0);
+  const updateQty = (productId, variantId, value) => {
+    const qty = Math.max(0, Math.floor(Number(value) || 0));
+    setDrafts((prev) => ({ ...prev, [variantId]: qty }));
+    setStore((prev) => ({
+      ...prev,
+      products: prev.products.map((p) => p.id !== productId ? p : ({
+        ...p,
+        variants: (p.variants || []).map((v) => v.id !== variantId ? v : { ...v, stockQty: qty }),
+      })),
+    }));
+  };
+  const updateThreshold = (productId, variantId, value) => {
+    const threshold = Math.max(0, Math.floor(Number(value) || 0));
+    setStore((prev) => ({
+      ...prev,
+      products: prev.products.map((p) => p.id !== productId ? p : ({
+        ...p,
+        variants: (p.variants || []).map((v) => v.id !== variantId ? v : { ...v, lowStockThreshold: threshold }),
+      })),
+    }));
+  };
+  return (
+    <section className={`space-y-5 rounded-3xl border border-[#00D4FF]/30 p-5 ${isLight ? 'bg-white' : 'bg-[#0A1A3A]/50'}`}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-xl font-black text-[#00B4FF]">إدارة كميات المخزون</h2>
+          <p className="mt-1 text-xs text-[#A0AEC0]">عدّل رصيد كل مقاس ولون مباشرة. التغييرات تُحفظ على قاعدة بيانات الموقع مع حفظ الإدارة.</p>
+        </div>
+        <div className="rounded-xl border border-[#00D4FF]/40 px-4 py-3">
+          <div className="text-[11px] text-[#A0AEC0]">إجمالي القطع المسجلة</div>
+          <div className="text-2xl font-black text-[#00B4FF]">{totalUnits}</div>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="ابحث باسم المنتج..." className={`min-w-[220px] flex-1 rounded-xl border border-[#00D4FF]/35 px-4 py-3 text-sm outline-none ${isLight ? 'bg-[#F3F8FF] text-[#05050F]' : 'bg-[#05050F] text-white'}`} />
+        <button type="button" onClick={() => setOnlyLow((v) => !v)} className={`rounded-xl border px-4 py-3 text-xs font-bold ${onlyLow ? 'border-[#00D4FF] bg-[#00D4FF]/15 text-[#00B4FF]' : 'border-[#00D4FF]/30 text-[#A0AEC0]'}`}>
+          {onlyLow ? 'عرض كل المقاسات' : 'عرض الناقص فقط'}
+        </button>
+      </div>
+      {rows.length === 0 ? <p className="rounded-xl border border-[#00D4FF]/20 p-6 text-center text-sm text-[#A0AEC0]">لا توجد مقاسات مطابقة للبحث.</p> : (
+        <div className="overflow-x-auto rounded-2xl border border-[#00D4FF]/20">
+          <table className="w-full min-w-[620px] text-right text-xs">
+            <thead className={isLight ? 'bg-[#EAF4FF]' : 'bg-[#05050F]'}>
+              <tr className="text-[#00B4FF]"><th className="p-3">المنتج</th><th className="p-3">المقاس / اللون</th><th className="p-3">الكمية المتاحة</th><th className="p-3">حد التنبيه</th><th className="p-3">الحالة</th></tr>
+            </thead>
+            <tbody>
+              {rows.map(({ product, variant, qty, threshold }) => (
+                <tr key={product.id + '-' + variant.id} className="border-t border-[#00D4FF]/15">
+                  <td className="p-3 font-bold">{product.title}</td>
+                  <td className="p-3">{variant.size || '—'} / {variant.colorName || '—'}</td>
+                  <td className="p-3"><input aria-label="الكمية المتاحة" type="number" min="0" value={qty} onChange={(e) => updateQty(product.id, variant.id, e.target.value)} className={`w-24 rounded-lg border border-[#00D4FF]/40 px-3 py-2 text-center font-black ${isLight ? 'bg-white text-[#05050F]' : 'bg-[#05050F] text-white'}`} /></td>
+                  <td className="p-3"><input aria-label="حد تنبيه المخزون" type="number" min="0" value={threshold} onChange={(e) => updateThreshold(product.id, variant.id, e.target.value)} className={`w-20 rounded-lg border border-[#00D4FF]/30 px-2 py-2 text-center ${isLight ? 'bg-white text-[#05050F]' : 'bg-[#05050F] text-white'}`} /></td>
+                  <td className="p-3"><span className={qty === 0 ? 'font-bold text-red-500' : qty <= threshold ? 'font-bold text-amber-500' : 'font-bold text-emerald-500'}>{qty === 0 ? 'نفد' : qty <= threshold ? 'منخفض' : 'متوفر'}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <p className="text-[11px] text-[#A0AEC0]">ملحوظة: الكمية تُحدّث في بيانات المتجر المشتركة، وتُستخدم لمنع طلب كمية أكبر من المتاح. اكتب 0 لإيقاف بيع هذا المقاس مؤقتاً.</p>
+    </section>
   );
 }
 
