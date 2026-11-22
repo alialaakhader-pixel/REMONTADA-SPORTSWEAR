@@ -139,20 +139,27 @@ function App() {
       const list=Array.isArray(stateRow?.public_state?.products)?stateRow.public_state.products:[];
       const enriched=[];
       for(const p of list) {
-        const {data:assignedCode,error:codeError}=await supabase.rpc('inventory_assign_model_code',{p_product_id:String(p.id),p_product_title:p.title||'منتج'});
-        if(codeError) throw codeError;
-        const modelCode=String(assignedCode);
         const variants=[];
+        const assignedCodes=new Set();
         for(const v of p.variants||[]) {
+          const color=String(v.colorName||'').trim();
+          const modelKey=String(p.id)+'::color::'+(color?color.toLocaleLowerCase('ar-EG'):'default');
+          const {data:assignedCode,error:codeError}=await supabase.rpc('inventory_assign_model_code',{
+            p_product_id:modelKey,p_product_title:(p.title||'منتج')+(color?' - '+color:'')
+          });
+          if(codeError) throw codeError;
+          const modelCode=String(assignedCode);
+          assignedCodes.add(modelCode);
           const code=String(modelCode+(v.size?'-'+v.size:''));
           const {error}=await supabase.rpc('inventory_initialize_stock',{
             p_product_id:String(p.id),p_variant_id:String(v.id),p_product_title:p.title||'منتج',
             p_variant_label:variantLabel(v),p_sku:code,p_initial_quantity:Math.max(0,Number(v.stockQty||0))
           });
           if(error) throw error;
-          variants.push({...v,sku:code,variantCode:code});
+          variants.push({...v,modelCode,sku:code,variantCode:code});
         }
-        enriched.push({...p,modelCode:String(modelCode),variants});
+        const productModelCode=assignedCodes.size===1?[...assignedCodes][0]:'';
+        enriched.push({...p,modelCode:productModelCode,variants});
       }
       const {data:rows,error}=await supabase.from('inventory_stock').select('*');
       if(error) throw error;
@@ -252,7 +259,7 @@ function App() {
     {tab==='sale'?<div className="workspace">
       <section className="catalog"><div className="section-head"><div><h2>المنتجات</h2><p>ابحث باسم القطعة أو رقم الموديل أو كود المقاس</p></div><span className="count">{products.length} منتج</span></div>
         <div className="search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){const q=query.trim().toLowerCase();const hits=products.flatMap(p=>(p.variants||[]).map(v=>({p,v})).filter(({p,v})=>[variantCode(p,v),p.modelCode,v.sku].some(x=>String(x||'').toLowerCase()===q)));if(hits.length===1){addToCart(hits[0].p,hits[0].v);setQuery('');}else if(hits.length>1)setMessage('الكود يطابق أكثر من اختيار، استخدم كود المقاس الكامل.');else if(q)setMessage('لم يتم العثور على كود مطابق.');}}} placeholder="اسم القطعة أو الكود مثل 102-L"/></div>
-        <div className="product-grid">{visibleProducts.map(p=><article className="product-card" key={p.id}><div className="product-info"><div><b>{p.title}</b><small className="model-code">كود الموديل: {p.modelCode||'—'}</small></div><strong>{money(p.basePrice)}</strong></div>
+        <div className="product-grid">{visibleProducts.map(p=><article className="product-card" key={p.id}><div className="product-info"><div><b>{p.title}</b><small className="model-code">كود الموديل: {p.modelCode||'حسب اللون / النوع'}</small></div><strong>{money(p.basePrice)}</strong></div>
           {(p.variants||[]).map(v=>{const key=String(p.id)+':'+String(v.id),qty=Number(stock[key]?.quantity??v.stockQty??0),code=variantCode(p,v);return <div className="variant-row" key={v.id}><div><span>{variantLabel(v)}</span><small>الكود: <b>{code}</b> · المتاح: {qty}</small></div><button className="add" disabled={qty<=0||busy} onClick={()=>addToCart(p,v)}><Plus size={16}/> إضافة</button></div>;})}
         </article>)}</div>
         {!products.length&&<div className="empty"><Package size={32}/><b>لا توجد منتجات محفوظة</b><span>اتصل بالإنترنت واضغط مزامنة لتحميل المنتجات أول مرة.</span></div>}
