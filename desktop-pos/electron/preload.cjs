@@ -11,6 +11,10 @@ contextBridge.exposeInMainWorld('remontadaDesktop', {
   replaceCatalog: (data) => ipcRenderer.invoke('pos:replace-catalog', data),
   createSale: (payload) => ipcRenderer.invoke('pos:create-sale', payload),
   addStock: (payload) => ipcRenderer.invoke('pos:add-stock', payload),
+  saveProduct: (payload) => ipcRenderer.invoke('pos:save-product', payload),
+  adjustStock: (payload) => ipcRenderer.invoke('pos:adjust-stock', payload),
+  returnSaleItem: (payload) => ipcRenderer.invoke('pos:return-sale-item', payload),
+  addExpense: (payload) => ipcRenderer.invoke('pos:add-expense', payload),
   pending: () => ipcRenderer.invoke('pos:pending'),
   markSynced: (id) => ipcRenderer.invoke('pos:mark-synced', id),
   syncError: (data) => ipcRenderer.invoke('pos:sync-error', data)
