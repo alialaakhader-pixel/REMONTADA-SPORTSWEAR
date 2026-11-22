@@ -8,7 +8,7 @@ import {
   Lock, KeyRound, Camera, CheckSquare, Copy, Download,
   AlertTriangle, Clock, Footprints, Shirt, UserCheck, FileUp
 } from 'lucide-react';
-import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStoreState, saveStoreState, changeAdminPassword } from './lib/supabase';
+import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStoreState, saveStoreState, changeAdminPassword, reserveOnlineInventory } from './lib/supabase';
 
 // ============================================================================
 // 1. الإعدادات الافتراضية النظيفة 100% (بدون أي بيانات وهمية - بداية فارغة)
@@ -2241,7 +2241,7 @@ function CartDrawer({
     notify(`تم تفعيل كود الخصم (${found.code})`);
   };
 
-  const handleCheckoutSubmit = (e) => {
+  const handleCheckoutSubmit = async (e) => {
     e.preventDefault();
     if (!customerName.trim() || !customerPhone.trim() || !city.trim() || !address.trim()) {
       notify('يرجى إدخال جميع بيانات التوصيل');
@@ -2280,6 +2280,18 @@ function CartDrawer({
       })),
       createdAt: new Date().toISOString(),
     };
+
+    try {
+      await reserveOnlineInventory(newOrder.id, cartDetails.map((d) => ({
+        productId: d.product.id,
+        variantId: d.variant.id,
+        productTitle: d.product.title,
+        qty: d.qty,
+      })));
+    } catch (error) {
+      notify(error?.message || 'تعذر تأكيد الكمية من المخزون المركزي. حاول مرة أخرى.');
+      return;
+    }
 
     setStore((prev) => ({
       ...prev,
