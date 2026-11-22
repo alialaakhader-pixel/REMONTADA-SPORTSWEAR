@@ -9,9 +9,9 @@ Windows desktop point-of-sale app for REMONTADA SPORTSWEAR.
 - Offline sales, receipts, and stock receiving are saved locally in SQLite.
 - Every sale/restock creates a unique sync event; the queue retries when the admin session and internet connection are available.
 - Central inventory changes are atomic and idempotent when synced.
-- Model codes are assigned centrally and remain stable: one short number per product/design/color (for example `102`), with size suffixes such as `102-S`, `102-M`, `102-L`.
+- Model codes are assigned centrally and remain stable: one short number per distinct product/color type (for example `102` for the white Real Madrid shirt, `103` for the blue City shirt), with size suffixes such as `102-S`, `102-M`, `102-L`. If colors are stored as variants inside one product, each color receives its own model number.
 - Search supports product name, model number, and full size code.
-- Standard Windows printing is available through the print dialog. A USB barcode scanner can be used later as keyboard input; dedicated receipt-printer support is a follow-up.
+- A formatted 80mm receipt is available through the Windows print dialog and can be sent to a compatible thermal printer. USB barcode scanners that type the scanned code into the search field and send Enter are supported.
 
 ## First setup
 1. Install and open REMONTADA POS while the shop PC is online.
