@@ -242,6 +242,7 @@ function App() {
     <header className="topbar"><div className="brand"><div className="brand-mark small">R</div><div><b>REMONTADA <span>POS</span></b><small>نظام البيع والمخزون المحلي والمركزي</small></div></div>
       <div className="top-actions"><span className={online?'online':'offline'}>{online?<Wifi size={15}/>:<WifiOff size={15}/>} {online?'متصل بالإنترنت':'وضع عدم الاتصال'}</span>
       <span className="queue-count"><CloudUpload size={15}/> حركات معلقة: {pending}</span>
+      {!session&&online&&<button className="primary" onClick={()=>setAuthorized(false)}>تسجيل الدخول للمزامنة</button>}
       <button className="ghost" onClick={()=>refreshData()} disabled={busy}><RefreshCw size={16}/> مزامنة</button><button className="ghost" onClick={logout}><LogOut size={16}/> خروج</button></div>
     </header>
     <div className="tabs"><button className={tab==='sale'?'active':''} onClick={()=>setTab('sale')}><ShoppingCart size={17}/> الكاشير</button><button className={tab==='stock'?'active':''} onClick={()=>setTab('stock')}><Boxes size={17}/> المخزون والتوريد</button></div>
