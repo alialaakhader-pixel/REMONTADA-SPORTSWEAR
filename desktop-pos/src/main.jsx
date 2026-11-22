@@ -253,9 +253,10 @@ function App() {
   async function saveProduct(e) {
     e.preventDefault();
     const p=products.find(x=>x.id===editingId);
-    const variants=productForm.variants.split(/\r?\n/).filter(Boolean).map((line,i)=>{const [size='',colorName='',qty='0']=line.split(',').map(x=>x.trim());return {id:p?.variants?.[i]?.id||id(),size,colorName,stockQty:Math.max(0,Number(qty)||0),variantCode:productForm.modelCode+(size?'-'+size:'')};});
+    const variants=productForm.variants.split(/\r?\n/).filter(Boolean).map((line,i)=>{const [size='',colorName='',qty='0']=line.split(',').map(x=>x.trim());return {...(p?.variants?.[i]||{}),id:p?.variants?.[i]?.id||id(),size,colorName,stockQty:Math.max(0,Number(qty)||0),variantCode:productForm.modelCode+(size?'-'+size:'')};});
     try {
-      const snap=await desktop.saveProduct({id:editingId||id(),title:productForm.title,modelCode:productForm.modelCode,basePrice:Number(productForm.basePrice),variants});
+      const productPayload={...(p||{}),id:editingId||id(),title:productForm.title,modelCode:productForm.modelCode,basePrice:Number(productForm.basePrice),brand:p?.brand||'REMONTADA',sportId:p?.sportId||'sport-apparel',gender:p?.gender||'unisex',description:p?.description||'',images:p?.images||[],isActive:p?.isActive??true,variants};
+      const snap=await desktop.saveProduct(productPayload);
       applySnapshot(snap);setManageOpen(false);
       if(session&&navigator.onLine){const ok=await syncPending(session);if(ok){await refreshData(session);setMessage('تم حفظ المنتج ومزامنته مع الموقع.');}else setMessage('تم حفظ المنتج محليًا، والمزامنة معلقة لحين حل التعارض.');}
       else setMessage('تم حفظ المنتج محليًا وسيظهر على الموقع بعد عودة الإنترنت والمزامنة.');
