@@ -116,6 +116,45 @@ export async function loadStoreState(session = null) {
   return row;
 }
 
+export async function setInventoryVariantStock(session, product, variant, quantity, lowStockThreshold) {
+  if (!session?.access_token) throw new Error("سجّل دخول الإدارة لتعديل المخزون");
+  const currentRows = await request(
+    `/rest/v1/inventory_stock?product_id=eq.${encodeURIComponent(String(product.id))}&variant_id=eq.${encodeURIComponent(String(variant.id))}&select=quantity`,
+    { method: "GET" },
+    session.access_token
+  );
+  const currentQty = Number(currentRows?.[0]?.quantity || 0);
+  const nextQty = Math.max(0, Math.floor(Number(quantity) || 0));
+  const delta = nextQty - currentQty;
+  if (delta !== 0) {
+    await request("/rest/v1/rpc/inventory_adjust_stock", {
+      method: "POST",
+      body: JSON.stringify({
+        p_product_id: String(product.id),
+        p_variant_id: String(variant.id),
+        p_product_title: String(product.title || ""),
+        p_variant_label: `${variant.size || ""} / ${variant.colorName || ""}`,
+        p_sku: variant.sku || null,
+        p_quantity_delta: delta,
+        p_movement_type: delta > 0 ? "restock" : "adjustment",
+        p_note: "تعديل مباشر من لوحة إدارة الموقع",
+      }),
+    }, session.access_token);
+  }
+  if (nextQty > 0 || currentRows?.length) {
+    await request(
+      `/rest/v1/inventory_stock?product_id=eq.${encodeURIComponent(String(product.id))}&variant_id=eq.${encodeURIComponent(String(variant.id))}`,
+      {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ low_stock_threshold: Math.max(0, Math.floor(Number(lowStockThreshold) || 0)) }),
+      },
+      session.access_token
+    );
+  }
+  return nextQty;
+}
+
 export async function reserveOnlineInventory(orderId, items) {
   return request("/rest/v1/rpc/inventory_reserve_online_order", {
     method: "POST",
