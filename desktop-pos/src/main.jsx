@@ -102,12 +102,9 @@ function App() {
       const list=Array.isArray(stateRow?.public_state?.products)?stateRow.public_state.products:[];
       const enriched=[];
       for(const p of list) {
-        let modelCode=p.modelCode||p.model_code||'';
-        if(!modelCode) {
-          const {data:code,error:codeError}=await supabase.rpc('inventory_assign_model_code',{p_product_id:String(p.id),p_product_title:p.title||'منتج'});
-          if(codeError) throw codeError;
-          modelCode=String(code);
-        }
+        const {data:assignedCode,error:codeError}=await supabase.rpc('inventory_assign_model_code',{p_product_id:String(p.id),p_product_title:p.title||'منتج'});
+        if(codeError) throw codeError;
+        const modelCode=String(assignedCode);
         const variants=[];
         for(const v of p.variants||[]) {
           const code=String(modelCode+(v.size?'-'+v.size:''));
