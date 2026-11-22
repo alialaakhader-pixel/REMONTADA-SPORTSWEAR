@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
-const { randomBytes, scryptSync, timingSafeEqual } = require('node:crypto');
+const { randomBytes, randomUUID, scryptSync, timingSafeEqual } = require('node:crypto');
 const Database = require('better-sqlite3');
 
 let db;
@@ -172,15 +172,22 @@ ipcMain.handle('pos:save-product', (_e, p) => {
     db.prepare(`INSERT INTO products(product_id,title,model_code,base_price,raw_json) VALUES(?,?,?,?,?)
       ON CONFLICT(product_id) DO UPDATE SET title=excluded.title,model_code=excluded.model_code,base_price=excluded.base_price,raw_json=excluded.raw_json`)
       .run(pid,String(p.title).trim(),String(p.modelCode||''),Number(p.basePrice||0),JSON.stringify({...p,id:pid}));
+    const normalizedVariants=[];
     for(const v of variants){
       const vid=String(v.id||randomBytes(8).toString('hex'));
       const old=db.prepare('SELECT quantity FROM variants WHERE product_id=? AND variant_id=?').get(pid,vid);
       const qty=old?old.quantity:Math.max(0,Math.floor(Number(v.stockQty||0)));
+      const sku=String(v.variantCode||v.sku||vid);
+      const normalized={...v,id:vid,sku,variantCode:sku,stockQty:qty};
+      normalizedVariants.push(normalized);
       db.prepare(`INSERT INTO variants(product_id,variant_id,label,size,color,sku,quantity,price,raw_json)
         VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(product_id,variant_id) DO UPDATE SET
         label=excluded.label,size=excluded.size,color=excluded.color,sku=excluded.sku,price=excluded.price,raw_json=excluded.raw_json`)
-        .run(pid,vid,[v.size,v.colorName].filter(Boolean).join(' / ')||'بدون مقاس',String(v.size||''),String(v.colorName||''),String(v.variantCode||v.sku||vid),qty,Number(p.basePrice||0),JSON.stringify({...v,id:vid}));
+        .run(pid,vid,[v.size,v.colorName].filter(Boolean).join(' / ')||'بدون مقاس',String(v.size||''),String(v.colorName||''),sku,qty,Number(p.basePrice||0),JSON.stringify(normalized));
     }
+    const product={...p,id:pid,title:String(p.title).trim(),modelCode:String(p.modelCode||''),basePrice:Number(p.basePrice||0),variants:normalizedVariants};
+    db.prepare('INSERT INTO sync_queue(event_id,event_type,payload,created_at,synced) VALUES(?,?,?,?,0)')
+      .run(randomUUID(),'product_upsert',JSON.stringify({product}),new Date().toISOString());
   });
   tx(); return snapshot();
 });
@@ -193,6 +200,11 @@ ipcMain.handle('pos:adjust-stock', (_e,p) => {
     if(!row || row.quantity+delta<0) throw new Error('الكمية الجديدة غير صحيحة');
     db.prepare('UPDATE variants SET quantity=quantity+? WHERE product_id=? AND variant_id=?').run(delta,String(p.product_id),String(p.variant_id));
     db.prepare('INSERT INTO stock_movements VALUES(?,?,?,?,?,?,?)').run(p.movement_id,String(p.product_id),String(p.variant_id),delta,'adjustment',String(p.note||'تسوية جرد'),new Date().toISOString());
+    const product=db.prepare('SELECT title FROM products WHERE product_id=?').get(String(p.product_id));
+    const variant=db.prepare('SELECT label,sku FROM variants WHERE product_id=? AND variant_id=?').get(String(p.product_id),String(p.variant_id));
+    const payload={event_id:p.event_id,product_id:String(p.product_id),variant_id:String(p.variant_id),product_title:product?.title||'',variant_label:variant?.label||'',sku:variant?.sku||'',quantity_delta:delta,note:String(p.note||'تسوية جرد')};
+    db.prepare('INSERT INTO sync_queue(event_id,event_type,payload,created_at,synced) VALUES(?,?,?,?,0)')
+      .run(p.event_id,'adjustment',JSON.stringify(payload),new Date().toISOString());
   });
   tx(); return snapshot();
 });
@@ -207,12 +219,20 @@ ipcMain.handle('pos:return-sale-item', (_e,p) => {
     if(p.restock) db.prepare('UPDATE variants SET quantity=quantity+? WHERE product_id=? AND variant_id=?').run(qty,String(p.product_id),String(p.variant_id));
     db.prepare('INSERT INTO returns VALUES(?,?,?,?,?,?,?,?,?,?,?)').run(String(p.return_id),String(p.sale_id),String(p.product_id),String(p.variant_id),String(p.product_title),String(p.variant_label),qty,Number(p.refund_amount||0),p.restock?1:0,String(p.reason||''),new Date().toISOString());
     db.prepare('INSERT INTO stock_movements VALUES(?,?,?,?,?,?,?)').run(String(p.return_id),String(p.product_id),String(p.variant_id),p.restock?qty:0,'return',String(p.reason||'مرتجع'),new Date().toISOString());
+    const variant=db.prepare('SELECT sku FROM variants WHERE product_id=? AND variant_id=?').get(String(p.product_id),String(p.variant_id));
+    const payload={...p,event_id:p.event_id,sku:variant?.sku||''};
+    db.prepare('INSERT INTO sync_queue(event_id,event_type,payload,created_at,synced) VALUES(?,?,?,?,0)')
+      .run(String(p.event_id),'return',JSON.stringify(payload),new Date().toISOString());
   });
   tx(); return snapshot();
 });
 ipcMain.handle('pos:add-expense', (_e,p) => {
   initDb();
-  db.prepare('INSERT INTO expenses VALUES(?,?,?,?,?,?)').run(String(p.expense_id),String(p.title||'مصروف'),Number(p.amount||0),String(p.category||'عام'),String(p.note||''),new Date().toISOString());
+  const createdAt=new Date().toISOString();
+  db.prepare('INSERT INTO expenses VALUES(?,?,?,?,?,?)').run(String(p.expense_id),String(p.title||'مصروف'),Number(p.amount||0),String(p.category||'عام'),String(p.note||''),createdAt);
+  const payload={...p,event_id:p.event_id};
+  db.prepare('INSERT INTO sync_queue(event_id,event_type,payload,created_at,synced) VALUES(?,?,?,?,0)')
+    .run(String(p.event_id),'expense',JSON.stringify(payload),createdAt);
   return snapshot();
 });
 ipcMain.handle('pos:pending', () => { initDb(); return db.prepare('SELECT event_id,event_type,payload FROM sync_queue WHERE synced=0 ORDER BY created_at').all().map(x=>({...x,payload:JSON.parse(x.payload)})); });
