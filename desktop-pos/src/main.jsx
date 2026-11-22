@@ -94,6 +94,7 @@ function App() {
         }
         setPassword('');
       } catch(onlineError) {
+        if(onlineError?.status && onlineError.status < 500) throw onlineError;
         const valid=await desktop?.verifyOfflinePassword(password);
         if(!valid) throw onlineError;
         setAuthorized(true); setOfflineMode(true); setPassword('');
@@ -193,7 +194,8 @@ function App() {
     try {
       let centrallyApplied=false;
       if(session && navigator.onLine) {
-        await refreshData(session);
+        const inventoryReady=await refreshData(session);
+        if(!inventoryReady) throw new Error('تعذر تحديث المخزون المركزي. لم يتم تسجيل البيع؛ أعد المزامنة أولاً.');
         const {error:centralError}=await supabase.rpc('pos_apply_offline_event',{p_event_id:eventId,p_event_type:'sale',p_payload:payload});
         if(!centralError) centrallyApplied=true;
         else if(/رصيد المخزون|الكمية المطلوبة|مخزون/i.test(centralError.message||'')) throw centralError;
