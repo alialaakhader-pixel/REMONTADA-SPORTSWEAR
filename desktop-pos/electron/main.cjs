@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
+const { randomBytes, scryptSync, timingSafeEqual } = require('node:crypto');
 const Database = require('better-sqlite3');
 
 let db;
@@ -56,7 +57,27 @@ function snapshot() {
 }
 ipcMain.handle('pos:init', () => snapshot());
 ipcMain.handle('pos:authorize', () => { initDb(); db.prepare("INSERT INTO settings(key,value) VALUES('offline_authorized','1') ON CONFLICT(key) DO UPDATE SET value='1'").run(); return true; });
-ipcMain.handle('pos:logout', () => { initDb(); db.prepare("DELETE FROM settings WHERE key='offline_authorized'").run(); return true; });
+ipcMain.handle('pos:save-offline-credentials', (_e,{email,password}) => {
+  initDb();
+  const salt=randomBytes(16);
+  const hash=scryptSync(String(password),salt,64);
+  const put=db.prepare("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value");
+  const tx=db.transaction(()=>{put.run('offline_authorized','1');put.run('offline_email',String(email||''));put.run('offline_salt',salt.toString('hex'));put.run('offline_hash',hash.toString('hex'));});
+  tx(); return true;
+});
+ipcMain.handle('pos:offline-info', () => {
+  initDb(); const get=db.prepare('SELECT value FROM settings WHERE key=?');
+  return {authorized:get.get('offline_authorized')?.value==='1',email:get.get('offline_email')?.value||'',hasPassword:Boolean(get.get('offline_hash')?.value&&get.get('offline_salt')?.value)};
+});
+ipcMain.handle('pos:verify-offline-password', (_e,password) => {
+  initDb(); const get=db.prepare('SELECT value FROM settings WHERE key=?');
+  const salt=get.get('offline_salt')?.value, stored=get.get('offline_hash')?.value;
+  if(!salt||!stored) return false;
+  const actual=scryptSync(String(password),Buffer.from(salt,'hex'),64);
+  const expected=Buffer.from(stored,'hex');
+  return actual.length===expected.length && timingSafeEqual(actual,expected);
+});
+ipcMain.handle('pos:logout', () => { initDb(); db.prepare("DELETE FROM settings WHERE key LIKE 'offline_%'").run(); return true; });
 ipcMain.handle('pos:replace-catalog', (_e, { products, stockRows }) => {
   initDb();
   const serverStock = new Map((stockRows || []).map(r => [r.product_id + ':' + r.variant_id, Number(r.quantity || 0)]));
