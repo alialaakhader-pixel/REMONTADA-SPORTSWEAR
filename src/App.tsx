@@ -8,13 +8,13 @@ import {
   Lock, KeyRound, Camera, CheckSquare, Copy, Download,
   AlertTriangle, Clock, Footprints, Shirt, UserCheck, FileUp
 } from 'lucide-react';
+import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStoreState, saveStoreState, changeAdminPassword } from './lib/supabase';
 
 // ============================================================================
 // 1. الإعدادات الافتراضية النظيفة 100% (بدون أي بيانات وهمية - بداية فارغة)
 // ============================================================================
 
 const STORAGE_KEY = 'remontada_sportswear_pro_v5';
-const DEFAULT_ADMIN_PASSWORD = 'REMONTADA-ADMIN-2026';
 
 const DEFAULT_SPORTS = [
   { id: 'sport-football', name: 'كرة القدم', visible: true },
@@ -27,7 +27,6 @@ const DEFAULT_SPORTS = [
 
 const INITIAL_STATE = {
   theme: 'dark', // 'dark' | 'light'
-  adminPassword: DEFAULT_ADMIN_PASSWORD,
   settings: {
     storeName: 'REMONTADA SPORTSWEAR',
     heroTitle: 'REMONTADA SPORTSWEAR',
@@ -393,8 +392,9 @@ export default function App() {
         return {
           ...INITIAL_STATE,
           ...parsed,
-          adminPassword: parsed.adminPassword || DEFAULT_ADMIN_PASSWORD,
-          deliveryAgents: parsed.deliveryAgents || [],
+          orders: [],
+          deliveryAgents: [],
+          customerProfile: INITIAL_STATE.customerProfile,
         };
       }
     } catch (e) {
@@ -402,14 +402,95 @@ export default function App() {
     }
     return INITIAL_STATE;
   });
+  const [adminSession, setAdminSession] = useState(() => readAdminSession());
+  const [adminUser, setAdminUser] = useState(null);
+  const [dbReady, setDbReady] = useState(false);
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+      const safeStore = {
+        ...store,
+        orders: [],
+        deliveryAgents: [],
+        customerProfile: INITIAL_STATE.customerProfile,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(safeStore));
     } catch (e) {
-      console.error('تعذر الحفظ في التخزين المحلي:', e);
+      console.error('تعذر الحفظ المحلي:', e);
     }
   }, [store]);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const row = await loadStoreState();
+        if (active && row?.public_state) {
+          setStore((prev) => ({
+            ...prev,
+            ...row.public_state,
+            orders: [],
+            deliveryAgents: [],
+            customerProfile: INITIAL_STATE.customerProfile,
+          }));
+        }
+      } catch (e) {
+        console.error('تعذر تحميل بيانات المتجر من Supabase:', e);
+      } finally {
+        if (active) setDbReady(true);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    if (!adminSession?.access_token) return () => { active = false; };
+    setDbReady(false);
+    (async () => {
+      try {
+        const user = await getCurrentAdmin(adminSession);
+        if (!user) {
+          await signOutAdmin(adminSession);
+          if (active) {
+            setAdminSession(null);
+            setAdminUser(null);
+            setAdminUnlocked(false);
+          }
+          return;
+        }
+        const row = await loadStoreState(adminSession);
+        if (active) {
+          setAdminUser(user);
+          if (row?.public_state) {
+            setStore((prev) => ({
+              ...prev,
+              ...row.public_state,
+              ...(row.private_state || {}),
+            }));
+          }
+          setAdminUnlocked(true);
+        }
+      } catch (e) {
+        console.error('تعذر استعادة جلسة الإدارة:', e);
+        if (active) {
+          setAdminSession(null);
+          setAdminUser(null);
+          setAdminUnlocked(false);
+        }
+      } finally {
+        if (active) setDbReady(true);
+      }
+    })();
+    return () => { active = false; };
+  }, [adminSession]);
+
+  useEffect(() => {
+    if (!dbReady || !adminSession?.access_token || !adminUnlocked) return;
+    saveStoreState(store, adminSession).catch((e) => {
+      console.error('تعذر حفظ التغييرات في Supabase:', e);
+    });
+  }, [store, adminSession, adminUnlocked, dbReady]);
 
   useEffect(() => {
     const link = document.createElement('link');
@@ -425,6 +506,30 @@ export default function App() {
   const [activePage, setActivePage] = useState('home');
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [adminTab, setAdminTab] = useState('products'); // 'products' | 'promotions' | 'orders' | 'agents' | 'shipping' | 'security'
+
+  const handleAdminLogin = async (email, password) => {
+    const { session, user } = await signInAdmin(email, password);
+    setAdminSession(session);
+    setAdminUser(user);
+    return user;
+  };
+
+  const handleAdminLogout = async () => {
+    await signOutAdmin(adminSession);
+    setAdminSession(null);
+    setAdminUser(null);
+    setAdminUnlocked(false);
+    setStore((prev) => ({
+      ...prev,
+      orders: [],
+      deliveryAgents: [],
+      customerProfile: INITIAL_STATE.customerProfile,
+    }));
+  };
+
+  const handleAdminPasswordChange = async (password) => {
+    await changeAdminPassword(adminSession, password);
+  };
 
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
@@ -875,6 +980,9 @@ export default function App() {
             isLight={isLight}
             adminUnlocked={adminUnlocked}
             setAdminUnlocked={setAdminUnlocked}
+            onAdminLogin={handleAdminLogin}
+            onAdminLogout={handleAdminLogout}
+            onChangeAdminPassword={handleAdminPasswordChange}
             adminTab={adminTab}
             setAdminTab={setAdminTab}
             lowStockAlerts={lowStockAlerts}
@@ -2854,12 +2962,16 @@ function AdminGateAndDashboard({
   isLight,
   adminUnlocked,
   setAdminUnlocked,
+  onAdminLogin,
+  onAdminLogout,
+  onChangeAdminPassword,
   adminTab,
   setAdminTab,
   lowStockAlerts,
   onViewReceipt,
   notify,
 }) {
+  const [emailInput, setEmailInput] = useState('');
   const [passInput, setPassInput] = useState('');
 
   if (!adminUnlocked) {
@@ -2883,20 +2995,33 @@ function AdminGateAndDashboard({
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              if (passInput === store.adminPassword) {
-                setAdminUnlocked(true);
+              try {
+                await onAdminLogin(emailInput.trim(), passInput);
                 setPassInput('');
-                notify('تم فتح لوحة تحكم REMONTADA SPORTSWEAR');
-              } else {
-                notify('كلمة المرور غير صحيحة');
+                setEmailInput('');
+                notify('تم تسجيل الدخول وفتح لوحة تحكم REMONTADA SPORTSWEAR');
+              } catch (error) {
+                notify(error?.message || 'تعذر تسجيل الدخول');
               }
             }}
             className="mt-6 space-y-3"
           >
             <input
+              type="email"
+              required
+              autoComplete="username"
+              placeholder="البريد الإلكتروني للإدارة..."
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              className={`mb-3 w-full rounded-xl border border-[#00D4FF]/40 px-4 py-3 text-center text-sm outline-none focus:border-[#00D4FF] ${
+                isLight ? 'bg-[#F3F8FF] text-[#05050F]' : 'bg-[#05050F] text-white'
+              }`}
+            />
+            <input
               type="password"
               required
-              placeholder="أدخل كلمة مرور الإدارة..."
+              autoComplete="current-password"
+              placeholder="كلمة مرور حساب الإدارة..."
               value={passInput}
               onChange={(e) => setPassInput(e.target.value)}
               className={`w-full rounded-xl border border-[#00D4FF]/40 px-4 py-3 text-center text-sm outline-none focus:border-[#00D4FF] ${
@@ -2958,7 +3083,7 @@ function AdminGateAndDashboard({
           })}
 
           <button
-            onClick={() => setAdminUnlocked(false)}
+            onClick={() => { onAdminLogout(); }}
             className="rounded-xl border border-[#00D4FF]/40 px-3.5 py-2.5 text-xs font-bold text-[#A0AEC0] hover:text-white"
           >
             قفل
@@ -3035,7 +3160,7 @@ function AdminGateAndDashboard({
       )}
 
       {adminTab === 'security' && (
-        <AdminPasswordChanger store={store} setStore={setStore} isLight={isLight} notify={notify} />
+        <AdminPasswordChanger isLight={isLight} notify={notify} onChangePassword={onChangeAdminPassword} />
       )}
     </div>
   );
@@ -3144,34 +3269,28 @@ function AdminDeliveryAgentsManager({ store, setStore, isLight, notify }) {
 // 16. تغيير كلمة مرور الإدارة من داخل لوحة التحكم
 // ============================================================================
 
-function AdminPasswordChanger({ store, setStore, isLight, notify }) {
-  const [currentPass, setCurrentPass] = useState('');
+function AdminPasswordChanger({ isLight, notify, onChangePassword }) {
   const [newPass, setNewPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
 
-  const handleChangePassword = (e) => {
+  const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (currentPass !== store.adminPassword) {
-      notify('كلمة المرور الحالية غير صحيحة');
-      return;
-    }
-    if (newPass.trim().length < 6) {
-      notify('كلمة المرور الجديدة يجب أن تكون 6 أحرف أو أكثر');
+    if (newPass.trim().length < 8) {
+      notify('كلمة المرور الجديدة يجب أن تكون 8 أحرف أو أكثر');
       return;
     }
     if (newPass !== confirmPass) {
       notify('تأكيد كلمة المرور غير متطابق');
       return;
     }
-
-    setStore((prev) => ({
-      ...prev,
-      adminPassword: newPass.trim(),
-    }));
-    setCurrentPass('');
-    setNewPass('');
-    setConfirmPass('');
-    notify('تم تغيير كلمة مرور لوحة الإدارة بنجاح');
+    try {
+      await onChangePassword(newPass.trim());
+      setNewPass('');
+      setConfirmPass('');
+      notify('تم تحديث كلمة مرور حساب الإدارة بنجاح');
+    } catch (error) {
+      notify(error?.message || 'تعذر تغيير كلمة المرور');
+    }
   };
 
   return (
@@ -3186,19 +3305,9 @@ function AdminPasswordChanger({ store, setStore, isLight, notify }) {
         <h3 className="text-base font-black">تغيير كلمة مرور الإدارة</h3>
       </div>
       <p className="text-xs text-[#A0AEC0]">
-        كلمة المرور المؤقتة الحالية مفعّلة ويمكنك تغييرها في أي وقت إلى كلمة مرور خاصة بك.
+        يتم تحديث كلمة المرور مباشرة في Supabase Auth، ولا تُخزّن داخل كود المتجر.
       </p>
 
-      <input
-        type="password"
-        required
-        placeholder="كلمة المرور الحالية *"
-        value={currentPass}
-        onChange={(e) => setCurrentPass(e.target.value)}
-        className={`w-full rounded-xl border border-[#00D4FF]/35 px-3.5 py-2.5 text-xs outline-none ${
-          isLight ? 'bg-[#F3F8FF] text-[#05050F]' : 'bg-[#05050F] text-white'
-        }`}
-      />
       <input
         type="password"
         required
