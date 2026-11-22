@@ -2271,6 +2271,7 @@ function CartDrawer({
       total: grandTotal,
       items: cartDetails.map((d) => ({
         productId: d.product.id,
+        variantId: d.variant.id,
         productTitle: d.product.title,
         size: d.variant.size,
         colorName: d.variant.colorName,
@@ -4201,10 +4202,29 @@ function AdminOrdersList({ store, setStore, isLight, onViewReceipt, notify }) {
                     setStore((prev) => ({
                       ...prev,
                       orders: prev.orders.map((x) => (x.id === ord.id ? { ...x, status: next } : x)),
+                      ...(next === 'ملغي' ? {
+                        products: prev.products.map((product) => {
+                          const canceledItems = (ord.items || []).filter((item) => item.productId === product.id);
+                          if (!canceledItems.length) return product;
+                          return {
+                            ...product,
+                            variants: product.variants.map((variant) => {
+                              const canceled = canceledItems.find((item) =>
+                                item.variantId != null
+                                  ? item.variantId === variant.id
+                                  : item.size === variant.size && item.colorName === variant.colorName
+                              );
+                              return canceled
+                                ? { ...variant, stockQty: Number(variant.stockQty || 0) + Number(canceled.qty || 0) }
+                                : variant;
+                            }),
+                          };
+                        }),
+                      } : {}),
                     }));
                     notify(next === 'ملغي' ? 'تم إلغاء الطلب وإعادة الكمية للمخزون إن كان محجوزًا' : `تم تحديث حالة الطلب إلى ${next}`);
                   }}
-                  disabled={ord.status === 'ملغي' || ord.status === 'تم التسليم' || ord.cashCollected}
+                  disabled={ord.status === 'ملغي' || ord.status === 'تم الشحن' || ord.status === 'تم التسليم' || ord.cashCollected}
                   className={`rounded-xl border border-[#00D4FF]/35 px-3 py-2 text-xs font-bold outline-none disabled:opacity-50 ${
                     isLight ? 'bg-white text-[#05050F]' : 'bg-[#0A1A3A] text-white'
                   }`}
