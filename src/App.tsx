@@ -69,6 +69,30 @@ const INITIAL_STATE = {
   },
 };
 
+// Normalize persisted and remote data so one malformed/older record cannot crash the storefront.
+function normalizeStoreState(candidate, includePrivate = false) {
+  const source = candidate && typeof candidate === 'object' ? candidate : {};
+  return {
+    ...INITIAL_STATE,
+    ...source,
+    settings: {
+      ...INITIAL_STATE.settings,
+      ...(source.settings && typeof source.settings === 'object' ? source.settings : {}),
+    },
+    sports: Array.isArray(source.sports) ? source.sports : INITIAL_STATE.sports,
+    governorates: Array.isArray(source.governorates) ? source.governorates : INITIAL_STATE.governorates,
+    products: Array.isArray(source.products) ? source.products : [],
+    promotions: Array.isArray(source.promotions) ? source.promotions : [],
+    coupons: Array.isArray(source.coupons) ? source.coupons : [],
+    reviews: Array.isArray(source.reviews) ? source.reviews : [],
+    orders: includePrivate && Array.isArray(source.orders) ? source.orders : [],
+    deliveryAgents: includePrivate && Array.isArray(source.deliveryAgents) ? source.deliveryAgents : [],
+    customerProfile: includePrivate && source.customerProfile && typeof source.customerProfile === 'object'
+      ? { ...INITIAL_STATE.customerProfile, ...source.customerProfile }
+      : INITIAL_STATE.customerProfile,
+  };
+}
+
 // ============================================================================
 // 2. دوال مساعدة: ضغط الصور، التسعير بالجنيه المصري، المقاسات، والتقييمات
 // ============================================================================
@@ -389,13 +413,7 @@ export default function App() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        return {
-          ...INITIAL_STATE,
-          ...parsed,
-          orders: [],
-          deliveryAgents: [],
-          customerProfile: INITIAL_STATE.customerProfile,
-        };
+        return normalizeStoreState(parsed);
       }
     } catch (e) {
       console.error(e);
@@ -426,13 +444,7 @@ export default function App() {
       try {
         const row = await loadStoreState();
         if (active && row?.public_state) {
-          setStore((prev) => ({
-            ...prev,
-            ...row.public_state,
-            orders: [],
-            deliveryAgents: [],
-            customerProfile: INITIAL_STATE.customerProfile,
-          }));
+          setStore((prev) => normalizeStoreState({ ...prev, ...row.public_state }));
         }
       } catch (e) {
         console.error('تعذر تحميل بيانات المتجر من Supabase:', e);
@@ -463,11 +475,7 @@ export default function App() {
         if (active) {
           setAdminUser(user);
           if (row?.public_state) {
-            setStore((prev) => ({
-              ...prev,
-              ...row.public_state,
-              ...(row.private_state || {}),
-            }));
+            setStore((prev) => normalizeStoreState({ ...prev, ...row.public_state, ...(row.private_state || {}) }, true));
           }
           setAdminUnlocked(true);
         }
