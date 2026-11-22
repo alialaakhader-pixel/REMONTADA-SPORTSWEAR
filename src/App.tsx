@@ -8,7 +8,7 @@ import {
   Lock, KeyRound, Camera, CheckSquare, Copy, Download,
   AlertTriangle, Clock, Footprints, Shirt, UserCheck, FileUp
 } from 'lucide-react';
-import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStoreState, saveStoreState, changeAdminPassword, reserveOnlineInventory } from './lib/supabase';
+import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStoreState, saveStoreState, changeAdminPassword, reserveOnlineInventory, releaseOnlineInventory } from './lib/supabase';
 
 // ============================================================================
 // 1. الإعدادات الافتراضية النظيفة 100% (بدون أي بيانات وهمية - بداية فارغة)
@@ -4188,15 +4188,24 @@ function AdminOrdersList({ store, setStore, isLight, onViewReceipt, notify }) {
 
                 <select
                   value={ord.status}
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const next = e.target.value;
+                    if (next === 'ملغي' && ord.status !== 'ملغي') {
+                      try {
+                        await releaseOnlineInventory(ord.id);
+                      } catch (error) {
+                        notify(error?.message || 'تعذر تحرير المخزون لهذا الطلب');
+                        return;
+                      }
+                    }
                     setStore((prev) => ({
                       ...prev,
                       orders: prev.orders.map((x) => (x.id === ord.id ? { ...x, status: next } : x)),
                     }));
-                    notify(`تم تحديث حالة الطلب إلى ${next}`);
+                    notify(next === 'ملغي' ? 'تم إلغاء الطلب وإعادة الكمية للمخزون إن كان محجوزًا' : `تم تحديث حالة الطلب إلى ${next}`);
                   }}
-                  className={`rounded-xl border border-[#00D4FF]/35 px-3 py-2 text-xs font-bold outline-none ${
+                  disabled={ord.status === 'ملغي' || ord.status === 'تم التسليم' || ord.cashCollected}
+                  className={`rounded-xl border border-[#00D4FF]/35 px-3 py-2 text-xs font-bold outline-none disabled:opacity-50 ${
                     isLight ? 'bg-white text-[#05050F]' : 'bg-[#0A1A3A] text-white'
                   }`}
                 >
