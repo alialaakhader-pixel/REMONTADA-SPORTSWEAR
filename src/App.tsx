@@ -71,25 +71,49 @@ const INITIAL_STATE = {
 
 // Normalize persisted and remote data so one malformed/older record cannot crash the storefront.
 function normalizeStoreState(candidate, includePrivate = false) {
-  const source = candidate && typeof candidate === 'object' ? candidate : {};
+  const source = candidate && typeof candidate === 'object' && !Array.isArray(candidate) ? candidate : {};
+  const objectArray = (value) => Array.isArray(value)
+    ? value.filter((item) => item && typeof item === 'object' && !Array.isArray(item))
+    : [];
+  const products = objectArray(source.products).map((product, index) => ({
+    ...product,
+    id: String(product.id ?? `product-${index}`),
+    title: typeof product.title === 'string' ? product.title : '',
+    brand: typeof product.brand === 'string' ? product.brand : '',
+    basePrice: Number.isFinite(Number(product.basePrice)) ? Number(product.basePrice) : 0,
+    variants: objectArray(product.variants).map((variant, variantIndex) => ({
+      ...variant,
+      id: String(variant.id ?? `${product.id ?? index}-variant-${variantIndex}`),
+      stockQty: Number.isFinite(Number(variant.stockQty)) ? Number(variant.stockQty) : 0,
+      lowStockThreshold: Number.isFinite(Number(variant.lowStockThreshold)) ? Number(variant.lowStockThreshold) : 3,
+    })),
+  }));
+  const sourceSettings = source.settings && typeof source.settings === 'object' && !Array.isArray(source.settings)
+    ? source.settings : {};
+  const customer = source.customerProfile && typeof source.customerProfile === 'object' && !Array.isArray(source.customerProfile)
+    ? source.customerProfile : {};
+
   return {
     ...INITIAL_STATE,
     ...source,
-    settings: {
-      ...INITIAL_STATE.settings,
-      ...(source.settings && typeof source.settings === 'object' ? source.settings : {}),
-    },
-    sports: Array.isArray(source.sports) ? source.sports : INITIAL_STATE.sports,
-    governorates: Array.isArray(source.governorates) ? source.governorates : INITIAL_STATE.governorates,
-    products: Array.isArray(source.products) ? source.products : [],
-    promotions: Array.isArray(source.promotions) ? source.promotions : [],
-    coupons: Array.isArray(source.coupons) ? source.coupons : [],
-    reviews: Array.isArray(source.reviews) ? source.reviews : [],
-    orders: includePrivate && Array.isArray(source.orders) ? source.orders : [],
-    deliveryAgents: includePrivate && Array.isArray(source.deliveryAgents) ? source.deliveryAgents : [],
-    customerProfile: includePrivate && source.customerProfile && typeof source.customerProfile === 'object'
-      ? { ...INITIAL_STATE.customerProfile, ...source.customerProfile }
-      : INITIAL_STATE.customerProfile,
+    theme: source.theme === 'light' ? 'light' : 'dark',
+    settings: { ...INITIAL_STATE.settings, ...sourceSettings },
+    sports: objectArray(source.sports).length
+      ? objectArray(source.sports).map((item) => ({ ...item, id: String(item.id ?? ''), name: String(item.name ?? '') }))
+      : INITIAL_STATE.sports,
+    governorates: objectArray(source.governorates).length
+      ? objectArray(source.governorates).map((item) => ({
+          ...item, id: String(item.id ?? ''), name: String(item.name ?? ''),
+          fee: Number.isFinite(Number(item.fee)) ? Number(item.fee) : 0,
+        }))
+      : INITIAL_STATE.governorates,
+    products,
+    promotions: objectArray(source.promotions),
+    coupons: objectArray(source.coupons),
+    reviews: objectArray(source.reviews),
+    orders: includePrivate ? objectArray(source.orders) : [],
+    deliveryAgents: includePrivate ? objectArray(source.deliveryAgents) : [],
+    customerProfile: includePrivate ? { ...INITIAL_STATE.customerProfile, ...customer } : INITIAL_STATE.customerProfile,
   };
 }
 
