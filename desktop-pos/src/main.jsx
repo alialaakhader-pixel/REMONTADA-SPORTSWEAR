@@ -197,8 +197,10 @@ function App() {
     const payload={event_id:id(),product_id:String(p.id),variant_id:String(v.id),product_title:p.title,variant_label:variantLabel(v),sku:variantCode(p,v),quantity_delta:qty,note:'توريد من برنامج الكاشير'};
     try {
       const snap=await desktop.addStock(payload);applySnapshot(snap);
-      if(session&&navigator.onLine){await syncPending(session);setMessage('تمت إضافة الكمية ومزامنتها.');}
-      else setMessage('تم حفظ التوريد محليًا وسيُزامن عند عودة الإنترنت.');
+      if(session&&navigator.onLine){
+        const synced=await syncPending(session);
+        setMessage(synced?'تمت إضافة الكمية ومزامنتها.':'تم حفظ التوريد محليًا، والمزامنة متوقفة مؤقتًا حتى حل تعارض المخزون.');
+      } else setMessage('تم حفظ التوريد محليًا وسيُزامن عند عودة الإنترنت.');
     } catch(err){setMessage(err.message||'تعذر إضافة المخزون');}
     finally{setBusy(false);}
   }
