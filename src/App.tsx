@@ -447,6 +447,7 @@ export default function App() {
   const [adminSession, setAdminSession] = useState(() => readAdminSession());
   const [adminUser, setAdminUser] = useState(null);
   const [dbReady, setDbReady] = useState(false);
+  const [adminUnlocked, setAdminUnlocked] = useState(false);
 
   useEffect(() => {
     try {
@@ -536,7 +537,6 @@ export default function App() {
 
   // الصفحات: 'home' | 'shop' | 'account' | 'courier' | 'admin'
   const [activePage, setActivePage] = useState('home');
-  const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [adminTab, setAdminTab] = useState('products'); // 'products' | 'promotions' | 'orders' | 'agents' | 'shipping' | 'security'
 
   const handleAdminLogin = async (email, password) => {
