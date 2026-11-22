@@ -17,3 +17,5 @@
   .print-item{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin:7px 0}
   .print-item small{display:block}.print-item strong{grid-column:2;text-align:right}
 }
+
+.modal-backdrop{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:#000b;backdrop-filter:blur(8px)}.manage-card{width:min(620px,96vw);max-height:90vh;overflow:auto}.manage-card label{display:grid;gap:7px;margin-top:14px;color:#c5d5e8;font-size:13px;font-weight:700}.manage-card input,.manage-card textarea{width:100%;padding:12px;border:1px solid #28415e;border-radius:11px;background:#081321;color:#f2f7ff;outline:none}.manage-card textarea{resize:vertical;line-height:1.8}.manage-card .section-head{margin:0}
