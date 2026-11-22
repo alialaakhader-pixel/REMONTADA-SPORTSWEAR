@@ -228,7 +228,7 @@ function App() {
     {message&&<div className="notice-bar"><AlertCircle size={17}/>{message}<button onClick={()=>setMessage('')}>×</button></div>}
     {tab==='sale'?<div className="workspace">
       <section className="catalog"><div className="section-head"><div><h2>المنتجات</h2><p>ابحث باسم القطعة أو رقم الموديل أو كود المقاس</p></div><span className="count">{products.length} منتج</span></div>
-        <div className="search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="اسم القطعة أو الكود مثل 102-L"/></div>
+        <div className="search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){const q=query.trim().toLowerCase();const hits=products.flatMap(p=>(p.variants||[]).map(v=>({p,v})).filter(({p,v})=>[variantCode(p,v),p.modelCode,v.sku].some(x=>String(x||'').toLowerCase()===q)));if(hits.length===1){addToCart(hits[0].p,hits[0].v);setQuery('');}else if(hits.length>1)setMessage('الكود يطابق أكثر من اختيار، استخدم كود المقاس الكامل.');else if(q)setMessage('لم يتم العثور على كود مطابق.');}}} placeholder="اسم القطعة أو الكود مثل 102-L"/></div>
         <div className="product-grid">{visibleProducts.map(p=><article className="product-card" key={p.id}><div className="product-info"><div><b>{p.title}</b><small className="model-code">كود الموديل: {p.modelCode||'—'}</small></div><strong>{money(p.basePrice)}</strong></div>
           {(p.variants||[]).map(v=>{const key=String(p.id)+':'+String(v.id),qty=Number(stock[key]?.quantity??v.stockQty??0),code=variantCode(p,v);return <div className="variant-row" key={v.id}><div><span>{variantLabel(v)}</span><small>الكود: <b>{code}</b> · المتاح: {qty}</small></div><button className="add" disabled={qty<=0||busy} onClick={()=>addToCart(p,v)}><Plus size={16}/> إضافة</button></div>;})}
         </article>)}</div>
@@ -248,6 +248,12 @@ function App() {
       <div className="stock-table"><div className="table-row table-head"><span>القطعة</span><span>المقاس / الكود</span><span>الرصيد</span></div>
         {products.flatMap(p=>(p.variants||[]).map(v=><div className="table-row" key={p.id+':'+v.id}><b>{p.title} <small className="model-code">({p.modelCode})</small></b><span>{variantLabel(v)} · {variantCode(p,v)}</span><strong className={Number(stock[String(p.id)+':'+String(v.id)]?.quantity||0)<=3?'low':''}>{Number(stock[String(p.id)+':'+String(v.id)]?.quantity||0)} قطعة</strong></div>))}
       </div>
+    </section>}
+    {lastReceipt&&<section className="print-receipt" aria-hidden="true">
+      <h2>REMONTADA SPORTSWEAR</h2><p>فاتورة بيع المحل</p><hr/>
+      <div>رقم الفاتورة: {lastReceipt.receiptNumber}</div><div>التاريخ: {lastReceipt.date}</div><hr/>
+      {lastReceipt.items.map((item,i)=><div className="print-item" key={i}><div><b>{item.title}</b><small>{item.label} · {item.code}</small></div><span>{item.qty} × {money(item.price)}</span><strong>{money(item.qty*item.price)}</strong></div>)}
+      <hr/><h3>الإجمالي: {money(lastReceipt.total)}</h3><p>شكراً لزيارتكم ❤️</p>
     </section>}
     <footer><span><CheckCircle2 size={15}/> قاعدة بيانات محلية محفوظة على جهاز المحل</span><span>Windows 10 / 11 · {pending} حركة تنتظر المزامنة</span></footer>
   </div>;
