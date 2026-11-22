@@ -155,3 +155,12 @@ export async function saveStoreState(store, session) {
     body: JSON.stringify({ public_state: publicState, private_state: privateState, updated_at: new Date().toISOString() }),
   }, session.access_token);
 }
+
+export async function releaseOnlineInventory(orderId) {
+  const session = readAdminSession();
+  if (!session?.access_token) throw new Error("سجّل دخول الإدارة لإلغاء الطلب وتحرير المخزون");
+  return request("/rest/v1/rpc/inventory_release_online_order", {
+    method: "POST",
+    body: JSON.stringify({ p_order_id: String(orderId) }),
+  }, session.access_token);
+}
