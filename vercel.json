@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/pos-tablet", "destination": "/" },
+    { "source": "/pos-tablet/", "destination": "/" }
+  ]
+}
