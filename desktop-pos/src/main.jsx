@@ -44,15 +44,27 @@ function App() {
         if(info?.email) setEmail(info.email);
         const {data}=await supabase.auth.getSession();
         const user=data?.session?.user;
-        if(user?.app_metadata?.role==='admin' && navigator.onLine) {
+        if(user?.app_metadata?.role==='admin') {
           setSession(data.session); setAuthorized(true); await desktop?.authorize();
+          if(!navigator.onLine) setOfflineMode(true);
         } else if(info?.authorized && info?.hasPassword && !navigator.onLine) {
           setOfflineMode(true); setAuthorized(false);
         }
       } catch(e) { if(alive) setMessage('تعذر فتح قاعدة بيانات المحل: '+(e.message||'')); }
     })();
-    const onlineHandler=()=>{setOfflineMode(false);};
-    const offlineHandler=()=>{setOfflineMode(true);};
+    const onlineHandler=async()=>{
+      setOfflineMode(false);
+      try {
+        const {data}=await supabase.auth.getSession();
+        if(data?.session?.user?.app_metadata?.role==='admin') {
+          setSession(data.session); setAuthorized(true);
+          await refreshData(data.session);
+        } else {
+          setMessage('عاد الإنترنت. سجّل دخول الإدارة لإرسال المبيعات المحفوظة إلى الموقع.');
+        }
+      } catch { setMessage('عاد الإنترنت، لكن تعذر استعادة جلسة الإدارة. أعد تسجيل الدخول للمزامنة.'); }
+    };
+    const offlineHandler=()=>{setOfflineMode(true);setMessage('انقطع الإنترنت؛ ستُحفظ المبيعات محليًا حتى عودة الاتصال.');};
     window.addEventListener('online',onlineHandler); window.addEventListener('offline',offlineHandler);
     return ()=>{alive=false;window.removeEventListener('online',onlineHandler);window.removeEventListener('offline',offlineHandler);};
   },[]);
