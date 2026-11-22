@@ -40,12 +40,14 @@ function App() {
         const local=await desktop?.init();
         if(!alive) return;
         applySnapshot(local);
+        const info=await desktop?.offlineInfo();
+        if(info?.email) setEmail(info.email);
         const {data}=await supabase.auth.getSession();
         const user=data?.session?.user;
-        if(user?.app_metadata?.role==='admin') {
+        if(user?.app_metadata?.role==='admin' && navigator.onLine) {
           setSession(data.session); setAuthorized(true); await desktop?.authorize();
-        } else if(local?.offlineAuthorized) {
-          setOfflineMode(true); setAuthorized(true);
+        } else if(info?.authorized && info?.hasPassword && !navigator.onLine) {
+          setOfflineMode(true); setAuthorized(false);
         }
       } catch(e) { if(alive) setMessage('تعذر فتح قاعدة بيانات المحل: '+(e.message||'')); }
     })();
@@ -58,12 +60,28 @@ function App() {
   async function login(e) {
     e.preventDefault(); setBusy(true); setMessage('');
     try {
-      const {data,error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
-      if(error) throw error;
-      if(data.user?.app_metadata?.role!=='admin') { await supabase.auth.signOut(); throw new Error('الحساب غير مصرح له باستخدام الكاشير'); }
-      setSession(data.session); setAuthorized(true); setOfflineMode(false); await desktop?.authorize(); setPassword('');
-      setMessage('تم تسجيل الدخول. يتم تجهيز نسخة العمل المحلية للمحل.'); await refreshData(data.session);
-    } catch(err) { setMessage(err.message||'تعذر تسجيل الدخول. يلزم اتصال أول مرة لتفعيل البرنامج.'); }
+      if(!navigator.onLine) {
+        const valid=await desktop?.verifyOfflinePassword(password);
+        if(!valid) throw new Error('كلمة المرور غير صحيحة أو لم يتم تفعيل الدخول دون إنترنت من قبل.');
+        setAuthorized(true); setOfflineMode(true); setPassword('');
+        setMessage('تم فتح الكاشير دون إنترنت. ستتم المزامنة عند عودة الاتصال.');
+        return;
+      }
+      try {
+        const {data,error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
+        if(error) throw error;
+        if(data.user?.app_metadata?.role!=='admin') { await supabase.auth.signOut(); throw new Error('الحساب غير مصرح له باستخدام الكاشير'); }
+        setSession(data.session); setAuthorized(true); setOfflineMode(false);
+        await desktop?.saveOfflineCredentials({email:email.trim(),password});
+        setPassword('');
+        setMessage('تم تسجيل الدخول وتجهيز نسخة العمل المحلية للمحل.'); await refreshData(data.session);
+      } catch(onlineError) {
+        const valid=await desktop?.verifyOfflinePassword(password);
+        if(!valid) throw onlineError;
+        setAuthorized(true); setOfflineMode(true); setPassword('');
+        setMessage('تعذر الوصول للخادم؛ تم فتح النسخة المحلية. المزامنة ستبدأ عند استقرار الاتصال.');
+      }
+    } catch(err) { setMessage(err.message||'تعذر تسجيل الدخول.'); }
     finally { setBusy(false); }
   }
 
@@ -192,10 +210,10 @@ function App() {
 
   if(!isAdmin) return <main className="login-shell"><form className="login-card" onSubmit={login}>
     <div className="brand-mark">R</div><p className="eyebrow">REMONTADA SPORTSWEAR</p><h1>كاشير المحل</h1>
-    <p className="muted">سجّل الدخول بحساب الإدارة أول مرة أثناء الاتصال بالإنترنت. بعد ذلك يمكنك البيع دون إنترنت.</p>
-    <label>البريد الإلكتروني<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="البريد الإلكتروني للإدارة"/></label>
+    <p className="muted">أول مرة سجّل بحساب الإدارة والإنترنت متصل. بعد التفعيل يمكنك الدخول بكلمة مرور الإدارة المحفوظة على جهاز المحل والعمل دون إنترنت.</p>
+    <label>البريد الإلكتروني<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} disabled={!online} placeholder="البريد الإلكتروني للإدارة"/></label>
     <label>كلمة المرور<input type="password" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="كلمة المرور"/></label>
-    <button className="primary wide" disabled={busy}>{busy?'جارٍ الدخول...':'دخول الكاشير'}</button>{message&&<p className="notice">{message}</p>}
+    <button className="primary wide" disabled={busy}>{busy?'جارٍ الدخول...':online?'دخول الكاشير / تفعيل الجهاز':'دخول دون إنترنت'}</button>{message&&<p className="notice">{message}</p>}
   </form></main>;
 
   return <div className="app-shell">
