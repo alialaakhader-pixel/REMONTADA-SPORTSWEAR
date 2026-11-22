@@ -16,8 +16,9 @@ Windows desktop point-of-sale app for REMONTADA SPORTSWEAR.
 ## First setup
 1. Install and open REMONTADA POS while the shop PC is online.
 2. Sign in with the existing REMONTADA administrator account. This first online sign-in activates the local offline workspace.
-3. Press **مزامنة** and wait until the catalog and stock are loaded.
-4. After this initial setup, sales and stock receiving can be recorded without internet. Pending movements sync when connectivity returns.
+3. The app saves a salted password hash locally (not the raw password) for offline unlock.
+4. Press **مزامنة** and wait until the catalog and stock are loaded.
+5. After this initial setup, sales and stock receiving can be recorded without internet. Pending movements sync when connectivity returns.
 
 ## Important stock behavior
 The shop PC is the local offline record while disconnected. The website cannot see a shop sale until the PC reconnects and syncs it. To avoid selling the same stock twice, the website's online checkout is enabled only while the shop POS has checked in recently; if the POS is offline, website checkout pauses until the POS reconnects. Online orders and connected POS sales reserve stock centrally.
