@@ -2989,11 +2989,11 @@ function AdminGateAndDashboard({
             دخول لوحة الإدارة
           </h1>
           <p className={`mt-2 text-xs ${isLight ? 'text-[#3B5278]' : 'text-[#A0AEC0]'}`}>
-            أدخل كلمة مرور لوحة الإدارة. لا تشاركها مع أي شخص.
+            سجّل الدخول بالبريد الإلكتروني وكلمة مرور حساب الإدارة.
           </p>
 
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
               try {
                 await onAdminLogin(emailInput.trim(), passInput);
