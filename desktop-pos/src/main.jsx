@@ -106,7 +106,7 @@ function App() {
         }
         const variants=[];
         for(const v of p.variants||[]) {
-          const code=String(v.sku|| (modelCode+(v.size?'-'+v.size:'')));
+          const code=String(modelCode+(v.size?'-'+v.size:''));
           const {error}=await supabase.rpc('inventory_initialize_stock',{
             p_product_id:String(p.id),p_variant_id:String(v.id),p_product_title:p.title||'منتج',
             p_variant_label:variantLabel(v),p_sku:code,p_initial_quantity:Math.max(0,Number(v.stockQty||0))
