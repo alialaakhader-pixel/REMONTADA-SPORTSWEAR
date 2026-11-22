@@ -70,6 +70,7 @@ function App() {
   async function syncPending(activeSession=session) {
     if(!activeSession || !navigator.onLine) return;
     const queue=await desktop?.pending()||[];
+    let allSynced=true;
     for(const ev of queue) {
       try {
         const {error}=await supabase.rpc('pos_apply_offline_event',{p_event_id:ev.event_id,p_event_type:ev.event_type,p_payload:ev.payload});
@@ -78,10 +79,12 @@ function App() {
       } catch(err) {
         await desktop?.syncError({eventId:ev.event_id,error:err.message});
         setMessage('المزامنة متوقفة عند حركة لم تُرفع بعد: '+(err.message||'خطأ اتصال'));
+        allSynced=false;
         break;
       }
     }
     const latest=await desktop?.init(); applySnapshot(latest);
+    return allSynced;
   }
 
   async function refreshData(activeSession=session) {
@@ -92,7 +95,8 @@ function App() {
     }
     setBusy(true);
     try {
-      await syncPending(activeSession);
+      const allSynced=await syncPending(activeSession);
+      if(!allSynced) throw new Error('توجد حركة محلية لم تُزامن؛ أوقفنا البيع الإلكتروني مؤقتًا لحماية المخزون.');
       const {data:stateRow,error:stateError}=await supabase.from('store_state').select('public_state').eq('id',1).single();
       if(stateError) throw stateError;
       const list=Array.isArray(stateRow?.public_state?.products)?stateRow.public_state.products:[];
