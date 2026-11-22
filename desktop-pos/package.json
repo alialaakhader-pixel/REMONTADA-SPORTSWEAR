@@ -1,0 +1,33 @@
+{
+  "name": "remontada-pos",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "desktop": "electron .",
+    "dist:win": "vite build && electron-builder --win nsis portable"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.57.4",
+    "lucide-react": "0.468.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "4.3.4",
+    "electron": "34.2.0",
+    "electron-builder": "25.1.8",
+    "vite": "6.1.0"
+  },
+  "main": "electron/main.cjs",
+  "build": {
+    "appId": "com.remontada.pos",
+    "productName": "REMONTADA POS",
+    "directories": { "output": "release" },
+    "files": ["dist/**/*", "electron/**/*", "package.json"],
+    "win": { "target": ["nsis", "portable"], "icon": "build/icon.ico" },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true }
+  }
+}
