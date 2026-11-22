@@ -354,7 +354,7 @@ function App() {
       {lastReceipt.items.map((item,i)=><div className="print-item" key={i}><div><b>{item.title}</b><small>{item.label} · {item.code}</small></div><span>{item.qty} × {money(item.price)}</span><strong>{money(item.qty*item.price)}</strong></div>)}
       <hr/><h3>الإجمالي: {money(lastReceipt.total)}</h3><p>شكراً لزيارتكم ❤️</p>
     </section>}
-    <footer><span><CheckCircle2 size={15}/> قاعدة بيانات محلية محفوظة على جهاز المحل</span><span>Windows 10 / 11 · {pending} حركة تنتظر المزامنة</span></footer>
+    <footer><span><CheckCircle2 size={15}/> قاعدة بيانات محلية محفوظة على التابلت</span><span>Android / Tablet · {pending} حركة تنتظر المزامنة</span></footer>
   </div>;
 }
 export default App;
