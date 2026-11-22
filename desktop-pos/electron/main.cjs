@@ -67,7 +67,7 @@ function snapshot() {
     stock[row.product_id + ':' + row.variant_id] = { quantity: row.quantity, sku: row.sku };
   }
   const pending = db.prepare('SELECT count(*) AS n FROM sync_queue WHERE synced=0').get().n;
-  const sales = db.prepare('SELECT * FROM sales ORDER BY created_at DESC LIMIT 100').all();
+  const sales = db.prepare('SELECT * FROM sales ORDER BY created_at DESC LIMIT 100').all().map(s=>({...s,items:db.prepare('SELECT * FROM sale_items WHERE sale_id=?').all(s.sale_id)}));
   const returns = db.prepare('SELECT * FROM returns ORDER BY created_at DESC LIMIT 100').all();
   const expenses = db.prepare('SELECT * FROM expenses ORDER BY created_at DESC LIMIT 100').all();
   const movements = db.prepare('SELECT * FROM stock_movements ORDER BY created_at DESC LIMIT 200').all();
