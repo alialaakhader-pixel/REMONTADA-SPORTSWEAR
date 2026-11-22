@@ -125,10 +125,15 @@ function App() {
   }
 
   async function refreshData(activeSession=session) {
-    if(!activeSession || !navigator.onLine) {
+    if(!activeSession && navigator.onLine) {
+      const local=await desktop?.init(); applySnapshot(local);
+      setMessage('لإرسال المبيعات والتوريدات للموقع، اضغط تسجيل الدخول للمزامنة وأدخل حساب الإدارة.');
+      return false;
+    }
+    if(!navigator.onLine) {
       const local=await desktop?.init(); applySnapshot(local);
       setMessage('أنت تعمل دون إنترنت. المبيعات محفوظة على جهاز المحل وستتزامن عند عودة الاتصال.');
-      return;
+      return false;
     }
     setBusy(true);
     try {
