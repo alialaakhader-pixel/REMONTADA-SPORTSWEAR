@@ -3,3 +3,17 @@
 
 .offline{display:flex;align-items:center;gap:6px;color:#ffbd73;font-size:12px}.queue-count{display:flex;align-items:center;gap:6px;color:#8fdcff;font-size:12px;white-space:nowrap}.model-code{display:block;margin-top:3px;color:#65dfff;font-size:11px;font-weight:800}.product-info{align-items:flex-start}.product-info>div{min-width:0}.variant-row small b{color:#8be4ff;font-weight:900}.top-actions{flex-wrap:wrap;justify-content:flex-end}
 @media(max-width:1150px){.workspace{grid-template-columns:minmax(0,1fr) 340px}.app-shell{padding-left:16px;padding-right:16px}.top-actions{gap:6px}}
+
+.print-receipt{display:none}
+@media print{
+  @page{size:80mm auto;margin:4mm}
+  html,body,#root{background:#fff!important;color:#111!important;width:100%!important;min-height:0!important}
+  .app-shell{display:block!important;padding:0!important;margin:0!important;background:#fff!important;color:#111!important}
+  .topbar,.tabs,.notice-bar,.workspace,.stock-page,footer{display:none!important}
+  .print-receipt{display:block!important;width:100%;font:12px/1.5 Arial,sans-serif;color:#111!important;background:#fff!important}
+  .print-receipt h2,.print-receipt h3,.print-receipt p{text-align:center;margin:5px 0;color:#111!important}
+  .print-receipt h2{font-size:17px;font-weight:900}.print-receipt h3{font-size:15px}
+  .print-receipt hr{border:0;border-top:1px dashed #333;margin:8px 0}
+  .print-item{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin:7px 0}
+  .print-item small{display:block}.print-item strong{grid-column:2;text-align:right}
+}
