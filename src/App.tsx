@@ -14,7 +14,7 @@ import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStore
 // 1. الإعدادات الافتراضية النظيفة 100% (بدون أي بيانات وهمية - بداية فارغة)
 // ============================================================================
 
-const STORAGE_KEY = 'remontada_sportswear_pro_v5';
+const STORAGE_KEY = 'remontada_sportswear_pro_v6';
 
 const DEFAULT_SPORTS = [
   { id: 'sport-football', name: 'كرة القدم', visible: true },
