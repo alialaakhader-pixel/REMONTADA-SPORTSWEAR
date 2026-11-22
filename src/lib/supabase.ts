@@ -89,7 +89,46 @@ export async function loadStoreState(session = null) {
     { method: "GET" },
     session?.access_token || null
   );
-  return rows?.[0] || null;
+  const row = rows?.[0] || null;
+  if (!row?.public_state) return row;
+  try {
+    const stockRows = await request(
+      "/rest/v1/inventory_public_stock?select=product_id,variant_id,quantity,sku",
+      { method: "GET" },
+      session?.access_token || null
+    );
+    const stock = new Map((stockRows || []).map((item) => [
+      String(item.product_id) + ":" + String(item.variant_id), Number(item.quantity || 0)
+    ]));
+    row.public_state = {
+      ...row.public_state,
+      products: (row.public_state.products || []).map((product) => ({
+        ...product,
+        variants: (product.variants || []).map((variant) => ({
+          ...variant,
+          stockQty: stock.get(String(product.id) + ":" + String(variant.id)) ?? 0,
+        })),
+      })),
+    };
+  } catch (error) {
+    console.warn("تعذر تحميل المخزون المركزي، سيتم عرض بيانات المتجر المحفوظة مؤقتاً:", error);
+  }
+  return row;
+}
+
+export async function reserveOnlineInventory(orderId, items) {
+  return request("/rest/v1/rpc/inventory_reserve_online_order", {
+    method: "POST",
+    body: JSON.stringify({
+      p_order_id: String(orderId),
+      p_items: items.map((item) => ({
+        product_id: String(item.productId),
+        variant_id: String(item.variantId),
+        quantity: Number(item.qty),
+        product_title: String(item.productTitle || ""),
+      })),
+    }),
+  });
 }
 
 export async function saveStoreState(store, session) {
