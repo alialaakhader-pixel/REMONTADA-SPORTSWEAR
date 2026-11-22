@@ -80,8 +80,12 @@ export async function changeAdminPassword(session, password) {
 }
 
 export async function loadStoreState(session = null) {
+  // Public visitors must never request the private_state column.
+  const columns = session?.access_token
+    ? "id,public_state,private_state,updated_at"
+    : "id,public_state,updated_at";
   const rows = await request(
-    "/rest/v1/store_state?id=eq.1&select=id,public_state,private_state,updated_at",
+    `/rest/v1/store_state?id=eq.1&select=${columns}`,
     { method: "GET" },
     session?.access_token || null
   );
