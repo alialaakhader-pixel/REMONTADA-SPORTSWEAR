@@ -29,6 +29,16 @@ jobs:
           packages: 'platform-tools'
       - name: Install Android build platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Set Android version
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          p=json.load(open('package.json'))
+          p['version']=f"1.0.{os.environ['GITHUB_RUN_NUMBER']}"
+          open('package.json','w').write(json.dumps(p, indent=2)+'\\n')
+          PY
+        env:
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
       - name: Install dependencies
         run: npm install
       - name: Sync shared POS source
@@ -39,13 +49,77 @@ jobs:
         run: npx cap add android
       - name: Sync Capacitor
         run: npx cap sync android
-      - name: Build debug APK
+      - name: Set Android versionCode
         working-directory: mobile-pos/android
-        run: chmod +x gradlew && ./gradlew assembleDebug
-      - name: Upload APK
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          python3 - <<'PY'
+          import os, re
+          path='app/build.gradle'
+          s=open(path).read()
+          s,n=re.subn(r'versionCode\\s+\\d+', 'versionCode '+os.environ['BUILD_NUMBER'], s, count=1)
+          if n != 1: raise SystemExit('Could not set Android versionCode')
+          open(path,'w').write(s)
+          PY
+      - name: Prepare persistent signing key
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+        working-directory: mobile-pos
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/remontada-upload.jks"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/remontada-upload.jks" >> "$GITHUB_ENV"
+      - name: Configure release signing
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+        working-directory: mobile-pos/android
+        run: |
+          python3 - <<'PY'
+          p='app/build.gradle'
+          s=open(p).read()
+          signing='''signingConfigs {
+                  release {
+                      storeFile file(System.getenv("ANDROID_KEYSTORE_PATH"))
+                      storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                      keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+                  }
+              }
+          '''
+          if 'signingConfigs {' not in s:
+              s=s.replace('    buildTypes {', '    '+signing+'    buildTypes {', 1)
+          i=s.find('    buildTypes {')
+          j=s.find('        release {', i)
+          if i < 0 or j < 0: raise SystemExit('Could not locate Android release build type')
+          k=j+len('        release {')
+          s=s[:k]+'\\n            signingConfig signingConfigs.release'+s[k:]
+          open(p,'w').write(s)
+          PY
+      - name: Build signed release APK
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+        working-directory: mobile-pos/android
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: chmod +x gradlew && ./gradlew assembleRelease
+      - name: Upload signed APK
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
         uses: actions/upload-artifact@v4
         with:
-          name: REMONTADA-POS-Android-APK
+          name: REMONTADA-POS-Android-SIGNED
+          path: mobile-pos/android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 30
+      - name: Build debug APK (temporary first-install fallback)
+        if: ${{ !(secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '') }}
+        working-directory: mobile-pos/android
+        run: chmod +x gradlew && ./gradlew assembleDebug
+      - name: Upload debug APK
+        if: ${{ !(secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: REMONTADA-POS-Android-DEBUG-ONLY
           path: mobile-pos/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
