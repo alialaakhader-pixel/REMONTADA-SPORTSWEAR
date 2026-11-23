@@ -12,6 +12,8 @@ permissions:
 jobs:
   build-android:
     runs-on: ubuntu-latest
+    env:
+      HAS_ANDROID_SIGNING: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' && 'true' || 'false' }}
     defaults:
       run:
         working-directory: mobile-pos
@@ -30,15 +32,15 @@ jobs:
       - name: Install Android build platform
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Set Android version
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
         run: |
           python3 - <<'PY'
-          import json, os, re
+          import json, os
           p=json.load(open('package.json'))
-          p['version']=f"1.0.{os.environ['GITHUB_RUN_NUMBER']}"
-          open('package.json','w').write(json.dumps(p, indent=2)+'\\n')
+          p['version']=f"1.0.{os.environ['BUILD_NUMBER']}"
+          with open('package.json','w') as f: json.dump(p,f,indent=2); f.write('\\n')
           PY
-        env:
-          GITHUB_RUN_NUMBER: ${{ github.run_number }}
       - name: Install dependencies
         run: npm install
       - name: Sync shared POS source
@@ -58,20 +60,19 @@ jobs:
           import os, re
           path='app/build.gradle'
           s=open(path).read()
-          s,n=re.subn(r'versionCode\\s+\\d+', 'versionCode '+os.environ['BUILD_NUMBER'], s, count=1)
+          s,n=re.subn(r'versionCode\s+\d+', 'versionCode '+os.environ['BUILD_NUMBER'], s, count=1)
           if n != 1: raise SystemExit('Could not set Android versionCode')
           open(path,'w').write(s)
           PY
       - name: Prepare persistent signing key
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
-        working-directory: mobile-pos
+        if: env.HAS_ANDROID_SIGNING == 'true'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/remontada-upload.jks"
           echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/remontada-upload.jks" >> "$GITHUB_ENV"
       - name: Configure release signing
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+        if: env.HAS_ANDROID_SIGNING == 'true'
         working-directory: mobile-pos/android
         run: |
           python3 - <<'PY'
@@ -96,7 +97,7 @@ jobs:
           open(p,'w').write(s)
           PY
       - name: Build signed release APK
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+        if: env.HAS_ANDROID_SIGNING == 'true'
         working-directory: mobile-pos/android
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -104,7 +105,7 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: chmod +x gradlew && ./gradlew assembleRelease
       - name: Upload signed APK
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '' }}
+        if: env.HAS_ANDROID_SIGNING == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: REMONTADA-POS-Android-SIGNED
@@ -112,11 +113,11 @@ jobs:
           if-no-files-found: error
           retention-days: 30
       - name: Build debug APK (temporary first-install fallback)
-        if: ${{ !(secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '') }}
+        if: env.HAS_ANDROID_SIGNING != 'true'
         working-directory: mobile-pos/android
         run: chmod +x gradlew && ./gradlew assembleDebug
       - name: Upload debug APK
-        if: ${{ !(secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_PASSWORD != '' && secrets.ANDROID_KEY_ALIAS != '' && secrets.ANDROID_KEY_PASSWORD != '') }}
+        if: env.HAS_ANDROID_SIGNING != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: REMONTADA-POS-Android-DEBUG-ONLY
