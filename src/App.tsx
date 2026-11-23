@@ -758,178 +758,52 @@ export default function App() {
         </div>
       )}
 
-      {/* شريط إعلانات مخصص أو شريط العروض الخاصة المفعلة */}
-      {store.settings.announcementActive && store.settings.announcementText ? (
-        <div className="border-b border-[#00D4FF]/35 bg-[#001F4D] px-4 py-2 text-center text-xs font-extrabold text-[#00D4FF]">
-          {store.settings.announcementText}
+      <div className="border-b border-white/10 bg-[#050B18] px-3 py-2 text-[10px] font-bold text-white sm:text-xs">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-4 gap-y-1">
+          <span className="flex items-center gap-1.5"><span className="text-[#FFC83D]">★</span> خدمة عملاء مميزة</span>
+          <span className="hidden h-3 w-px bg-white/25 sm:block" />
+          <span className="flex items-center gap-1.5"><Shield className="h-3.5 w-3.5 text-emerald-400" /> جودة أصلية مضمونة</span>
+          <span className="hidden h-3 w-px bg-white/25 sm:block" />
+          <span className="flex items-center gap-1.5"><Truck className="h-3.5 w-3.5 text-[#159CFF]" /> شحن لجميع المحافظات</span>
         </div>
-      ) : (
-        activePromotions.length > 0 && (
-          <div className="border-b border-[#00D4FF]/35 bg-gradient-to-l from-[#001F4D] via-[#0A1A3A] to-[#001F4D] px-4 py-2 text-center">
-            <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-3 text-xs font-extrabold text-[#00D4FF]">
-              <Sparkles className="h-3.5 w-3.5" />
-              {activePromotions.map((pr, idx) => (
-                <span key={pr.id}>
-                  {pr.title} — خصم{' '}
-                  {pr.discountType === 'percentage' ? `${pr.discountValue}%` : formatEGP(pr.discountValue)}
-                  {idx < activePromotions.length - 1 ? '  |  ' : ''}
-                </span>
-              ))}
-            </div>
-          </div>
-        )
+      </div>
+      {store.settings.announcementActive && store.settings.announcementText && (
+        <div className="bg-[#063A7A] px-4 py-2 text-center text-xs font-black text-white">{store.settings.announcementText}</div>
       )}
-
-      {/* الهيدر الثابت */}
-      <header
-        className={`sticky top-0 z-40 border-b border-[#00D4FF]/25 backdrop-blur-xl ${
-          isLight ? 'bg-[#F3F8FF]/90' : 'bg-[#05050F]/90'
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3.5">
-          <button onClick={() => setActivePage('home')} className="text-right focus:outline-none">
-            <RemontadaOfficialLogo
-              variant="header"
-              customImage={store.settings.customHeroImage}
-              isLight={isLight}
-            />
-          </button>
-
-          <nav className="hidden items-center gap-1.5 lg:flex">
-            {[
-              { id: 'home', label: 'الواجهة الرئيسية' },
-              { id: 'shop', label: 'المتجر' },
-              { id: 'account', label: 'طلباتي وتقييمي' },
-              { id: 'courier', label: 'عامل التوصيل' },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActivePage(item.id)}
-                className={`rounded-xl px-3.5 py-2 text-xs font-extrabold transition ${
-                  activePage === item.id
-                    ? 'bg-[#00B4FF] text-[#05050F] shadow-[0_0_20px_rgba(0,212,255,0.5)]'
-                    : isLight
-                    ? 'text-[#3B5278] hover:bg-[#00B4FF]/15 hover:text-[#05050F]'
-                    : 'text-[#A0AEC0] hover:bg-[#0A1A3A] hover:text-white'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-
-          {/* شريط البحث الذكي */}
-          <div className="relative order-3 w-full sm:order-none sm:w-52 xl:w-64">
-            <Search className="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#00D4FF]" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                if (activePage === 'home' && e.target.value.trim()) setActivePage('shop');
-              }}
-              placeholder="ابحث عن منتج أو ماركة..."
-              className={`w-full rounded-xl border border-[#00D4FF]/35 py-2 pr-10 pl-4 text-xs outline-none transition focus:border-[#00D4FF] ${
-                isLight
-                  ? 'bg-white text-[#05050F] placeholder-[#5A7194]'
-                  : 'bg-[#0A1A3A]/55 text-white placeholder-[#A0AEC0]'
-              }`}
-            />
+      {activePromotions.length > 0 && (
+        <div className="bg-[#061A3B] px-4 py-2 text-center text-[11px] font-bold text-[#7CCBFF]">
+          {activePromotions.map((pr, idx) => <span key={pr.id}>{pr.title} — خصم {pr.discountType === "percentage" ? pr.discountValue + "%" : formatEGP(pr.discountValue)}{idx < activePromotions.length - 1 ? "  |  " : ""}</span>)}
+        </div>
+      )}
+      <header className="sticky top-0 z-40 border-b border-[#168DFF]/25 bg-[#061026]/95 shadow-[0_8px_35px_rgba(0,0,0,.2)] backdrop-blur-xl">
+        <div className="mx-auto grid max-w-7xl grid-cols-3 items-center px-4 py-3 sm:px-6 lg:px-10">
+          <div className="flex items-center justify-start gap-2">
+            <button onClick={() => setActivePage("shop")} aria-label="القائمة" className="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-2xl text-white hover:border-[#00A3FF] hover:text-[#00A3FF]">☰</button>
+            <button onClick={() => setActivePage("shop")} className="hidden rounded-full border border-white/15 px-3 py-2 text-xs font-bold text-white/80 hover:border-[#00A3FF] sm:block">المتجر</button>
           </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsSizeFinderOpen(true)}
-              className={`inline-flex items-center gap-1.5 rounded-xl border border-[#00D4FF]/40 px-3 py-2 text-xs font-extrabold text-[#00D4FF] transition hover:border-[#00D4FF] ${
-                isLight ? 'bg-white' : 'bg-[#0A1A3A]/70'
-              }`}
-              title="حاسبة المقاس (ملابس وأحذية)"
-            >
-              <Ruler className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">حاسبة المقاس</span>
+          <button onClick={() => setActivePage("home")} className="flex items-center justify-center gap-2 text-center">
+            <span className="text-xl font-black italic tracking-tight text-white sm:text-2xl">Remontada<span className="text-[#00A3FF]">.</span></span>
+            <span className="hidden flex-col items-center text-[9px] font-black tracking-[.3em] text-[#65C9FF] sm:flex"><span className="h-px w-10 bg-[#00A3FF]" />STORE<span className="h-px w-10 bg-[#00A3FF]" /></span>
+            <span className="text-2xl text-[#00A3FF]">♞</span>
+          </button>
+          <div className="flex items-center justify-end gap-2">
+            <label className="hidden max-w-[190px] flex-1 items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-2 lg:flex">
+              <Search className="h-4 w-4 shrink-0 text-white/80" />
+              <input value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); if (activePage === "home" && e.target.value.trim()) setActivePage("shop"); }} placeholder="ابحث..." className="w-full min-w-0 bg-transparent text-xs text-white outline-none placeholder:text-white/45" />
+            </label>
+            <button onClick={() => setIsCartOpen(true)} aria-label="سلة التسوق" className="relative grid h-10 w-10 place-items-center rounded-full text-white hover:bg-white/10">
+              <ShoppingBag className="h-5 w-5" />
+              <span className="absolute -left-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-red-600 px-1 text-[10px] font-black text-white">{totalCartCount}</span>
             </button>
-
-            {compareIds.length > 0 && (
-              <button
-                onClick={() => setIsCompareOpen(true)}
-                className="relative rounded-xl border border-[#00D4FF]/45 bg-[#0A1A3A] p-2.5 text-[#00D4FF]"
-                title="مقارنة المنتجات"
-              >
-                <Scale className="h-4 w-4" />
-                <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#00D4FF] text-[10px] font-black text-[#05050F]">
-                  {compareIds.length}
-                </span>
-              </button>
-            )}
-
-            <button
-              onClick={toggleTheme}
-              className={`rounded-xl border border-[#00D4FF]/35 p-2.5 text-[#00D4FF] transition hover:border-[#00D4FF] ${
-                isLight ? 'bg-white' : 'bg-[#0A1A3A]/60'
-              }`}
-              title={isLight ? 'الوضع الليلي' : 'الوضع النهاري'}
-            >
-              {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-            </button>
-
-            <button
-              onClick={() => setActivePage('account')}
-              className={`rounded-xl border border-[#00D4FF]/35 p-2.5 text-[#00D4FF] transition hover:border-[#00D4FF] ${
-                isLight ? 'bg-white' : 'bg-[#0A1A3A]/60'
-              }`}
-              title="طلباتي وتأكيد الاستلام"
-            >
-              <User className="h-4 w-4" />
-            </button>
-
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className={`relative rounded-xl border border-[#00D4FF]/35 p-2.5 text-[#00D4FF] transition hover:border-[#00D4FF] ${
-                isLight ? 'bg-white' : 'bg-[#0A1A3A]/60'
-              }`}
-              title="سلة المشتريات"
-            >
-              <ShoppingBag className="h-4 w-4" />
-              {totalCartCount > 0 && (
-                <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#00D4FF] text-[10px] font-black text-[#05050F]">
-                  {totalCartCount}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => setActivePage('admin')}
-              className={`relative inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2.5 text-xs font-black transition ${
-                activePage === 'admin'
-                  ? 'bg-white text-[#05050F] shadow-[0_0_24px_rgba(255,255,255,0.6)]'
-                  : 'bg-[#00B4FF] text-[#05050F] shadow-[0_0_22px_rgba(0,212,255,0.55)] hover:bg-[#00D4FF]'
-              }`}
-            >
-              <Shield className="h-4 w-4" />
-              <span>الإدارة</span>
-              {lowStockAlerts.length > 0 && (
-                <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-[#05050F] bg-[#00D4FF] text-[10px] font-black text-[#05050F]">
-                  {lowStockAlerts.length}
-                </span>
-              )}
-            </button>
+            <button onClick={() => setActivePage("account")} aria-label="حسابي" className="hidden h-10 w-10 place-items-center rounded-full text-white hover:bg-white/10 sm:grid"><User className="h-5 w-5" /></button>
           </div>
         </div>
-
-        {/* شريط تنقل سريع للموبايل */}
-        <div className="flex items-center justify-around border-t border-[#00D4FF]/15 px-2 py-2 lg:hidden text-[11px] font-bold">
-          <button onClick={() => setActivePage('home')} className={activePage === 'home' ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
-            الرئيسية
-          </button>
-          <button onClick={() => setActivePage('shop')} className={activePage === 'shop' ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
-            المتجر
-          </button>
-          <button onClick={() => setActivePage('account')} className={activePage === 'account' ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
-            طلباتي وتقييمي
-          </button>
-          <button onClick={() => setActivePage('courier')} className={activePage === 'courier' ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
-            عامل التوصيل
-          </button>
+        <div className="flex items-center justify-center gap-5 border-t border-white/10 px-3 py-2 text-[11px] font-bold lg:hidden">
+          <button onClick={() => setActivePage("home")} className={activePage === "home" ? "text-[#42B8FF]" : "text-white/70"}>الرئيسية</button>
+          <button onClick={() => setActivePage("shop")} className={activePage === "shop" ? "text-[#42B8FF]" : "text-white/70"}>المتجر</button>
+          <button onClick={() => setActivePage("account")} className={activePage === "account" ? "text-[#42B8FF]" : "text-white/70"}>طلباتي</button>
+          <button onClick={() => setActivePage("courier")} className={activePage === "courier" ? "text-[#42B8FF]" : "text-white/70"}>التوصيل</button>
+          <button onClick={() => setActivePage("admin")} className="text-white/70">الإدارة</button>
         </div>
       </header>
 
@@ -1026,26 +900,32 @@ export default function App() {
         )}
       </main>
 
-      {/* الفوتر الاحترافي */}
-      <footer
-        className={`mt-20 border-t border-[#00D4FF]/25 ${
-          isLight ? 'bg-white' : 'bg-[#05050F]'
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 py-10 md:flex-row">
-          <RemontadaOfficialLogo
-            variant="header"
-            customImage={store.settings.customHeroImage}
-            isLight={isLight}
-          />
-          <div className="flex items-center gap-2 rounded-xl border border-[#00D4FF]/30 bg-[#0A1A3A]/50 px-4 py-2 text-xs text-[#00D4FF]">
-            <Truck className="h-4 w-4" />
-            <span>التوصيل مدفوع لجميع المحافظات المصرية — الأسعار بالجنيه المصري (ج.م)</span>
+      <footer className="relative mt-16 overflow-hidden border-t border-[#087BFF]/40 bg-[#050B18] text-white">
+        <div className="pointer-events-none absolute -left-20 top-0 h-36 w-2/3 -rotate-12 border-y-[18px] border-[#0066FF]/20" />
+        <div className="relative mx-auto grid max-w-7xl gap-8 px-5 py-12 text-center md:grid-cols-3 md:items-center md:text-right lg:px-10">
+          <div className="order-3 flex flex-col items-center md:order-1 md:items-start">
+            <div className="text-2xl font-black italic">Remontada <span className="text-[#00A3FF]">STORE</span></div>
+            <div className="mt-1 text-[10px] font-bold tracking-[.35em] text-[#65C9FF]">SPORTSWEAR</div>
+            <span className="mt-2 text-3xl text-[#00A3FF]">♞</span>
           </div>
-          <div className={`text-xs ${isLight ? 'text-[#475F84]' : 'text-[#A0AEC0]'}`}>
-            © {new Date().getFullYear()} REMONTADA SPORTSWEAR
+          <div className="order-2">
+            <div className="text-sm font-bold text-white/80">اطلب الآن عبر واتساب</div>
+            <a href="https://wa.me/201221855469" target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center justify-center gap-3 text-2xl font-black tracking-wide text-white sm:text-3xl">
+              <span>01221855469</span>
+              <span className="grid h-12 w-12 place-items-center rounded-full bg-[#20C96B] text-2xl text-white">◉</span>
+            </a>
+          </div>
+          <div className="order-1 md:order-3 md:text-left">
+            <div className="text-sm font-bold">تابعنا على</div>
+            <div className="mt-4 flex justify-center gap-2 md:justify-end">
+              <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 font-black">◎</a>
+              <a href="https://tiktok.com" target="_blank" rel="noreferrer" aria-label="TikTok" className="grid h-10 w-10 place-items-center rounded-xl bg-black font-black">♪</a>
+              <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" className="grid h-10 w-10 place-items-center rounded-xl bg-[#1877F2] font-black">f</a>
+              <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube" className="grid h-10 w-10 place-items-center rounded-xl bg-[#FF0033] font-black">▶</a>
+            </div>
           </div>
         </div>
+        <div className="relative border-t border-white/10 px-4 py-4 text-center text-[10px] text-[#8FA6C5]">© {new Date().getFullYear()} REMONTADA STORE — جميع الحقوق محفوظة · التوصيل لجميع محافظات مصر</div>
       </footer>
 
       {/* حاسبة المقاس التفاعلية (ملابس: طول + وزن + قصة | أحذية: طول القدم سم) */}
@@ -1200,7 +1080,7 @@ function HomeView({
         <div className="mx-auto max-w-7xl px-4 lg:px-10">
           <div className="mb-9 flex items-center justify-center gap-4">
             <span className="h-px w-16 bg-[#007BFF] sm:w-28" />
-            <IbexMark size={29} glow={false} idPrefix="best-seller-title" />
+            <span className="text-3xl font-black italic text-[#00A3FF]">R</span>
             <h2 className="text-3xl font-black sm:text-4xl">الأكثر طلباً</h2>
             <span className="h-px w-16 bg-[#007BFF] sm:w-28" />
           </div>
