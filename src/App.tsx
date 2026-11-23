@@ -421,7 +421,7 @@ const RemontadaOfficialLogo = ({ variant = 'header', customImage = '', isLight =
             style={{ fontFamily: "'Chakra Petch', sans-serif" }}
             className={`mt-1 text-[9px] font-bold tracking-[0.34em] ${isLight ? 'text-[#3B5278]' : 'text-[#A0AEC0]'}`}
           >
-            SPORTSWEAR
+            STORE
           </div>
         </div>
       )}
@@ -781,10 +781,8 @@ export default function App() {
             <button onClick={() => setActivePage("shop")} aria-label="القائمة" className="grid h-10 w-10 place-items-center rounded-full border border-white/15 text-2xl text-white hover:border-[#00A3FF] hover:text-[#00A3FF]">☰</button>
             <button onClick={() => setActivePage("shop")} className="hidden rounded-full border border-white/15 px-3 py-2 text-xs font-bold text-white/80 hover:border-[#00A3FF] sm:block">المتجر</button>
           </div>
-          <button onClick={() => setActivePage("home")} className="flex items-center justify-center gap-2 text-center">
-            <span className="text-xl font-black italic tracking-tight text-white sm:text-2xl">Remontada<span className="text-[#00A3FF]">.</span></span>
-            <span className="hidden flex-col items-center text-[9px] font-black tracking-[.3em] text-[#65C9FF] sm:flex"><span className="h-px w-10 bg-[#00A3FF]" />STORE<span className="h-px w-10 bg-[#00A3FF]" /></span>
-            <span className="text-2xl text-[#00A3FF]">♞</span>
+          <button onClick={() => setActivePage("home")} className="flex items-center justify-center text-center">
+            <RemontadaOfficialLogo variant="header" customImage="" isLight={false} />
           </button>
           <div className="flex items-center justify-end gap-2">
             <label className="hidden max-w-[190px] flex-1 items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-2 lg:flex">
