@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import TabletPos from './pos/TabletPos';
+import { Browser } from '@capacitor/browser';
 
 const REPO = 'alialaakhader-pixel/REMONTADA-SPORTSWEAR';
 const APP_VERSION = document.querySelector('meta[name="app-version"]')?.getAttribute('content') || '1.0.0';
@@ -74,9 +75,9 @@ function UpdateNotice() {
         <div><b style={{fontSize:19}}>تحديث جديد متاح</b><div style={{color:'#9fb1c8',fontSize:13}}>REMONTADA POS · الإصدار {release.version}</div></div>
       </div>
       <p style={{color:'#cbd5e1',lineHeight:1.8,fontSize:14}}>يوجد إصدار أحدث من برنامج الكاشير. سيظهر لك تنبيه عند توفر تحديث جاهز للتثبيت.</p>
-      <div role="status" style={{textAlign:'center',background:'#173b42',color:'#b8fff0',fontWeight:800,padding:'13px 16px',borderRadius:12,marginTop:18}}>سيتم إتاحة التحديث من داخل البرنامج قريبًا</div>
+      <button onClick={async () => { try { await Browser.open({ url: release.url }); } catch { window.open(release.url, '_blank', 'noopener,noreferrer'); } }} style={{width:'100%',marginTop:18,padding:13,border:0,borderRadius:12,background:'#0d9488',color:'#fff',fontWeight:800,fontFamily:'inherit',cursor:'pointer'}}>تنزيل التحديث {release.version}</button>
       <button onClick={() => setDismissed(true)} style={{width:'100%',marginTop:10,padding:11,border:0,borderRadius:12,background:'#243247',color:'#e2e8f0',fontFamily:'inherit'}}>لاحقًا</button>
-      <small style={{display:'block',color:'#91a4bc',lineHeight:1.7,marginTop:12}}>التنبيه للإعلام فقط في هذه المرحلة؛ لم يتم تفعيل تنزيل التحديث أو تثبيته من داخل التطبيق بعد.</small>
+      <small style={{display:'block',color:'#91a4bc',lineHeight:1.7,marginTop:12}}>سيُفتح تنزيل ملف التحديث. بعد اكتمال التنزيل اضغط على ملف APK ووافق على التثبيت. لا تحذف النسخة الحالية؛ التحديث يستخدم مفتاح التوقيع نفسه.</small>
     </section>
   </div>;
 }
