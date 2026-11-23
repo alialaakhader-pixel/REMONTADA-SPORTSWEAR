@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Chakra+Petch:wght@600;700;800&display=swap');
+:root{font-family:'Cairo',sans-serif;color:#edf4ff;background:#050914;font-synthesis:none;text-rendering:optimizeLegibility}*{box-sizing:border-box}body{margin:0;min-width:0;min-height:100vh;background:radial-gradient(ellipse at 15% 0%,#102443 0,transparent 38%),#050914}button,input,select{font:inherit}button{cursor:pointer}.login-shell{min-height:100vh;display:grid;place-items:center;padding:24px}.login-card{width:min(430px,100%);padding:38px;border:1px solid #1d4263;border-radius:28px;background:linear-gradient(145deg,#101f34,#09111f);box-shadow:0 30px 90px #0008}.brand-mark{width:62px;height:62px;display:grid;place-items:center;border-radius:18px;background:linear-gradient(135deg,#00d4ff,#0877ff);color:#00111e;font:900 40px 'Chakra Petch';box-shadow:0 0 35px #00bfff55}.brand-mark.small{width:42px;height:42px;border-radius:13px;font-size:26px}.eyebrow{margin:22px 0 2px;color:#00d4ff;font:800 12px 'Chakra Petch';letter-spacing:2px}.login-card h1{margin:0;font-size:32px}.muted,.section-head p{color:#8499b3;font-size:13px}.login-card label,.checkout label{display:grid;gap:8px;margin-top:18px;color:#c5d5e8;font-size:13px;font-weight:700}.login-card input,.checkout select,.restock-form input,.restock-form select{width:100%;padding:13px 14px;border:1px solid #28415e;border-radius:12px;background:#081321;color:#f2f7ff;outline:none}.login-card input:focus,.restock-form input:focus,.restock-form select:focus{border-color:#00c8ff}.primary{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:0;border-radius:12px;padding:13px 18px;background:linear-gradient(100deg,#00d4ff,#087bff);color:#00111f;font-weight:900}.primary:disabled{opacity:.45;cursor:not-allowed}.wide{width:100%;margin-top:22px}.notice{padding:11px;border-radius:10px;background:#102c43;color:#aeeaff;font-size:13px}.app-shell{max-width:1600px;margin:auto;padding:0 28px 20px}.topbar{height:84px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1b2c42}.brand,.top-actions,.online,.tabs button,.ghost,.section-head,footer,footer span{display:flex;align-items:center;gap:12px}.brand b{font:800 19px 'Chakra Petch';letter-spacing:1px}.brand b span{color:#00d4ff}.brand small{display:block;color:#7f95ae;font-size:11px}.top-actions{gap:10px}.online{color:#75d6ad;font-size:12px}.online i{width:8px;height:8px;border-radius:50%;background:#39d99b;box-shadow:0 0 12px #39d99b}.ghost{justify-content:center;padding:10px 13px;border:1px solid #29415c;border-radius:11px;background:#0b1727;color:#dcecff;font-size:12px}.tabs{display:flex;gap:8px;padding:22px 0}.tabs button{padding:11px 18px;border:1px solid #233a55;border-radius:12px;background:#0a1422;color:#9bb0c8;font-weight:800}.tabs button.active{border-color:#00c9ff;background:#09233a;color:#00d4ff}.notice-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;border:1px solid #22516a;border-radius:12px;background:#0b2639;color:#b5eaff;font-size:13px}.notice-bar button{margin-right:auto;border:0;background:none;color:#fff;font-size:22px}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:20px;align-items:start}.catalog,.cart-panel,.stock-page{border:1px solid #1b304a;border-radius:20px;background:linear-gradient(145deg,#0c192a,#08111e);padding:22px;min-height:650px}.cart-panel{position:sticky;top:18px;min-height:620px;display:flex;flex-direction:column}.section-head{justify-content:space-between;margin-bottom:20px}.section-head h2{margin:0;font-size:22px}.section-head p{margin:3px 0 0}.count{padding:6px 10px;border-radius:20px;background:#0c2a43;color:#6edfff;font-size:12px}.search{display:flex;align-items:center;gap:10px;padding:0 13px;border:1px solid #253b55;border-radius:12px;background:#07111d;color:#7390ae}.search input{width:100%;padding:13px 0;border:0;outline:0;background:transparent;color:white}.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:13px;margin-top:16px}.product-card{padding:15px;border:1px solid #203751;border-radius:15px;background:#0a1726}.product-info{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px}.product-info b{font-size:14px}.product-info strong,.cart-line strong{color:#00d4ff;white-space:nowrap}.variant-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid #1b3047}.variant-row span,.variant-row small,.cart-line small{display:block;font-size:12px}.variant-row small{color:#7890aa;margin-top:2px}.add{display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid #12628a;border-radius:9px;background:#0a2a40;color:#70dcff;font-size:11px;font-weight:800}.add:disabled{opacity:.35;cursor:not-allowed}.cart-lines{flex:1;overflow:auto}.cart-line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid #1b3047}.cart-line b{font-size:13px}.cart-line small{color:#7d95b1;margin:3px 0 6px}.qty{display:flex;align-items:center;gap:8px}.qty button{width:28px;height:28px;display:grid;place-items:center;border:1px solid #284765;border-radius:8px;background:#0c2238;color:#a8eaff}.qty span{min-width:16px;text-align:center;font-weight:800}.checkout{border-top:1px solid #233a54;padding-top:14px}.checkout label{margin:0}.total{display:flex;justify-content:space-between;align-items:center;margin-top:18px;font-weight:800}.total b{font:800 25px 'Chakra Petch';color:#00d4ff}.empty{display:grid;place-items:center;gap:10px;min-height:240px;color:#6f87a2;text-align:center}.empty b{color:#c9d9eb}.empty span{font-size:12px}.empty.compact{min-height:160px}.stock-page{min-height:650px}.restock-form{display:grid;grid-template-columns:2fr 2fr 1fr auto;align-items:end;gap:12px;padding:18px;border:1px solid #203751;border-radius:15px;background:#091625}.restock-form label{display:grid;gap:7px;color:#a9bdd3;font-size:12px;font-weight:800}.stock-table{margin-top:22px;border:1px solid #203751;border-radius:14px;overflow:hidden}.table-row{display:grid;grid-template-columns:2fr 1.3fr 1fr;gap:12px;padding:13px 16px;border-bottom:1px solid #1b3047;font-size:13px}.table-row:last-child{border-bottom:0}.table-head{background:#0c2136;color:#8fb0ca;font-weight:800}.table-row strong{color:#6fe0b3}.table-row strong.low{color:#ffb56b}footer{justify-content:space-between;padding:20px 2px;color:#66819d;font-size:11px}footer span:first-child{color:#73dcb2}.notice-bar{animation:fade .2s ease}@keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}@media print{body{background:#fff;color:#000}.topbar,.tabs,.catalog,.cart-panel,.stock-page,footer{display:none!important}}
+
+.offline{display:flex;align-items:center;gap:6px;color:#ffbd73;font-size:12px}.queue-count{display:flex;align-items:center;gap:6px;color:#8fdcff;font-size:12px;white-space:nowrap}.model-code{display:block;margin-top:3px;color:#65dfff;font-size:11px;font-weight:800}.product-info{align-items:flex-start}.product-info>div{min-width:0}.variant-row small b{color:#8be4ff;font-weight:900}.top-actions{flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:1150px){.workspace{grid-template-columns:minmax(0,1fr) 340px}.app-shell{padding-left:16px;padding-right:16px}.top-actions{gap:6px}}
+
+.print-receipt{display:none}
+@media print{
+  @page{size:80mm auto;margin:4mm}
+  html,body,#root{background:#fff!important;color:#111!important;width:100%!important;min-height:0!important}
+  .app-shell{display:block!important;padding:0!important;margin:0!important;background:#fff!important;color:#111!important}
+  .topbar,.tabs,.notice-bar,.workspace,.stock-page,footer{display:none!important}
+  .print-receipt{display:block!important;width:100%;font:12px/1.5 Arial,sans-serif;color:#111!important;background:#fff!important}
+  .print-receipt h2,.print-receipt h3,.print-receipt p{text-align:center;margin:5px 0;color:#111!important}
+  .print-receipt h2{font-size:17px;font-weight:900}.print-receipt h3{font-size:15px}
+  .print-receipt hr{border:0;border-top:1px dashed #333;margin:8px 0}
+  .print-item{display:grid;grid-template-columns:1fr auto;gap:2px 8px;margin:7px 0}
+  .print-item small{display:block}.print-item strong{grid-column:2;text-align:right}
+}
+
+.modal-backdrop{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:#000b;backdrop-filter:blur(8px)}.manage-card{width:min(620px,96vw);max-height:90vh;overflow:auto}.manage-card label{display:grid;gap:7px;margin-top:14px;color:#c5d5e8;font-size:13px;font-weight:700}.manage-card input,.manage-card textarea{width:100%;padding:12px;border:1px solid #28415e;border-radius:11px;background:#081321;color:#f2f7ff;outline:none}.manage-card textarea{resize:vertical;line-height:1.8}.manage-card .section-head{margin:0}
+
+/* Tablet adaptation: preserve the desktop visual language while making controls touch-friendly. */
+@media(max-width:900px){
+ .app-shell{padding:0 14px 18px}
+ .topbar{height:auto;min-height:78px;padding:12px 0;gap:12px;align-items:flex-start}
+ .top-actions{gap:7px}
+ .workspace{grid-template-columns:minmax(0,1fr) 320px;gap:12px}
+ .catalog,.cart-panel,.stock-page{padding:16px;min-height:0}
+ .product-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+ .tabs{overflow-x:auto;padding:14px 0;scrollbar-width:thin}
+ .tabs button{white-space:nowrap;padding:12px 14px}
+ .restock-form{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .table-row{grid-template-columns:1.3fr 1fr .8fr;gap:8px;padding:12px 10px}
+}
+@media(max-width:680px){
+ .app-shell{padding:0 10px 14px}
+ .topbar{display:grid;grid-template-columns:1fr;gap:10px}
+ .top-actions{justify-content:flex-start}
+ .top-actions .ghost,.top-actions .primary{padding:9px 10px;font-size:11px}
+ .workspace{grid-template-columns:1fr}
+ .cart-panel{position:static;min-height:0;order:-1}
+ .catalog{min-height:0}
+ .product-grid{grid-template-columns:1fr}
+ .restock-form{grid-template-columns:1fr}
+ .table-row{grid-template-columns:1fr 1fr;align-items:center}
+ .table-head{display:none}
+ .stock-page{padding:13px}
+ .section-head{gap:10px;align-items:flex-start}
+ .section-head h2{font-size:19px}
+ .login-card{padding:25px}
+ .tabs button{font-size:12px}
+}
+@media(min-width:681px) and (max-width:900px){
+ .cart-panel{position:static}
+}
