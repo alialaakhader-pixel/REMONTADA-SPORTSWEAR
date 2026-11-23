@@ -17,5 +17,12 @@ contextBridge.exposeInMainWorld('remontadaDesktop', {
   addExpense: (payload) => ipcRenderer.invoke('pos:add-expense', payload),
   pending: () => ipcRenderer.invoke('pos:pending'),
   markSynced: (id) => ipcRenderer.invoke('pos:mark-synced', id),
-  syncError: (data) => ipcRenderer.invoke('pos:sync-error', data)
+  syncError: (data) => ipcRenderer.invoke('pos:sync-error', data),
+  checkForUpdates: () => ipcRenderer.invoke('app:check-for-updates'),
+  installUpdate: () => ipcRenderer.invoke('app:install-update'),
+  onUpdateStatus: (callback) => {
+    const handler = (_event, status) => callback(status);
+    ipcRenderer.on('app:update-status', handler);
+    return () => ipcRenderer.removeListener('app:update-status', handler);
+  }
 });
