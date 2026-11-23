@@ -19,13 +19,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Set Windows app version
+        shell: pwsh
+        run: |
+          $p = Get-Content package.json -Raw | ConvertFrom-Json
+          $p.version = "1.1.${{ github.run_number }}"
+          $p | ConvertTo-Json -Depth 100 | Set-Content package.json
       - name: Install dependencies
         run: npm install
       - name: Build Windows installers
         run: npm run dist:win
       - uses: actions/upload-artifact@v4
         with:
-          name: remontada-pos-windows
-          path: desktop-pos/release/*.exe
+          name: REMONTADA-POS-Windows
+          path: |
+            desktop-pos/release/*.exe
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
