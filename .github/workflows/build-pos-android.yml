@@ -39,7 +39,7 @@ jobs:
           import json, os
           p=json.load(open('package.json'))
           p['version']=f"1.0.{os.environ['BUILD_NUMBER']}"
-          with open('package.json','w') as f: json.dump(p,f,indent=2); f.write('\\n')
+          with open('package.json','w') as f: json.dump(p,f,indent=2); f.write('\n')
           PY
       - name: Install dependencies
         run: npm install
@@ -93,7 +93,7 @@ jobs:
           j=s.find('        release {', i)
           if i < 0 or j < 0: raise SystemExit('Could not locate Android release build type')
           k=j+len('        release {')
-          s=s[:k]+'\\n            signingConfig signingConfigs.release'+s[k:]
+          s=s[:k]+'\n            signingConfig signingConfigs.release'+s[k:]
           open(p,'w').write(s)
           PY
       - name: Build signed release APK
