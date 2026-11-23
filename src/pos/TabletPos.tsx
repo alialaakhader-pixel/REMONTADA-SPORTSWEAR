@@ -12,6 +12,18 @@ const id = () => crypto.randomUUID();
 const desktop = window.remontadaDesktop || browserDesktop;
 const variantLabel = v => [v.size,v.colorName].filter(Boolean).join(' / ') || 'بدون مقاس';
 const variantCode = (p,v) => v.variantCode || v.sku || (p.modelCode ? String(p.modelCode)+(v.size?'-'+v.size:'') : String(v.id));
+const productImageUrl = p => { const image=p?.images?.[0]; return typeof image==='string'?image:(image?.url||''); };
+async function uploadProductImage(file, productId) {
+  if(!file) return null;
+  if(!navigator.onLine) throw new Error('رفع صورة المنتج يحتاج اتصالًا بالإنترنت.');
+  if(!file.type?.startsWith('image/')) throw new Error('اختر ملف صورة صالحًا.');
+  if(file.size>5*1024*1024) throw new Error('حجم الصورة يجب ألا يتجاوز 5 ميجابايت.');
+  const ext=(file.name?.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+  const path=String(productId)+'/'+crypto.randomUUID()+'.'+ext;
+  const {data,error}=await supabase.storage.from('product-images').upload(path,file,{contentType:file.type,upsert:false});
+  if(error) throw error;
+  return supabase.storage.from('product-images').getPublicUrl(data.path).data.publicUrl;
+}
 
 function App() {
   const [session,setSession]=useState(null), [authorized,setAuthorized]=useState(false), [offlineMode,setOfflineMode]=useState(false);
@@ -20,7 +32,7 @@ function App() {
   const [cart,setCart]=useState([]), [query,setQuery]=useState(''), [payment,setPayment]=useState('cash'), [tab,setTab]=useState('sale');
   const [lastReceipt,setLastReceipt]=useState(null), [restock,setRestock]=useState({productId:'',variantId:'',qty:'1'}), [pending,setPending]=useState(0);
   const [manageOpen,setManageOpen]=useState(false), [editingId,setEditingId]=useState('');
-  const [productForm,setProductForm]=useState({title:'',modelCode:'',basePrice:'',variants:'S,أسود,0\nM,أسود,0\nL,أسود,0'});
+  const [productForm,setProductForm]=useState({title:'',modelCode:'',basePrice:'',variants:'S,أسود,0\nM,أسود,0\nL,أسود,0',imageFile:null});
   const [adjust,setAdjust]=useState({productId:'',variantId:'',delta:'',note:'جرد فعلي'});
   const [returnForm,setReturnForm]=useState({saleId:'',itemIndex:'0',quantity:'1',refund:'',reason:'استرجاع',restock:true});
   const [expenseForm,setExpenseForm]=useState({title:'',amount:'',category:'عام',note:''});
@@ -30,8 +42,9 @@ function App() {
   const cartTotal = useMemo(()=>cart.reduce((n,x)=>n+x.price*x.qty,0),[cart]);
   const visibleProducts = useMemo(()=>{
     const q=query.trim().toLowerCase();
-    if(!q) return products;
-    return products.filter(p => [p.title,p.modelCode,...(p.variants||[]).flatMap(v=>[variantCode(p,v),v.size,v.colorName,v.sku])].some(x=>String(x||'').toLowerCase().includes(q)));
+    const active=products.filter(p=>p.isActive!==false);
+    if(!q) return active;
+    return active.filter(p => [p.title,p.modelCode,...(p.variants||[]).flatMap(v=>[variantCode(p,v),v.size,v.colorName,v.sku])].some(x=>String(x||'').toLowerCase().includes(q)));
   },[products,query]);
 
   function applySnapshot(s) {
@@ -247,7 +260,7 @@ function App() {
 
   function openProductEditor(p) {
     setEditingId(p?.id||'');
-    setProductForm(p?{title:p.title,modelCode:p.modelCode||'',basePrice:String(p.basePrice||0),variants:(p.variants||[]).map(v=>[v.size||'',v.colorName||'',v.stockQty||0].join(',')).join('\n')}:{title:'',modelCode:'',basePrice:'',variants:'S,أسود,0\nM,أسود,0\nL,أسود,0'});
+    setProductForm(p?{title:p.title,modelCode:p.modelCode||'',basePrice:String(p.basePrice||0),variants:(p.variants||[]).map(v=>[v.size||'',v.colorName||'',v.stockQty||0].join(',')).join('\n'),imageFile:null}:{title:'',modelCode:'',basePrice:'',variants:'S,أسود,0\nM,أسود,0\nL,أسود,0',imageFile:null});
     setManageOpen(true);
   }
   async function saveProduct(e) {
@@ -255,12 +268,25 @@ function App() {
     const p=products.find(x=>x.id===editingId);
     const variants=productForm.variants.split(/\r?\n/).filter(Boolean).map((line,i)=>{const [size='',colorName='',qty='0']=line.split(',').map(x=>x.trim());return {...(p?.variants?.[i]||{}),id:p?.variants?.[i]?.id||id(),size,colorName,stockQty:Math.max(0,Number(qty)||0),variantCode:productForm.modelCode+(size?'-'+size:'')};});
     try {
-      const productPayload={...(p||{}),id:editingId||id(),title:productForm.title,modelCode:productForm.modelCode,basePrice:Number(productForm.basePrice),brand:p?.brand||'REMONTADA',sportId:p?.sportId||'sport-apparel',gender:p?.gender||'unisex',description:p?.description||'',images:p?.images||[],isActive:p?.isActive??true,variants};
+      const productId=editingId||id();
+      const uploadedImage=productForm.imageFile?await uploadProductImage(productForm.imageFile,productId):null;
+      const images=uploadedImage?[uploadedImage,...(p?.images||[]).filter(x=>x!==uploadedImage)]:p?.images||[];
+      const productPayload={...(p||{}),id:productId,title:productForm.title,modelCode:productForm.modelCode,basePrice:Number(productForm.basePrice),brand:p?.brand||'REMONTADA',sportId:p?.sportId||'sport-apparel',gender:p?.gender||'unisex',description:p?.description||'',images,isActive:p?.isActive??true,variants};
       const snap=await desktop.saveProduct(productPayload);
       applySnapshot(snap);setManageOpen(false);
       if(session&&navigator.onLine){const ok=await syncPending(session);if(ok){await refreshData(session);setMessage('تم حفظ المنتج ومزامنته مع الموقع.');}else setMessage('تم حفظ المنتج محليًا، والمزامنة معلقة لحين حل التعارض.');}
       else setMessage('تم حفظ المنتج محليًا وسيظهر على الموقع بعد عودة الإنترنت والمزامنة.');
     } catch(err){setMessage(err.message||'تعذر حفظ المنتج');}
+  }
+  async function archiveProduct(p) {
+    const currentlyArchived=p.isActive===false;
+    if(!window.confirm(currentlyArchived?'إعادة تفعيل المنتج ليظهر في الكاشير؟':'إخفاء المنتج من البيع؟ ستظل الفواتير والمخزون التاريخي محفوظين.')) return;
+    try {
+      const snap=await desktop.saveProduct({...p,isActive:currentlyArchived});
+      applySnapshot(snap);
+      if(session&&navigator.onLine){const ok=await syncPending(session);if(ok){await refreshData(session);setMessage(currentlyArchived?'تمت إعادة تفعيل المنتج.':'تم إخفاء المنتج من البيع مع الاحتفاظ بسجلاته.');}else setMessage('تم حفظ التغيير محليًا والمزامنة معلقة.');}
+      else setMessage('تم حفظ حالة المنتج محليًا وستُزامن عند الاتصال.');
+    } catch(err){setMessage(err.message||'تعذر تغيير حالة المنتج');}
   }
   async function adjustStockNow(e) {
     e.preventDefault();
@@ -318,7 +344,7 @@ function App() {
     {tab==='sale'?<div className="workspace">
       <section className="catalog"><div className="section-head"><div><h2>المنتجات</h2><p>ابحث باسم القطعة أو رقم الموديل أو كود المقاس</p></div><span className="count">{products.length} منتج</span></div>
         <div className="search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){const q=query.trim().toLowerCase();const hits=products.flatMap(p=>(p.variants||[]).map(v=>({p,v})).filter(({p,v})=>[variantCode(p,v),p.modelCode,v.sku].some(x=>String(x||'').toLowerCase()===q)));if(hits.length===1){addToCart(hits[0].p,hits[0].v);setQuery('');}else if(hits.length>1)setMessage('الكود يطابق أكثر من اختيار، استخدم كود المقاس الكامل.');else if(q)setMessage('لم يتم العثور على كود مطابق.');}}} placeholder="اسم القطعة أو الكود مثل 102-L"/></div>
-        <div className="product-grid">{visibleProducts.map(p=><article className="product-card" key={p.id}><div className="product-info"><div><b>{p.title}</b><small className="model-code">كود الموديل: {p.modelCode||'حسب اللون / النوع'}</small></div><strong>{money(p.basePrice)}</strong></div>
+        <div className="product-grid">{visibleProducts.map(p=><article className="product-card" key={p.id}><div className="product-info">{productImageUrl(p)&&<img className="pos-product-image" src={productImageUrl(p)} alt={p.title}/>}<div><b>{p.title}</b><small className="model-code">كود الموديل: {p.modelCode||'حسب اللون / النوع'}</small></div><strong>{money(p.basePrice)}</strong></div>
           {(p.variants||[]).map(v=>{const key=String(p.id)+':'+String(v.id),qty=Number(stock[key]?.quantity??v.stockQty??0),code=variantCode(p,v);return <div className="variant-row" key={v.id}><div><span>{variantLabel(v)}</span><small>الكود: <b>{code}</b> · المتاح: {qty}</small></div><button className="add" disabled={qty<=0||busy} onClick={()=>addToCart(p,v)}><Plus size={16}/> إضافة</button></div>;})}
         </article>)}</div>
         {!products.length&&<div className="empty"><Package size={32}/><b>لا توجد منتجات محفوظة</b><span>اتصل بالإنترنت واضغط مزامنة لتحميل المنتجات أول مرة.</span></div>}
@@ -342,12 +368,12 @@ function App() {
         <button className="primary" disabled={busy}>حفظ تسوية الجرد</button>
       </form>
       <div className="stock-table"><div className="table-row table-head"><span>القطعة</span><span>المقاس / الكود</span><span>الرصيد / تعديل</span></div>
-        {products.flatMap(p=>(p.variants||[]).map(v=><div className="table-row" key={p.id+':'+v.id}><b>{p.title} <small className="model-code">({p.modelCode})</small></b><span>{variantLabel(v)} · {variantCode(p,v)}</span><strong className={Number(stock[String(p.id)+':'+String(v.id)]?.quantity||0)<=3?'low':''}>{Number(stock[String(p.id)+':'+String(v.id)]?.quantity||0)} قطعة</strong><button className="ghost" onClick={()=>openProductEditor(p)}>تعديل</button></div>))}
+        {products.flatMap(p=>(p.variants||[]).map(v=><div className="table-row" key={p.id+':'+v.id}><b>{p.title} <small className="model-code">({p.modelCode})</small></b><span>{variantLabel(v)} · {variantCode(p,v)}</span><strong className={Number(stock[String(p.id)+':'+String(v.id)]?.quantity||0)<=3?'low':''}>{Number(stock[String(p.id)+':'+String(v.id)]?.quantity||0)} قطعة</strong><button className="ghost" onClick={()=>openProductEditor(p)}>تعديل</button><button className="ghost" onClick={()=>archiveProduct(p)}>{p.isActive===false?'إعادة تفعيل':'إخفاء'}</button></div>))}
       </div>
     </section>:null}
     {tab==='returns'&&<section className="stock-page"><div className="section-head"><div><h2>المرتجعات</h2><p>المرتجع لا يتجاوز الكمية المباعة المتبقية من الفاتورة</p></div></div><form className="restock-form" onSubmit={recordReturn}><label>الفاتورة<select required value={returnForm.saleId} onChange={e=>setReturnForm(x=>({...x,saleId:e.target.value,itemIndex:'0'}))}><option value="">اختر فاتورة</option>{sales.map(s=><option key={s.sale_id} value={s.sale_id}>{s.receipt_number} — {new Date(s.created_at).toLocaleString('ar-EG')}</option>)}</select></label><label>الصنف<select required value={returnForm.itemIndex} onChange={e=>setReturnForm(x=>({...x,itemIndex:e.target.value}))}>{(sales.find(s=>s.sale_id===returnForm.saleId)?.items||[]).map((it,i)=><option key={i} value={i}>{it.product_title} · {it.variant_label} · الكمية {it.quantity}</option>)}</select></label><label>كمية المرتجع<input type="number" min="1" required value={returnForm.quantity} onChange={e=>setReturnForm(x=>({...x,quantity:e.target.value}))}/></label><label>قيمة المبلغ المسترد<input type="number" min="0" step="0.01" value={returnForm.refund} onChange={e=>setReturnForm(x=>({...x,refund:e.target.value}))}/></label><label>السبب<input value={returnForm.reason} onChange={e=>setReturnForm(x=>({...x,reason:e.target.value}))}/></label><label><input type="checkbox" checked={returnForm.restock} onChange={e=>setReturnForm(x=>({...x,restock:e.target.checked}))}/> القطعة صالحة للبيع وإرجاعها للمخزون</label><button className="primary">تسجيل المرتجع</button></form><div className="stock-table">{returns.map(r=><div className="table-row" key={r.return_id}><b>{r.product_title}</b><span>{r.variant_label} × {r.quantity}</span><strong>{money(r.refund_amount)}</strong></div>)}</div></section>}
     {tab==='reports'&&<section className="stock-page"><div className="section-head"><div><h2>المصروفات وسجل المبيعات</h2><p>ملخص محفوظ محليًا على جهاز المحل</p></div></div><form className="restock-form" onSubmit={recordExpense}><label>اسم المصروف<input required value={expenseForm.title} onChange={e=>setExpenseForm(x=>({...x,title:e.target.value}))}/></label><label>القيمة بالجنيه<input type="number" min="0.01" step="0.01" required value={expenseForm.amount} onChange={e=>setExpenseForm(x=>({...x,amount:e.target.value}))}/></label><label>التصنيف<input value={expenseForm.category} onChange={e=>setExpenseForm(x=>({...x,category:e.target.value}))}/></label><label>ملاحظة<input value={expenseForm.note} onChange={e=>setExpenseForm(x=>({...x,note:e.target.value}))}/></label><button className="primary">حفظ المصروف</button></form><div className="stock-table"><div className="table-row table-head"><span>المبيعات</span><span>المصروفات</span><span>صافي تقريبي</span></div><div className="table-row"><b>{money(sales.reduce((n,s)=>n+Number(s.total||0),0))}</b><b>{money(expenses.reduce((n,x)=>n+Number(x.amount||0),0))}</b><strong>{money(sales.reduce((n,s)=>n+Number(s.total||0),0)-expenses.reduce((n,x)=>n+Number(x.amount||0),0))}</strong></div>{sales.map(s=><div className="table-row" key={s.sale_id}><b>فاتورة {s.receipt_number}</b><span>{new Date(s.created_at).toLocaleString('ar-EG')}</span><strong>{money(s.total)}</strong></div>)}</div></section>}
-    {manageOpen&&<div className="modal-backdrop"><form className="login-card manage-card" onSubmit={saveProduct}><div className="section-head"><h2>{editingId?'تعديل المنتج':'إضافة منتج جديد'}</h2><button type="button" className="ghost" onClick={()=>setManageOpen(false)}>إغلاق</button></div><label>اسم المنتج<input required value={productForm.title} onChange={e=>setProductForm(x=>({...x,title:e.target.value}))}/></label><label>كود الموديل<input required value={productForm.modelCode} onChange={e=>setProductForm(x=>({...x,modelCode:e.target.value}))}/></label><label>سعر البيع (ج.م)<input type="number" min="0" step="0.01" required value={productForm.basePrice} onChange={e=>setProductForm(x=>({...x,basePrice:e.target.value}))}/></label><label>المقاسات والألوان والكميات — سطر لكل اختيار: مقاس,لون,كمية<textarea rows="5" value={productForm.variants} onChange={e=>setProductForm(x=>({...x,variants:e.target.value}))}/></label><button className="primary wide">حفظ المنتج</button></form></div>}
+    {manageOpen&&<div className="modal-backdrop"><form className="login-card manage-card" onSubmit={saveProduct}><div className="section-head"><h2>{editingId?'تعديل المنتج':'إضافة منتج جديد'}</h2><button type="button" className="ghost" onClick={()=>setManageOpen(false)}>إغلاق</button></div><label>اسم المنتج<input required value={productForm.title} onChange={e=>setProductForm(x=>({...x,title:e.target.value}))}/></label><label>كود الموديل<input required value={productForm.modelCode} onChange={e=>setProductForm(x=>({...x,modelCode:e.target.value}))}/></label><label>سعر البيع (ج.م)<input type="number" min="0" step="0.01" required value={productForm.basePrice} onChange={e=>setProductForm(x=>({...x,basePrice:e.target.value}))}/></label><label>صورة المنتج<input type="file" accept="image/*" onChange={e=>setProductForm(x=>({...x,imageFile:e.target.files?.[0]||null}))}/></label>{productImageUrl(products.find(p=>String(p.id)===String(editingId)))&&<img className="manage-product-preview" src={productImageUrl(products.find(p=>String(p.id)===String(editingId)))} alt="صورة المنتج الحالية"/>}<small className="image-help">صورة واحدة جديدة لكل حفظ · JPG أو PNG أو WebP · حتى 5 ميجابايت. يتطلب الرفع اتصالًا بالإنترنت.</small><label>المقاسات والألوان والكميات — سطر لكل اختيار: مقاس,لون,كمية<textarea rows="5" value={productForm.variants} onChange={e=>setProductForm(x=>({...x,variants:e.target.value}))}/></label><button className="primary wide">حفظ المنتج</button></form></div>}
     {lastReceipt&&<section className="print-receipt" aria-hidden="true">
       <h2>REMONTADA SPORTSWEAR</h2><p>فاتورة بيع المحل</p><hr/>
       <div>رقم الفاتورة: {lastReceipt.receiptNumber}</div><div>التاريخ: {lastReceipt.date}</div><hr/>
