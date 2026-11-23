@@ -40,6 +40,7 @@ jobs:
           p=json.load(open('package.json'))
           p['version']=f"1.0.{os.environ['BUILD_NUMBER']}"
           with open('package.json','w') as f: json.dump(p,f,indent=2); f.write('\n')
+          with open(os.environ['GITHUB_ENV'],'a') as f: f.write(f"VITE_APP_VERSION={p['version']}\\n")
           PY
       - name: Install dependencies
         run: npm install
