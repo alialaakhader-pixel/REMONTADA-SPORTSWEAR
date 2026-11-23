@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import TabletPos from '../TabletPos';
+import TabletPos from './pos/TabletPos';
 
 class MobileErrorBoundary extends React.Component {
   constructor(props){super(props);this.state={failed:false};}
