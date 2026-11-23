@@ -54,3 +54,7 @@
 @media(min-width:681px) and (max-width:900px){
  .cart-panel{position:static}
 }
+
+.pos-product-image{width:64px;height:64px;object-fit:cover;border-radius:12px;border:1px solid #29435e;background:#07111d;flex:0 0 auto}
+.manage-product-preview{display:block;width:112px;height:112px;object-fit:cover;border-radius:14px;border:1px solid #29435e;margin-top:10px}
+.image-help{display:block;color:#89a3bd;font-size:11px;margin-top:8px;line-height:1.7}
