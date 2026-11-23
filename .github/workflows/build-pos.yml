@@ -7,7 +7,7 @@ on:
       - '.github/workflows/build-pos.yml'
     branches: [main]
 permissions:
-  contents: read
+  contents: write
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -23,16 +23,31 @@ jobs:
         shell: pwsh
         run: |
           $p = Get-Content package.json -Raw | ConvertFrom-Json
-          $p.version = "1.1.${{ github.run_number }}"
+          $p.version = "1.2.${{ github.run_number }}"
           $p | ConvertTo-Json -Depth 100 | Set-Content package.json
       - name: Install dependencies
         run: npm install
-      - name: Build Windows installers
-        run: npm run dist:win
-      - uses: actions/upload-artifact@v4
+      - name: Build Windows installers and update metadata
+        run: npm run dist:win -- --publish never
+      - name: Upload Windows installers
+        uses: actions/upload-artifact@v4
         with:
           name: REMONTADA-POS-Windows
           path: |
             desktop-pos/release/*.exe
+            desktop-pos/release/latest.yml
+            desktop-pos/release/*.blockmap
           if-no-files-found: error
           retention-days: 30
+      - name: Publish Windows update feed
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: pos-windows-latest
+          name: REMONTADA POS Windows Latest
+          body: إصدار Windows الرسمي. يكتشف البرنامج التحديث وينزّله تلقائيًا عند توفره.
+          files: |
+            desktop-pos/release/*.exe
+            desktop-pos/release/latest.yml
+            desktop-pos/release/*.blockmap
+          overwrite_files: true
+          fail_on_unmatched_files: true
