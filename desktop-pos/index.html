@@ -9,5 +9,32 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-  </body>
+    <style>
+    #update-panel{position:fixed;right:18px;bottom:18px;z-index:999999;max-width:min(420px,calc(100vw - 36px));display:none;background:#101827;color:#fff;border:1px solid #31506b;border-radius:14px;padding:14px 16px;box-shadow:0 16px 48px #0008;font:14px system-ui,sans-serif;direction:rtl}
+    #update-panel p{margin:6px 0 10px;color:#cbd5e1;line-height:1.6}#update-panel button{border:0;border-radius:9px;padding:9px 13px;margin-left:6px;cursor:pointer;font-weight:700}#update-install{background:#0d9488;color:#fff}#update-check{background:#26364a;color:#fff}
+  </style>
+  <aside id="update-panel" aria-live="polite"><b id="update-title">تحديث REMONTADA POS</b><p id="update-message"></p><button id="update-install" hidden>إعادة التشغيل وتثبيت التحديث</button><button id="update-check">فحص التحديثات</button></aside>
+  <script>
+    (() => {
+      const api = window.remontadaDesktop;
+      if (!api) return;
+      const panel = document.getElementById('update-panel');
+      const title = document.getElementById('update-title');
+      const message = document.getElementById('update-message');
+      const install = document.getElementById('update-install');
+      const check = document.getElementById('update-check');
+      const show = (s) => {
+        if (!s) return;
+        panel.style.display = 'block';
+        title.textContent = s.state === 'downloaded' ? 'التحديث جاهز' : 'تحديث REMONTADA POS';
+        message.textContent = s.message || '';
+        if (s.state === 'downloading' && Number.isFinite(s.percent)) message.textContent += ' ' + s.percent + '%';
+        install.hidden = s.state !== 'downloaded';
+      };
+      api.onUpdateStatus(show);
+      check.addEventListener('click', async () => { show({state:'checking',message:'جارٍ فحص التحديثات...'}); show(await api.checkForUpdates()); });
+      install.addEventListener('click', () => api.installUpdate());
+    })();
+  </script>
+</body>
 </html>
