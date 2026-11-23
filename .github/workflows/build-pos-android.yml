@@ -8,7 +8,7 @@ on:
       - 'src/pos/**'
       - '.github/workflows/build-pos-android.yml'
 permissions:
-  contents: read
+  contents: write
 jobs:
   build-android:
     runs-on: ubuntu-latest
@@ -112,6 +112,25 @@ jobs:
           path: mobile-pos/android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
+      - name: Publish signed Android release
+        if: env.HAS_ANDROID_SIGNING == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: pos-android-v1.0.${{ github.run_number }}
+          name: REMONTADA POS Android v1.0.${{ github.run_number }}
+          body: تحديث رسمي لتطبيق REMONTADA POS.
+          files: mobile-pos/android/app/build/outputs/apk/release/app-release.apk
+          fail_on_unmatched_files: true
+      - name: Rename release APK for update service
+        if: env.HAS_ANDROID_SIGNING == 'true'
+        working-directory: mobile-pos/android/app/build/outputs/apk/release
+        run: cp app-release.apk REMONTADA-POS-Android.apk
+      - name: Attach update APK to release
+        if: env.HAS_ANDROID_SIGNING == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: pos-android-v1.0.${{ github.run_number }}
+          files: mobile-pos/android/app/build/outputs/apk/release/REMONTADA-POS-Android.apk
       - name: Build debug APK (temporary first-install fallback)
         if: env.HAS_ANDROID_SIGNING != 'true'
         working-directory: mobile-pos/android
