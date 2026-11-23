@@ -13,6 +13,38 @@ const desktop = window.remontadaDesktop;
 const variantLabel = v => [v.size,v.colorName].filter(Boolean).join(' / ') || 'بدون مقاس';
 const variantCode = (p,v) => v.variantCode || v.sku || (p.modelCode ? String(p.modelCode)+(v.size?'-'+v.size:'') : String(v.id));
 
+
+function DesktopUpdateNotice() {
+  const [status, setStatus] = useState(null);
+  const [dismissed, setDismissed] = useState(false);
+  useEffect(() => {
+    if (!desktop || desktop.platform !== 'win32') return;
+    let active = true;
+    const unsubscribe = desktop.onUpdateStatus?.(next => {
+      if (active) { setStatus(next); setDismissed(false); }
+    });
+    desktop.checkForUpdates?.().then(result => {
+      if (active && result?.state === 'error') setStatus(result);
+    }).catch(error => {
+      if (active) setStatus({ state: 'error', message: String(error?.message || error) });
+    });
+    return () => { active = false; unsubscribe?.(); };
+  }, []);
+  if (!desktop || desktop.platform !== 'win32' || !status || status.state === 'current' || status.state === 'checking' || status.state === 'unsupported' || dismissed) return null;
+  const ready = status.state === 'downloaded';
+  const failed = status.state === 'error';
+  return <div role="status" style={{position:'fixed',zIndex:9999,bottom:18,left:18,right:18,maxWidth:520,margin:'0 auto',padding:'14px 16px',borderRadius:14,background:'#10243b',color:'#fff',boxShadow:'0 8px 32px #0005',border:'1px solid #2c5878',display:'flex',alignItems:'center',gap:12}}>
+    <div style={{flex:1,minWidth:0}}>
+      <b style={{display:'block',marginBottom:4}}>{ready?'التحديث جاهز للتثبيت':failed?'تعذر التحديث':'تحديث REMONTADA POS'}</b>
+      <span style={{fontSize:13,opacity:.9}}>{status.message || 'جارٍ تجهيز التحديث...'}</span>
+      {status.state === 'downloading' && <div style={{height:5,background:'#34516b',borderRadius:8,marginTop:9,overflow:'hidden'}}><div style={{height:'100%',width:Math.max(0,Math.min(100,Number(status.percent)||0))+'%',background:'#39c6a3'}}/></div>}
+      {status.state === 'available' && <span style={{display:'block',fontSize:12,marginTop:4}}>الإصدار {status.version || ''}</span>}
+    </div>
+    {ready && <button onClick={()=>desktop.installUpdate()} style={{border:0,borderRadius:9,padding:'9px 12px',background:'#27b68b',color:'#06251d',fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}}>إعادة التشغيل والتحديث</button>}
+    <button aria-label="إغلاق" onClick={()=>setDismissed(true)} style={{border:0,background:'transparent',color:'#fff',fontSize:22,cursor:'pointer'}}>×</button>
+  </div>;
+}
+
 function App() {
   const [session,setSession]=useState(null), [authorized,setAuthorized]=useState(false), [offlineMode,setOfflineMode]=useState(false);
   const [email,setEmail]=useState(''), [password,setPassword]=useState('');
@@ -306,7 +338,7 @@ function App() {
     <button className="primary wide" disabled={busy}>{busy?'جارٍ الدخول...':online?'دخول الكاشير / تفعيل الجهاز':'دخول دون إنترنت'}</button>{message&&<p className="notice">{message}</p>}
   </form></main>;
 
-  return <div className="app-shell">
+  return <div className="app-shell"><DesktopUpdateNotice/>
     <header className="topbar"><div className="brand"><div className="brand-mark small">R</div><div><b>REMONTADA <span>POS</span></b><small>نظام البيع والمخزون المحلي والمركزي</small></div></div>
       <div className="top-actions"><span className={online?'online':'offline'}>{online?<Wifi size={15}/>:<WifiOff size={15}/>} {online?'متصل بالإنترنت':'وضع عدم الاتصال'}</span>
       <span className="queue-count"><CloudUpload size={15}/> حركات معلقة: {pending}</span>
