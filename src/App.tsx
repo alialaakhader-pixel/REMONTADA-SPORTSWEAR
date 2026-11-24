@@ -1083,6 +1083,26 @@ function HomeView({
   onToggleCompare,
 }) {
   const [heroIndex, setHeroIndex] = useState(0);
+  const [playerPhotos, setPlayerPhotos] = useState([]);
+  useEffect(() => {
+    let active = true;
+    const loadPlayerPhoto = async (path) => {
+      const response = await fetch(path);
+      if (!response.ok) throw new Error('تعذر تحميل صورة اللاعب');
+      const encoded = (await response.text()).trim();
+      const binary = atob(encoded);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+      return URL.createObjectURL(new Blob([bytes], { type: 'image/webp' }));
+    };
+    Promise.all([
+      loadPlayerPhoto('/assets/player-01.webp.b64'),
+      loadPlayerPhoto('/assets/player-02.webp.b64'),
+      loadPlayerPhoto('/assets/player-03.webp.b64'),
+    ]).then((photos) => { if (active) setPlayerPhotos(photos); else photos.forEach(URL.revokeObjectURL); })
+      .catch((error) => console.error('تعذر تحميل صور نجوم ريمونتادا:', error));
+    return () => { active = false; };
+  }, []);
   const visibleProducts = (store.products || []).filter((p) => p.isActive);
   const heroSlides = [
     { title: 'WEAR THE PASSION', subtitle: 'عيش الشغف مع كل قطعة', image: IMG.hero, cta: 'تسوق الآن', category: 'all' },
@@ -1133,6 +1153,43 @@ function HomeView({
         </div>
         <button aria-label="الشريحة السابقة" onClick={() => setHeroIndex((heroIndex + heroSlides.length - 1) % heroSlides.length)} className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-[#061026]/65 text-2xl text-white backdrop-blur transition hover:bg-blue-600">‹</button>
         <button aria-label="الشريحة التالية" onClick={() => setHeroIndex((heroIndex + 1) % heroSlides.length)} className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-[#061026]/65 text-2xl text-white backdrop-blur transition hover:bg-blue-600">›</button>
+      </section>
+
+      <section className="relative overflow-hidden bg-[#06142d] px-4 py-10 sm:py-14">
+        <style>{`
+          @keyframes remontadaPlayerFloat { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-9px) } }
+          @keyframes remontadaPlayerGlow { 0%,100% { opacity:.35; transform:scaleX(.88) } 50% { opacity:1; transform:scaleX(1) } }
+          @media (prefers-reduced-motion: reduce) { .rem-player-card { animation:none !important } .rem-player-link { animation:none !important } }
+        `}</style>
+        <div className="pointer-events-none absolute inset-x-[12%] top-1/2 h-px bg-gradient-to-r from-transparent via-sky-400 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-[16%] top-1/2 h-1 -translate-y-1/2 rounded-full bg-sky-400/20 blur-md" style={{animation:'remontadaPlayerGlow 4s ease-in-out infinite'}} />
+        <div className="relative mx-auto max-w-7xl">
+          <div className="mb-7 text-center">
+            <p className="text-[11px] font-black tracking-[.28em] text-sky-400">REMONTADA PLAYER SPOTLIGHT</p>
+            <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">نجوم الشغف في قلب الملعب</h2>
+            <p className="mt-2 text-xs text-slate-300 sm:text-sm">ثلاث لقطات كروية… وطاقة واحدة بتجمعنا</p>
+          </div>
+          <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-3 sm:gap-5">
+            {[
+              { id: 'player-one', tag: 'THE PASSION', number: '01' },
+              { id: 'player-two', tag: 'THE PRIDE', number: '02' },
+              { id: 'player-three', tag: 'THE LEGACY', number: '03' },
+            ].map((player, index) => (
+              <button key={player.id} type="button" onClick={() => goCategory('football-kits')}
+                className="rem-player-card group relative isolate min-h-[300px] overflow-hidden rounded-2xl border border-sky-400/30 bg-[#0a2348] text-left shadow-[0_18px_45px_rgba(0,0,0,.35)] transition duration-500 hover:-translate-y-2 hover:border-sky-300 hover:shadow-[0_20px_55px_rgba(0,120,255,.25)]"
+                style={{animation:`remontadaPlayerFloat 5s ease-in-out ${index * .55}s infinite`}}>
+                {playerPhotos[index] ? <img src={playerPhotos[index]} alt="لقطة لاعب كرة قدم" loading="lazy" className="absolute inset-0 -z-20 h-full w-full object-cover object-center transition duration-700 group-hover:scale-105" /> : <div className="absolute inset-0 -z-20 bg-gradient-to-br from-blue-900 via-[#0a2348] to-slate-950" />}
+                <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#031027] via-[#031027]/20 to-transparent" />
+                <span className="absolute left-4 top-4 rounded-full border border-white/30 bg-[#06142d]/65 px-3 py-1 text-[10px] font-black tracking-[.2em] text-sky-200 backdrop-blur">{player.number}</span>
+                <span className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-3 text-white">
+                  <span><strong className="block text-lg font-black tracking-wide">{player.tag}</strong><small className="mt-1 block text-[10px] font-bold text-sky-200">REMONTADA FOOTBALL COLLECTION</small></span>
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#087cf0] text-xl transition group-hover:translate-x-1">←</span>
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="rem-player-link mx-auto mt-7 h-1 max-w-xs rounded-full bg-gradient-to-r from-transparent via-sky-400 to-transparent" style={{animation:'remontadaPlayerGlow 3.5s ease-in-out infinite'}} />
+        </div>
       </section>
 
       <section className={`border-b ${isLight ? 'border-slate-200 bg-white' : 'border-white/10 bg-[#f8fafc] text-[#101a2c]'}`}>
