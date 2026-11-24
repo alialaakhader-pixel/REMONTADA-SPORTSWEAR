@@ -1206,8 +1206,22 @@ function HomeView({
             <p className="mx-auto mt-5 max-w-lg text-sm leading-8 text-white/80">اختار إطلالتك الرياضية، وشجّع فريقك، وعِش كل لحظة بشغف ريمونتادا.</p>
             <button onClick={() => onNavigate('shop')} className="mt-7 inline-flex items-center gap-3 rounded-lg bg-[#0066FF] px-9 py-4 text-sm font-black text-white shadow-lg transition hover:bg-blue-700">تسوق الآن <ChevronLeft className="h-4 w-4" /></button>
           </div>
-          <div className="order-3 flex items-center justify-center">
-            <img src="/images/hero-players.jpg" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = IMG.jersey; }} alt="نجوم كرة القدم المصرية" className="max-h-[330px] w-full max-w-[390px] object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.55)]" />
+          <div className="order-3 mx-auto grid w-full max-w-[440px] grid-cols-3 items-end gap-2 sm:gap-3 lg:max-w-none">
+            <figure className="group relative min-w-0 overflow-hidden rounded-t-[48%] border border-white/25 bg-[#102B59] shadow-[0_16px_35px_rgba(0,0,0,.45)]">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/2010-abotrika.jpg" alt="محمد أبو تريكة" loading="eager" className="h-[210px] w-full object-cover object-top transition duration-500 group-hover:scale-105 sm:h-[280px] lg:h-[320px]" />
+              <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#06142d] via-[#06142d]/80 to-transparent px-1 pb-2 pt-8 text-center text-[10px] font-black text-white sm:text-xs">محمد أبو تريكة</figcaption>
+            </figure>
+            <figure className="group relative min-w-0 overflow-hidden rounded-t-[48%] border border-[#63B5FF]/70 bg-[#102B59] shadow-[0_16px_35px_rgba(0,0,0,.5)]">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/e/e5/Mohamed_salah.jpg" alt="محمد صلاح" loading="eager" className="h-[235px] w-full object-cover object-top transition duration-500 group-hover:scale-105 sm:h-[305px] lg:h-[350px]" />
+              <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#06142d] via-[#06142d]/80 to-transparent px-1 pb-2 pt-8 text-center text-[10px] font-black text-white sm:text-xs">محمد صلاح</figcaption>
+            </figure>
+            <figure className="group relative min-w-0 overflow-hidden rounded-t-[48%] border border-white/25 bg-[#102B59] shadow-[0_16px_35px_rgba(0,0,0,.45)]">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/OmarMarmoush.png" alt="عمر مرموش" loading="eager" className="h-[210px] w-full object-cover object-top transition duration-500 group-hover:scale-105 sm:h-[280px] lg:h-[320px]" />
+              <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#06142d] via-[#06142d]/80 to-transparent px-1 pb-2 pt-8 text-center text-[10px] font-black text-white sm:text-xs">عمر مرموش</figcaption>
+            </figure>
+            <p className="col-span-3 mt-1 text-center text-[8px] leading-4 text-white/45 sm:text-[9px]">
+              الصور: <a className="underline" href="https://commons.wikimedia.org/wiki/File:2010-abotrika.jpg" target="_blank" rel="noreferrer">Eslam Amin / CC BY-SA 3.0</a> · <a className="underline" href="https://commons.wikimedia.org/wiki/File:Mohamed_salah.jpg" target="_blank" rel="noreferrer">Saiflee100 / CC BY-SA 4.0</a> · <a className="underline" href="https://commons.wikimedia.org/wiki/File:OmarMarmoush.png" target="_blank" rel="noreferrer">Yallakora / CC BY 3.0</a>
+            </p>
           </div>
         </div>
       </section>
