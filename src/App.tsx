@@ -1170,118 +1170,22 @@ export default function App() {
 // 5. الواجهة الرئيسية (HomeView) — عروض خاصة + أفضل المنتجات تقييماً + حاسبة المقاس
 // ============================================================================
 
-function HomeView({
-  store, isLight, activePromotions, onNavigate, onGoAdminTab, onSelectCategory,
-  onOpenProduct, onAddToCart, onOpenSizeFinder, wishlist, onToggleWishlist,
-  compareIds, onToggleCompare,
-}) {
-  const activeProducts = store.products.filter((p) => p.isActive);
-  const bestSellers = activeProducts.filter((p) => p.badge === 'الأكثر مبيعاً' || p.isFeatured || p.isBestSeller).slice(0, 4);
-  const featuredProducts = bestSellers.length ? bestSellers : activeProducts.slice(0, 4);
-  const categoryCards = [
-    { id: 'football-kits', title: 'أطقم كرة القدم', image: '/images/cat-kits.jpg', fallback: IMG.jersey, detail: 'أطقم الأندية والمنتخبات' },
-    { id: 'hoodies', title: 'هوديز', image: '/images/cat-hoodies.jpg', fallback: IMG.hoodie, detail: 'هوديز وسويت شيرت' },
-    { id: 'pants-shorts', title: 'ترنجات', image: '/images/cat-tracksuits.jpg', fallback: IMG.running, detail: 'ترنجات وملابس رياضية' },
-    { id: 'tshirts', title: 'تيشرتات', image: '/images/cat-tshirts.jpg', fallback: IMG.cta, detail: 'تيشرتات رياضية وكاجوال' },
-    { id: 'offers', title: 'عروض خاصة', image: '/images/cat-offers.jpg', fallback: IMG.bag, detail: 'خصومات وعروض لفترة محدودة' },
-  ];
-  const benefits = [
-    { icon: Shield, title: 'منتجات أصلية 100%', detail: 'جودة مضمونة' },
-    { icon: CheckCircle2, title: 'استبدال واسترجاع سهل', detail: 'خدمة بعد الشراء' },
-    { icon: CreditCard, title: 'طرق دفع متعددة', detail: 'اختار طريقة الدفع المناسبة' },
-    { icon: Truck, title: 'شحن سريع لجميع المحافظات', detail: 'توصيل لكل أنحاء مصر' },
-  ];
+function HomeView() {
   return (
-    <div className="bg-white text-[#0A192F]" dir="rtl">
-      <section className="relative isolate overflow-hidden bg-[#0A192F] text-white">
-        <img src={IMG.hero} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
-        <div className="absolute inset-0 bg-gradient-to-l from-[#0A192F]/95 via-[#0A192F]/85 to-[#0066FF]/35" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(0,102,255,0.28),transparent_68%)]" />
-        <div className="relative mx-auto grid min-h-[500px] max-w-7xl items-center gap-8 px-5 py-14 sm:min-h-[580px] sm:px-8 lg:grid-cols-[1fr_1.2fr_1fr] lg:gap-5 lg:px-12">
-          <div className="order-2 flex justify-center lg:order-1"><RemontadaOfficialLogo variant="header" isLight={false} /></div>
-          <div className="order-1 text-center lg:order-2">
-            <p className="mb-4 text-xs font-extrabold tracking-[0.25em] text-[#8DBBFF]">REMONTADA STORE</p>
-            <h1 className="text-4xl font-black leading-tight sm:text-6xl">Remontada Store</h1>
-            <p className="mt-3 text-3xl font-black text-white sm:text-5xl">عِش الشغف</p>
-            <p className="mx-auto mt-5 max-w-lg text-sm leading-8 text-white/80">اختار إطلالتك الرياضية، وشجّع فريقك، وعِش كل لحظة بشغف ريمونتادا.</p>
-            <button onClick={() => onNavigate('shop')} className="mt-7 inline-flex items-center gap-3 rounded-lg bg-[#0066FF] px-9 py-4 text-sm font-black text-white shadow-lg transition hover:bg-blue-700">تسوق الآن <ChevronLeft className="h-4 w-4" /></button>
-          </div>
-          <div className="order-3 mx-auto grid w-full max-w-[440px] grid-cols-3 items-end gap-2 sm:gap-3 lg:max-w-none">
-            <figure className="group relative min-w-0 overflow-hidden rounded-t-[48%] border border-white/25 bg-[#102B59] shadow-[0_16px_35px_rgba(0,0,0,.45)]">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/2010-abotrika.jpg" alt="محمد أبو تريكة" loading="eager" className="h-[210px] w-full object-cover object-top transition duration-500 group-hover:scale-105 sm:h-[280px] lg:h-[320px]" />
-              <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#06142d] via-[#06142d]/80 to-transparent px-1 pb-2 pt-8 text-center text-[10px] font-black text-white sm:text-xs">محمد أبو تريكة</figcaption>
-            </figure>
-            <figure className="group relative min-w-0 overflow-hidden rounded-t-[48%] border border-[#63B5FF]/70 bg-[#102B59] shadow-[0_16px_35px_rgba(0,0,0,.5)]">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/e/e5/Mohamed_salah.jpg" alt="محمد صلاح" loading="eager" className="h-[235px] w-full object-cover object-top transition duration-500 group-hover:scale-105 sm:h-[305px] lg:h-[350px]" />
-              <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#06142d] via-[#06142d]/80 to-transparent px-1 pb-2 pt-8 text-center text-[10px] font-black text-white sm:text-xs">محمد صلاح</figcaption>
-            </figure>
-            <figure className="group relative min-w-0 overflow-hidden rounded-t-[48%] border border-white/25 bg-[#102B59] shadow-[0_16px_35px_rgba(0,0,0,.45)]">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/OmarMarmoush.png" alt="عمر مرموش" loading="eager" className="h-[210px] w-full object-cover object-top transition duration-500 group-hover:scale-105 sm:h-[280px] lg:h-[320px]" />
-              <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#06142d] via-[#06142d]/80 to-transparent px-1 pb-2 pt-8 text-center text-[10px] font-black text-white sm:text-xs">عمر مرموش</figcaption>
-            </figure>
-            <p className="col-span-3 mt-1 text-center text-[8px] leading-4 text-white/45 sm:text-[9px]">
-              الصور: <a className="underline" href="https://commons.wikimedia.org/wiki/File:2010-abotrika.jpg" target="_blank" rel="noreferrer">Eslam Amin / CC BY-SA 3.0</a> · <a className="underline" href="https://commons.wikimedia.org/wiki/File:Mohamed_salah.jpg" target="_blank" rel="noreferrer">Saiflee100 / CC BY-SA 4.0</a> · <a className="underline" href="https://commons.wikimedia.org/wiki/File:OmarMarmoush.png" target="_blank" rel="noreferrer">Yallakora / CC BY 3.0</a>
-            </p>
-          </div>
-        </div>
-      </section>
-      <section className="border-b border-[#0A192F]/10 bg-white">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-0 divide-x divide-x-reverse divide-[#0A192F]/10 md:grid-cols-4">
-          {benefits.map(({ icon: Icon, title, detail }) => (
-            <div key={title} className="flex items-center gap-3 px-4 py-5 sm:px-6">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#0066FF]/10 text-[#0066FF]"><Icon className="h-5 w-5" /></span>
-              <span><span className="block text-xs font-black text-[#0A192F] sm:text-sm">{title}</span><span className="mt-1 block text-[10px] text-[#0A192F]/55 sm:text-xs">{detail}</span></span>
-            </div>
-          ))}
-        </div>
-      </section>
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <div><p className="mb-2 text-xs font-black tracking-widest text-[#0066FF]">تسوق حسب القسم</p><h2 className="text-3xl font-black text-[#0A192F] sm:text-4xl">أقسام ريمونتادا</h2></div>
-          <button onClick={() => onNavigate('shop')} className="text-xs font-bold text-[#0066FF] hover:text-[#0A192F]">كل المنتجات ←</button>
-        </div>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {categoryCards.map((category) => (
-            <button key={category.id} onClick={() => onSelectCategory(category.id)} className="group relative min-h-[230px] overflow-hidden rounded-xl border border-[#0A192F]/10 bg-[#0A192F] text-right shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-              <img src={category.image} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = category.fallback; }} alt={category.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-110 group-hover:opacity-100" />
-              <span className="absolute inset-0 bg-gradient-to-t from-[#0A192F] via-[#0A192F]/35 to-transparent" />
-              <span className="absolute inset-x-0 bottom-0 p-4"><span className="block text-base font-black text-white">{category.title}</span><span className="mt-1 block text-[11px] font-bold text-white/75">{category.detail}</span><span className="mt-3 inline-flex items-center gap-1 text-xs font-black text-[#8DBBFF]">تسوق القسم <ChevronLeft className="h-3.5 w-3.5" /></span></span>
-            </button>
-          ))}
-        </div>
-      </section>
-      <section className="bg-[#F4F7FC]">
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <div><p className="mb-2 text-xs font-black tracking-widest text-[#0066FF]">اختيارات ريمونتادا</p><h2 className="text-3xl font-black text-[#0A192F] sm:text-4xl">الأكثر مبيعاً</h2><p className="mt-2 text-sm text-[#0A192F]/55">منتجات المتجر الفعلية المضافة من لوحة الإدارة.</p></div>
-            <button onClick={() => onNavigate('shop')} className="text-xs font-bold text-[#0066FF]">اكتشف كل المنتجات ←</button>
-          </div>
-          {featuredProducts.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[#0A192F]/20 bg-white px-5 py-12 text-center"><Package className="mx-auto mb-3 h-10 w-10 text-[#0066FF]" /><h3 className="text-base font-black text-[#0A192F]">قريباً — منتجات ريمونتادا</h3><p className="mx-auto mt-2 max-w-lg text-xs leading-6 text-[#0A192F]/55">المنتجات التي تضيفها من لوحة الإدارة ستظهر هنا تلقائياً.</p><button onClick={() => onGoAdminTab('products')} className="mt-5 rounded-lg bg-[#0066FF] px-5 py-3 text-xs font-black text-white">إضافة المنتجات</button></div>
-          ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">{featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} promotions={store.promotions} reviews={store.reviews} isLight={true} onOpen={() => onOpenProduct(product)} onAddToCart={() => onAddToCart(product.id)} isWishlisted={wishlist.includes(product.id)} onToggleWishlist={() => onToggleWishlist(product.id)} isCompared={compareIds.includes(product.id)} onToggleCompare={() => onToggleCompare(product.id)} />
-            ))}</div>
-          )}
-        </div>
-      </section>
-      {activePromotions.length > 0 && <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="mb-6"><p className="mb-2 text-xs font-black tracking-widest text-[#0066FF]">لفترة محدودة</p><h2 className="text-2xl font-black text-[#0A192F] sm:text-3xl">العروض الحالية</h2></div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{activePromotions.map((promo) => (
-          <div key={promo.id} className="rounded-xl border border-[#0A192F]/10 bg-white p-5"><span className="inline-block rounded bg-[#0066FF] px-3 py-1 text-xs font-black text-white">{promo.discountType === 'percentage' ? 'خصم ' + promo.discountValue + '%' : 'خصم ' + formatEGP(promo.discountValue)}</span><h3 className="mt-3 text-base font-black text-[#0A192F]">{promo.title}</h3>{promo.endsAt && <p className="mt-2 text-xs text-[#0A192F]/55">ينتهي العرض: {new Date(promo.endsAt).toLocaleDateString('ar-EG')}</p>}</div>
-        ))}</div>
-      </section>}
-      <footer className="bg-[#0A192F] px-4 py-10 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 border-b border-white/15 pb-8 sm:flex-row sm:items-center"><div><div className="text-xl font-black tracking-widest">REMONTADA STORE</div><div className="mt-1 text-xs font-bold text-white/55">عِش الشغف</div></div><div className="flex flex-wrap gap-x-6 gap-y-3 text-xs font-bold text-white/75"><button onClick={() => onNavigate('home')}>الرئيسية</button><button onClick={() => onNavigate('shop')}>كل المنتجات</button><button onClick={() => onNavigate('account')}>طلباتي</button><a href="https://wa.me/201221855469" target="_blank" rel="noreferrer">دعم واتساب</a></div></div>
-        <p className="mx-auto max-w-7xl pt-6 text-center text-[11px] text-white/45">© ريمونتادا. جميع الحقوق محفوظة.</p>
-      </footer>
-    </div>
+    <main
+      dir="rtl"
+      className="min-h-screen w-full overflow-x-hidden bg-[#061026]"
+    >
+      <img
+        src="https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/IMG-20261124-WA0002.jpg"
+        alt="واجهة متجر ريمونتادا الأصلية"
+        className="block h-auto w-full"
+        fetchPriority="high"
+        decoding="sync"
+      />
+    </main>
   );
 }
-
-// ============================================================================
-// 6. بطاقة المنتج الاحترافية (ProductCard)
-// ============================================================================
 
 function ProductCard({
   product,
