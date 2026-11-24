@@ -490,7 +490,13 @@ export default function App() {
   const isLight = store.theme === 'light';
 
   // الصفحات: 'home' | 'shop' | 'account' | 'courier' | 'admin'
-  const [activePage, setActivePage] = useState('home');
+  const [activePage, setActivePage] = useState(() => {
+    try {
+      return sessionStorage.getItem('remontada_auth_return_page') || 'home';
+    } catch {
+      return 'home';
+    }
+  });
   const [adminTab, setAdminTab] = useState('products'); // 'products' | 'promotions' | 'orders' | 'agents' | 'shipping' | 'security'
 
   const handleAdminLogin = async (email, password) => {
@@ -537,8 +543,48 @@ export default function App() {
     await changeAdminPassword(adminSession, password);
   };
 
-  const [cart, setCart] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
+  const [cart, setCart] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('remontada_cart_v1') || '[]');
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      return [];
+    }
+  });
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('remontada_wishlist_v1') || '[]');
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Persist cart and wishlist across the full-page Google OAuth redirect.
+  useEffect(() => {
+    try {
+      localStorage.setItem('remontada_cart_v1', JSON.stringify(cart));
+    } catch (error) {
+      console.warn('تعذر حفظ سلة التسوق محلياً:', error);
+    }
+  }, [cart]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('remontada_wishlist_v1', JSON.stringify(wishlist));
+    } catch (error) {
+      console.warn('تعذر حفظ المفضلة محلياً:', error);
+    }
+  }, [wishlist]);
+
+  useEffect(() => {
+    try {
+      if (activePage === 'account') sessionStorage.setItem('remontada_auth_return_page', 'account');
+      else sessionStorage.removeItem('remontada_auth_return_page');
+    } catch (error) {
+      console.warn('تعذر حفظ صفحة الرجوع:', error);
+    }
+  }, [activePage]);
   const [compareIds, setCompareIds] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
