@@ -1095,6 +1095,8 @@ function HomeView({
     { id: 'hoodies', title: 'Hoodies', subtitle: 'هوديز وسويت شيرت', image: IMG.hoodie, icon: '♟' },
     { id: 'pants-shorts', title: 'Tracksuits', subtitle: 'ترنجات وبناطيل رياضية', image: IMG.gym, icon: '✦' },
     { id: 'tshirts', title: 'T-Shirts', subtitle: 'تيشيرتات رياضية وكاجوال', image: IMG.jersey, icon: '▣' },
+    { id: 'shoes', title: 'Sports Shoes', subtitle: 'أحذية رياضية للجري والتدريب', image: IMG.shoe, icon: '👟' },
+    { id: 'accessories', title: 'Accessories', subtitle: 'شنط وجوارب وإكسسوارات رياضية', image: IMG.bag, icon: '🎒' },
     { id: 'offers', title: 'Special Offers', subtitle: 'أحدث العروض والخصومات', image: IMG.cta, icon: '★' },
   ];
   const featureItems = [
@@ -1151,7 +1153,7 @@ function HomeView({
           <div><p className="text-xs font-black uppercase tracking-[.22em] text-sky-500">SHOP BY CATEGORY</p><h2 className="mt-2 text-2xl font-black sm:text-3xl">تسوق حسب القسم</h2><p className={`mt-1 text-sm ${mutedClass}`}>اختار القسم وشوف المنتجات المتاحة فيه</p></div>
           <button onClick={() => onNavigate('shop')} className="shrink-0 text-xs font-black text-sky-500 hover:text-sky-300">كل المنتجات ←</button>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 lg:gap-4">
           {categoryTiles.map((tile) => {
             const count = tile.id === 'offers'
               ? visibleProducts.filter((p) => getEffectivePrice(p.basePrice, p.id, p.sportId, store.promotions).hasDiscount).length
