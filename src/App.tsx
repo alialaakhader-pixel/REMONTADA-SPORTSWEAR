@@ -814,7 +814,7 @@ export default function App() {
             ].map((item) => (
               <button
                 key={item.id}
-                onClick={() => setActivePage(item.id)}
+                onClick={() => { if (item.id === 'shop') setFilterCategory('all'); setActivePage(item.id); }}
                 className={`rounded-xl px-3.5 py-2 text-xs font-extrabold transition ${
                   activePage === item.id
                     ? 'bg-[#00B4FF] text-[#05050F] shadow-[0_0_20px_rgba(0,212,255,0.5)]'
@@ -931,7 +931,7 @@ export default function App() {
           <button onClick={() => setActivePage('home')} className={activePage === 'home' ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
             الرئيسية
           </button>
-          <button onClick={() => setActivePage('shop')} className={activePage === 'shop' ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
+          <button onClick={() => { setFilterCategory('all'); setActivePage('shop'); }} className={activePage === 'shop' || activePage.startsWith('category-') ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
             المتجر
           </button>
           <button onClick={() => setActivePage('account')} className={activePage === 'account' ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
