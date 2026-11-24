@@ -1188,6 +1188,11 @@ function HomeView({
     { id: 'tshirts', title: 'تيشيرتات', subtitle: 'ستايل يومي', image: '/images/cat-tshirts.jpg', fallback: IMG.cta },
     { id: 'offers', title: 'عروض خاصة', subtitle: 'فرص لفترة محدودة', image: '/images/cat-offers.jpg', fallback: IMG.bag },
   ];
+  const slides = [
+    { first: 'عِش الشغف،', second: 'وارتقِ بمستواك', copy: 'اختار إطلالتك الرياضية، وشجّع فريقك، واستعد لكل تحدٍ مع تشكيلة ريمونتادا.' },
+    { first: 'استعد للتحدي،', second: 'بستايلك الخاص', copy: 'ملابس رياضية وكاجوال تجمع بين الراحة والأناقة في كل يوم.' },
+    { first: 'شجّع فريقك،', second: 'وعِش اللحظة', copy: 'اكتشف أطقم الأندية والمنتخبات واختار ألوان فريقك المفضل.' },
+  ];
   const benefits = [
     { icon: Shield, title: 'منتجات أصلية 100%', detail: 'جودة تقدر تعتمد عليها' },
     { icon: CheckCircle2, title: 'استبدال واسترجاع سهل', detail: 'خدمة بعد الشراء' },
@@ -1218,11 +1223,11 @@ function HomeView({
               <Zap className="h-4 w-4" /> REMONTADA SPORTSWEAR
             </span>
             <h1 className="mt-5 text-4xl font-black leading-tight sm:text-6xl">
-              عِش الشغف،
-              <span className="block text-[#168BFF]">وارتقِ بمستواك</span>
+              {slides[activeSlide].first}
+              <span className="block text-[#168BFF]">{slides[activeSlide].second}</span>
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-sm font-semibold leading-8 text-white/80 lg:mx-0 sm:text-base">
-              اختار إطلالتك الرياضية، وشجّع فريقك، واستعد لكل تحدٍ مع تشكيلة ريمونتادا.
+              {slides[activeSlide].copy}
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
               <button onClick={() => onNavigate?.('shop')} className="inline-flex items-center gap-3 rounded-xl bg-[#087BFF] px-8 py-4 text-sm font-black text-white shadow-[0_12px_35px_rgba(0,102,255,.35)] transition hover:-translate-y-1 hover:bg-[#0066DD]">
