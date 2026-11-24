@@ -318,122 +318,20 @@ function getRemainingTimeLabel(endsAt) {
 
 const RemontadaOfficialLogo = ({ variant = 'header', customImage = '', isLight = false }) => {
   const isHero = variant === 'hero';
-
   return (
-    <div className={`inline-flex select-none ${isHero ? 'flex-col items-center text-center' : 'items-center gap-3'}`}>
+    <div className={`inline-flex select-none items-center ${isHero ? 'flex-col' : ''}`}>
       <div
-        className={`relative flex items-center justify-center overflow-hidden border border-[#0066FF]/45 bg-[#0A192F] ${
-          isHero
-            ? 'h-72 w-72 sm:h-80 sm:w-80 rounded-3xl p-4 shadow-[0_0_65px_rgba(0,212,255,0.42),inset_0_0_30px_rgba(0,180,255,0.2)]'
-            : 'h-12 w-12 rounded-xl p-1.5 shadow-[0_0_18px_rgba(0,212,255,0.35)]'
-        }`}
-      >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(0,212,255,0.32),transparent_70%)]" />
-
-        {customImage ? (
-          <img
-            src={customImage}
-            alt="REMONTADA SPORTSWEAR"
-            className="relative z-10 h-full w-full rounded-2xl object-cover"
-          />
-        ) : (
-          <svg
-            viewBox="0 0 320 290"
-            className="relative z-10 h-full w-full drop-shadow-[0_0_16px_rgba(0,212,255,0.9)]"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <linearGradient id="ibexBlueLight" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#80E5FF" />
-                <stop offset="45%" stopColor="#0066FF" />
-                <stop offset="100%" stopColor="#003380" />
-              </linearGradient>
-              <linearGradient id="ibexBlueDark" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#040D21" />
-                <stop offset="60%" stopColor="#0A2A66" />
-                <stop offset="100%" stopColor="#0099FF" />
-              </linearGradient>
-              <linearGradient id="textMetallic" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#E6FAFF" />
-                <stop offset="35%" stopColor="#0066FF" />
-                <stop offset="75%" stopColor="#0066CC" />
-                <stop offset="100%" stopColor="#002B66" />
-              </linearGradient>
-            </defs>
-
-            <line x1="70" y1="185" x2="275" y2="62" stroke="#0066FF" strokeOpacity="0.45" strokeWidth="2.5" />
-            <line x1="120" y1="190" x2="290" y2="92" stroke="#0066FF" strokeOpacity="0.3" strokeWidth="1.5" />
-
-            <polygon
-              points="135,54 132,34 146,24 162,26 174,38 176,54 168,42 156,34 144,38"
-              fill="url(#ibexBlueLight)"
-              stroke="#80E5FF"
-              strokeWidth="1"
-            />
-            <polygon points="146,24 162,26 155,34" fill="#FFFFFF" fillOpacity="0.75" />
-
-            <polygon points="135,54 122,68 126,86 138,84 146,66" fill="url(#ibexBlueDark)" stroke="#0066FF" strokeWidth="1" />
-            <polygon points="135,54 146,66 156,60 148,48" fill="url(#ibexBlueLight)" stroke="#80E5FF" strokeWidth="1" />
-            <polygon points="138,84 146,66 164,84 152,102" fill="url(#ibexBlueLight)" stroke="#0066FF" strokeWidth="1" />
-
-            <polygon points="146,66 178,76 164,84" fill="#80E5FF" fillOpacity="0.85" stroke="#0066FF" strokeWidth="1" />
-            <polygon points="164,84 178,76 206,96 184,114" fill="url(#ibexBlueLight)" stroke="#0066FF" strokeWidth="1" />
-            <polygon points="152,102 164,84 184,114 166,122" fill="url(#ibexBlueDark)" stroke="#0066FF" strokeWidth="1" />
-            <polygon points="184,114 206,96 226,118 202,130" fill="url(#ibexBlueDark)" stroke="#0066FF" strokeWidth="1" />
-
-            <polygon points="152,102 166,122 146,132 138,118" fill="url(#ibexBlueLight)" stroke="#0066FF" strokeWidth="1" />
-            <polygon points="146,132 162,138 156,148 140,140" fill="url(#ibexBlueDark)" stroke="#80E5FF" strokeWidth="1" />
-
-            <polygon points="202,130 226,118 238,148 222,154" fill="url(#ibexBlueLight)" stroke="#0066FF" strokeWidth="1" />
-            <polygon points="222,154 238,148 250,174 238,178" fill="url(#ibexBlueDark)" stroke="#80E5FF" strokeWidth="1" />
-
-            {isHero && (
-              <>
-                <text
-                  x="160"
-                  y="228"
-                  textAnchor="middle"
-                  fill="url(#textMetallic)"
-                  stroke="#80E5FF"
-                  strokeWidth="0.9"
-                  style={{ fontFamily: "'Chakra Petch', sans-serif", fontWeight: 900, fontSize: '36px', letterSpacing: '3px' }}
-                >
-                  REMONTADA
-                </text>
-                <line x1="36" y1="248" x2="86" y2="248" stroke="#0066FF" strokeWidth="1.5" />
-                <text
-                  x="160"
-                  y="252"
-                  textAnchor="middle"
-                  fill="#E6FAFF"
-                  style={{ fontFamily: "'Chakra Petch', sans-serif", fontWeight: 700, fontSize: '11px', letterSpacing: '5px' }}
-                >
-                  SPORTSWEAR
-                </text>
-                <line x1="234" y1="248" x2="284" y2="248" stroke="#0066FF" strokeWidth="1.5" />
-              </>
-            )}
-          </svg>
-        )}
-      </div>
-
-      {!isHero && (
-        <div>
-          <div
-            style={{ fontFamily: "'Chakra Petch', sans-serif" }}
-            className="text-lg sm:text-xl font-black tracking-widest text-[#0066FF] drop-shadow-[0_0_12px_rgba(0,212,255,0.65)] leading-none"
-          >
-            REMONTADA
-          </div>
-          <div
-            style={{ fontFamily: "'Chakra Petch', sans-serif" }}
-            className={`mt-1 text-[9px] font-bold tracking-[0.34em] ${isLight ? 'text-[#3B5278]' : 'text-[#A0AEC0]'}`}
-          >
-            SPORTSWEAR
-          </div>
-        </div>
-      )}
+        role="img"
+        aria-label="Remontada Store"
+        className={`shrink-0 bg-no-repeat ${isHero ? 'h-28 w-[350px] max-w-full' : 'h-[54px] w-[220px] max-w-[42vw]'}`}
+        style={{
+          backgroundImage: "url('https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/IMG-20261124-WA0002.jpg')",
+          backgroundSize: '768px 512px',
+          backgroundPosition: '-24px -25px',
+          backgroundColor: '#f8fafc',
+          borderRadius: '8px',
+        }}
+      />
     </div>
   );
 };
@@ -1170,20 +1068,144 @@ export default function App() {
 // 5. الواجهة الرئيسية (HomeView) — عروض خاصة + أفضل المنتجات تقييماً + حاسبة المقاس
 // ============================================================================
 
-function HomeView() {
+function HomeView({
+  store,
+  isLight,
+  activePromotions,
+  onNavigate,
+  onSelectCategory,
+  onOpenProduct,
+  onAddToCart,
+  onOpenSizeFinder,
+  wishlist,
+  onToggleWishlist,
+  compareIds,
+  onToggleCompare,
+}) {
+  const [heroIndex, setHeroIndex] = useState(0);
+  const visibleProducts = (store.products || []).filter((p) => p.isActive);
+  const heroSlides = [
+    { title: 'WEAR THE PASSION', subtitle: 'عيش الشغف مع كل قطعة', image: IMG.hero, cta: 'تسوق الآن', category: 'all' },
+    { title: 'YOUR GAME. YOUR STYLE.', subtitle: 'اختار إطلالتك الرياضية من ريمونتادا', image: IMG.cta, cta: 'اكتشف التشكيلة', category: 'tshirts' },
+    { title: 'BUILT FOR EVERY MOVE', subtitle: 'راحة وأناقة في كل تمرينة', image: IMG.journal, cta: 'شاهد المنتجات', category: 'pants-shorts' },
+  ];
+  const activeSlide = heroSlides[heroIndex];
+  const categoryTiles = [
+    { id: 'football-kits', title: 'Football Kits', subtitle: 'أطقم الأندية والمنتخبات', image: IMG.football, icon: '⚽' },
+    { id: 'hoodies', title: 'Hoodies', subtitle: 'هوديز وسويت شيرت', image: IMG.hoodie, icon: '♟' },
+    { id: 'pants-shorts', title: 'Tracksuits', subtitle: 'ترنجات وبناطيل رياضية', image: IMG.gym, icon: '✦' },
+    { id: 'tshirts', title: 'T-Shirts', subtitle: 'تيشيرتات رياضية وكاجوال', image: IMG.jersey, icon: '▣' },
+    { id: 'offers', title: 'Special Offers', subtitle: 'أحدث العروض والخصومات', image: IMG.cta, icon: '★' },
+  ];
+  const featureItems = [
+    { icon: <Shield className="h-7 w-7" />, title: 'منتجات أصلية', detail: 'اختيارات بجودة مميزة' },
+    { icon: <CheckCircle2 className="h-7 w-7" />, title: 'استبدال سهل', detail: 'خدمة ما بعد البيع' },
+    { icon: <CreditCard className="h-7 w-7" />, title: 'طرق دفع متعددة', detail: 'اختيارات دفع مرنة' },
+    { icon: <Truck className="h-7 w-7" />, title: 'شحن لكل مصر', detail: 'توصيل للمحافظات' },
+  ];
+  const sectionClass = isLight ? 'bg-white text-[#0A192F]' : 'bg-[#0B1930] text-white';
+  const mutedClass = isLight ? 'text-slate-600' : 'text-slate-300';
+  const goCategory = (id) => onSelectCategory(id);
+
   return (
-    <main
-      dir="rtl"
-      className="min-h-screen w-full overflow-x-hidden bg-[#061026]"
-    >
-      <img
-        src="https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/IMG-20261124-WA0002.jpg"
-        alt="واجهة متجر ريمونتادا الأصلية"
-        className="block h-auto w-full"
-        fetchPriority="high"
-        decoding="sync"
-      />
-    </main>
+    <div dir="rtl" className={`min-h-screen overflow-hidden ${isLight ? 'bg-[#f4f7fc] text-[#0A192F]' : 'bg-[#061026] text-white'}`}>
+      <section className="relative isolate min-h-[390px] overflow-hidden sm:min-h-[470px] lg:min-h-[520px]">
+        <img src={activeSlide.image} alt="" className="absolute inset-0 -z-20 h-full w-full object-cover" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-l from-[#061026]/95 via-[#061026]/65 to-[#061026]/15" />
+        <div className="mx-auto flex min-h-[390px] max-w-7xl items-center px-5 py-14 sm:min-h-[470px] lg:min-h-[520px]">
+          <div className="max-w-2xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#1687ff]/50 bg-[#061026]/65 px-4 py-2 text-xs font-black tracking-wider text-sky-300 backdrop-blur">
+              <Sparkles className="h-4 w-4" /> REMONTADA SPORTSWEAR
+            </div>
+            <h1 className="text-4xl font-black leading-tight sm:text-6xl lg:text-7xl" style={{fontFamily:"'Chakra Petch','Cairo',sans-serif"}}>
+              {activeSlide.title}
+            </h1>
+            <p className="mt-4 max-w-xl text-base font-bold leading-8 text-white/90 sm:text-xl">{activeSlide.subtitle}</p>
+            <button onClick={() => goCategory(activeSlide.category)} className="mt-8 inline-flex items-center gap-3 rounded-xl bg-[#087cf0] px-7 py-4 text-sm font-black text-white shadow-lg shadow-blue-950/40 transition hover:-translate-y-1 hover:bg-[#1592ff]">
+              <ShoppingBag className="h-5 w-5" /> {activeSlide.cta} <span aria-hidden="true">←</span>
+            </button>
+          </div>
+        </div>
+        <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2">
+          {heroSlides.map((slide, index) => (
+            <button key={slide.title} aria-label={`الشريحة ${index + 1}`} onClick={() => setHeroIndex(index)} className={`h-2.5 rounded-full transition-all ${heroIndex === index ? 'w-9 bg-sky-400' : 'w-2.5 bg-white/60'}`} />
+          ))}
+        </div>
+        <button aria-label="الشريحة السابقة" onClick={() => setHeroIndex((heroIndex + heroSlides.length - 1) % heroSlides.length)} className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-[#061026]/65 text-2xl text-white backdrop-blur transition hover:bg-blue-600">‹</button>
+        <button aria-label="الشريحة التالية" onClick={() => setHeroIndex((heroIndex + 1) % heroSlides.length)} className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-[#061026]/65 text-2xl text-white backdrop-blur transition hover:bg-blue-600">›</button>
+      </section>
+
+      <section className={`border-b ${isLight ? 'border-slate-200 bg-white' : 'border-white/10 bg-[#f8fafc] text-[#101a2c]'}`}>
+        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-slate-300/70 px-3 py-5 sm:grid-cols-4">
+          {featureItems.map((item) => (
+            <div key={item.title} className="flex items-center justify-center gap-3 px-2 py-2 sm:py-3">
+              <span className="text-[#087cf0]">{item.icon}</span>
+              <span><strong className="block text-xs font-black sm:text-sm">{item.title}</strong><small className="mt-1 block text-[10px] text-slate-500 sm:text-xs">{item.detail}</small></span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div><p className="text-xs font-black uppercase tracking-[.22em] text-sky-500">SHOP BY CATEGORY</p><h2 className="mt-2 text-2xl font-black sm:text-3xl">تسوق حسب القسم</h2><p className={`mt-1 text-sm ${mutedClass}`}>اختار القسم وشوف المنتجات المتاحة فيه</p></div>
+          <button onClick={() => onNavigate('shop')} className="shrink-0 text-xs font-black text-sky-500 hover:text-sky-300">كل المنتجات ←</button>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">
+          {categoryTiles.map((tile) => {
+            const count = tile.id === 'offers'
+              ? visibleProducts.filter((p) => getEffectivePrice(p.basePrice, p.id, p.sportId, store.promotions).hasDiscount).length
+              : visibleProducts.filter((p) => p.categoryId === tile.id).length;
+            return (
+              <button key={tile.id} onClick={() => goCategory(tile.id)} className="group relative min-h-[190px] overflow-hidden rounded-2xl text-right shadow-lg shadow-black/20 sm:min-h-[230px]">
+                <img src={tile.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#061026] via-[#061026]/25 to-transparent" />
+                <span className="absolute right-3 top-3 rounded-lg border border-white/25 bg-[#061026]/55 px-2 py-1 text-xs text-white backdrop-blur">{tile.icon}</span>
+                <span className="absolute inset-x-3 bottom-3 text-white">
+                  <strong className="block text-base font-black sm:text-lg">{tile.title}</strong>
+                  <small className="mt-1 block text-[10px] text-white/80 sm:text-xs">{tile.subtitle}</small>
+                  <span className="mt-2 flex items-center justify-between text-[10px] font-bold text-sky-300"><span>{count} منتج</span><span className="rounded-full bg-white p-1.5 text-[#061026] transition group-hover:bg-sky-400">←</span></span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {activePromotions.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 pb-10">
+          <div className="rounded-3xl border border-sky-500/30 bg-gradient-to-l from-[#0c2b56] to-[#0a1830] p-5 sm:p-7">
+            <div className="mb-4 flex items-center justify-between gap-3"><div><p className="text-xs font-black tracking-widest text-sky-300">LIMITED OFFERS</p><h2 className="mt-1 text-xl font-black text-white sm:text-2xl">العروض الحالية</h2></div><button onClick={() => goCategory('offers')} className="rounded-xl bg-sky-500 px-4 py-2 text-xs font-black text-white">كل العروض</button></div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {activePromotions.slice(0,3).map((promo) => <button key={promo.id} onClick={() => goCategory('offers')} className="rounded-xl border border-white/15 bg-white/5 p-4 text-right transition hover:bg-white/10"><strong className="block text-sm text-white">{promo.title}</strong><span className="mt-2 block text-xs text-sky-200">خصم {promo.discountType === 'percentage' ? `${promo.discountValue}%` : formatEGP(promo.discountValue)}</span></button>)}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className={`mx-auto max-w-7xl px-4 pb-14 `}>
+        <div className="mb-6 flex items-end justify-between gap-4"><div><p className="text-xs font-black tracking-[.2em] text-sky-500">JUST DROPPED</p><h2 className="mt-2 text-2xl font-black sm:text-3xl">أحدث المنتجات</h2><p className={`mt-1 text-sm ${mutedClass}`}>منتجات المتجر الفعلية المضافة من لوحة الإدارة</p></div><button onClick={() => onNavigate('shop')} className="text-xs font-black text-sky-500">تسوق الكل ←</button></div>
+        {visibleProducts.length === 0 ? (
+          <div className={`rounded-2xl border border-dashed p-8 text-center ${isLight ? 'border-slate-300 bg-white' : 'border-white/20 bg-white/5'}`}><Package className="mx-auto mb-3 h-9 w-9 text-sky-500" /><h3 className="font-black">المنتجات هتظهر هنا أول ما تضيفها</h3><p className={`mt-2 text-xs ${mutedClass}`}>تقدر تضيف المنتجات وصورها وأسعارها ومقاساتها من لوحة الإدارة.</p></div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {visibleProducts.slice(0,4).map((product) => (
+              <ProductCard key={product.id} product={product} promotions={store.promotions} reviews={store.reviews} isLight={isLight}
+                onOpen={() => onOpenProduct(product)} onAddToCart={() => onAddToCart(product.id)}
+                isWishlisted={wishlist.includes(product.id)} onToggleWishlist={() => onToggleWishlist(product.id)}
+                isCompared={compareIds.includes(product.id)} onToggleCompare={() => onToggleCompare(product.id)} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pb-16">
+        <div className="relative overflow-hidden rounded-3xl bg-[#0c2c59] p-7 sm:p-10">
+          <img src={IMG.shoe} alt="" loading="lazy" className="absolute inset-y-0 left-0 h-full w-1/2 object-cover opacity-35" />
+          <div className="relative max-w-xl"><p className="text-xs font-black tracking-widest text-sky-300">FIND YOUR FIT</p><h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">اختار المقاس المناسب بثقة</h2><p className="mt-2 text-sm leading-7 text-white/80">استخدم حاسبة المقاسات للملابس والأحذية قبل ما تضيف المنتج للسلة.</p><button onClick={onOpenSizeFinder} className="mt-5 rounded-xl bg-white px-5 py-3 text-xs font-black text-[#0c2c59] transition hover:bg-sky-100">افتح حاسبة المقاس</button></div>
+        </div>
+      </section>
+    </div>
   );
 }
 
