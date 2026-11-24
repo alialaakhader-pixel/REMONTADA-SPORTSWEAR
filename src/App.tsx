@@ -16,6 +16,15 @@ import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStore
 
 const STORAGE_KEY = 'remontada_sportswear_pro_v6';
 
+const PRODUCT_CATEGORIES = [
+  { id: 'hoodies', name: 'هوديز', description: 'هوديز وسويت شيرت' },
+  { id: 'tshirts', name: 'تيشيرتات', description: 'تيشيرتات رياضية وكاجوال' },
+  { id: 'football-kits', name: 'أطقم كرة القدم', description: 'أطقم الأندية والمنتخبات' },
+  { id: 'pants-shorts', name: 'بناطيل وشورتات', description: 'بناطيل وشورتات رياضية' },
+  { id: 'shoes', name: 'أحذية رياضية', description: 'أحذية التدريب والجري' },
+  { id: 'accessories', name: 'إكسسوارات', description: 'شنط وجوارب وإكسسوارات رياضية' },
+];
+
 const DEFAULT_SPORTS = [
   { id: 'sport-football', name: 'كرة القدم', visible: true },
   { id: 'sport-gym', name: 'الجيم واللياقة', visible: true },
@@ -577,6 +586,7 @@ export default function App() {
   // البحث والفلاتر
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSport, setFilterSport] = useState('all');
+  const [filterCategory, setFilterCategory] = useState('all');
   const [filterGender, setFilterGender] = useState('all');
   const [filterDiscountOnly, setFilterDiscountOnly] = useState(false);
   const [sortBy, setSortBy] = useState('newest');
@@ -719,6 +729,7 @@ export default function App() {
           }
         }
         if (filterSport !== 'all' && p.sportId !== filterSport) return false;
+        if (filterCategory !== 'all' && (p.categoryId || 'other') !== filterCategory) return false;
         if (filterGender !== 'all' && p.gender !== filterGender) return false;
         if (filterDiscountOnly) {
           const pr = getEffectivePrice(p.basePrice, p.id, p.sportId, store.promotions);
@@ -739,7 +750,7 @@ export default function App() {
         }
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
-  }, [store.products, store.promotions, store.reviews, searchQuery, filterSport, filterGender, filterDiscountOnly, sortBy]);
+  }, [store.products, store.promotions, store.reviews, searchQuery, filterSport, filterCategory, filterGender, filterDiscountOnly, sortBy]);
 
   return (
     <div
@@ -946,8 +957,10 @@ export default function App() {
               setAdminTab(tab);
               setActivePage('admin');
             }}
-            onSelectSport={(sportId) => {
-              setFilterSport(sportId);
+            onSelectCategory={(categoryId) => {
+              setFilterCategory(categoryId);
+              setFilterSport('all');
+              setSearchQuery('');
               setActivePage('shop');
             }}
             onOpenProduct={(p) => setSelectedProductModal(p)}
@@ -967,6 +980,8 @@ export default function App() {
             products={filteredProducts}
             filterSport={filterSport}
             setFilterSport={setFilterSport}
+            filterCategory={filterCategory}
+            setFilterCategory={setFilterCategory}
             filterGender={filterGender}
             setFilterGender={setFilterGender}
             filterDiscountOnly={filterDiscountOnly}
@@ -1122,7 +1137,7 @@ function HomeView({
   activePromotions,
   onNavigate,
   onGoAdminTab,
-  onSelectSport,
+  onSelectCategory,
   onOpenProduct,
   onAddToCart,
   onOpenSizeFinder,
@@ -1357,30 +1372,28 @@ function HomeView({
         )}
       </section>
 
-      {/* مجموعات حسب الرياضة */}
+      {/* أقسام المنتجات المستقلة */}
       <section className="mx-auto max-w-7xl px-4 pt-14">
-        <h2 style={{ fontFamily: "'Chakra Petch', 'Cairo', sans-serif" }} className="mb-6 text-2xl font-black">
-          تسوق حسب الرياضة
-        </h2>
+        <div className="mb-6">
+          <h2 className="text-2xl font-black">تسوق حسب القسم</h2>
+          <p className={`mt-2 text-sm ${isLight ? 'text-[#3B5278]' : 'text-[#A0AEC0]'}`}>اختر القسم لفتح صفحة تضم منتجاته فقط.</p>
+        </div>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {store.sports
-            .filter((s) => s.visible !== false)
-            .map((sport) => (
-              <button
-                key={sport.id}
-                onClick={() => onSelectSport(sport.id)}
-                className={`group rounded-2xl border border-[#00D4FF]/30 p-5 text-center transition hover:-translate-y-1 hover:border-[#00D4FF] hover:shadow-[0_0_24px_rgba(0,212,255,0.3)] ${
-                  isLight
-                    ? 'bg-white text-[#05050F]'
-                    : 'bg-gradient-to-b from-[#0A1A3A]/80 to-[#05050F] text-white'
-                }`}
-              >
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl border border-[#00D4FF]/30 bg-[#05050F] text-[#00D4FF] group-hover:bg-[#00B4FF] group-hover:text-[#05050F]">
-                  <Zap className="h-5 w-5" />
-                </div>
-                <div className="text-sm font-extrabold group-hover:text-[#00B4FF]">{sport.name}</div>
-              </button>
-            ))}
+          {PRODUCT_CATEGORIES.map((category) => (
+            <button
+              key={category.id}
+              onClick={() => onSelectCategory(category.id)}
+              className={`group rounded-2xl border border-[#00D4FF]/30 p-5 text-center transition hover:-translate-y-1 hover:border-[#00D4FF] hover:shadow-[0_0_24px_rgba(0,212,255,0.3)] ${
+                isLight ? 'bg-white text-[#05050F]' : 'bg-gradient-to-b from-[#0A1A3A]/80 to-[#05050F] text-white'
+              }`}
+            >
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl border border-[#00D4FF]/30 bg-[#05050F] text-[#00D4FF] group-hover:bg-[#00B4FF] group-hover:text-[#05050F]">
+                <Package className="h-5 w-5" />
+              </div>
+              <div className="text-sm font-extrabold group-hover:text-[#00B4FF]">{category.name}</div>
+              <div className="mt-1 text-[10px] text-[#A0AEC0]">{category.description}</div>
+            </button>
+          ))}
         </div>
       </section>
 
@@ -1591,6 +1604,8 @@ function ShopView({
   products,
   filterSport,
   setFilterSport,
+  filterCategory,
+  setFilterCategory,
   filterGender,
   setFilterGender,
   filterDiscountOnly,
@@ -1611,7 +1626,7 @@ function ShopView({
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 style={{ fontFamily: "'Chakra Petch', 'Cairo', sans-serif" }} className="text-3xl font-black">
-            المتجر والمنتجات
+            {filterCategory === 'all' ? 'كل المنتجات' : (PRODUCT_CATEGORIES.find((c) => c.id === filterCategory)?.name || 'القسم')}
           </h1>
         </div>
 
@@ -1651,6 +1666,22 @@ function ShopView({
           </div>
 
           <div>
+            <label className="mb-1.5 block text-xs font-bold">قسم المنتجات</label>
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className={`w-full rounded-xl border border-[#00D4FF]/35 px-3 py-2 text-xs outline-none ${
+                isLight ? 'bg-[#F3F8FF] text-[#05050F]' : 'bg-[#05050F] text-white'
+              }`}
+            >
+              <option value="all">كل الأقسام</option>
+              {PRODUCT_CATEGORIES.map((category) => (
+                <option key={category.id} value={category.id}>{category.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
             <label className="mb-1.5 block text-xs font-bold">الرياضة</label>
             <select
               value={filterSport}
@@ -1678,7 +1709,7 @@ function ShopView({
               <option value="all">الكل</option>
               <option value="men">رجالي</option>
               <option value="women">نسائي</option>
-              <option value="unisex">للجنسين (Unisex)</option>
+              <option value="unisex">للجنسين</option>
               <option value="kids">أطفال</option>
             </select>
           </div>
@@ -3425,6 +3456,7 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
   const [title, setTitle] = useState('');
   const [brand, setBrand] = useState('REMONTADA');
   const [sportId, setSportId] = useState(store.sports[0]?.id || '');
+  const [categoryId, setCategoryId] = useState('hoodies');
   const [gender, setGender] = useState('unisex');
   const [basePrice, setBasePrice] = useState('');
   const [description, setDescription] = useState('');
@@ -3478,6 +3510,7 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
       title: title.trim(),
       brand: brand.trim() || 'REMONTADA',
       sportId: sportId || store.sports[0]?.id || '',
+      categoryId,
       gender,
       basePrice: Number(basePrice),
       description: description.trim(),
@@ -3573,6 +3606,17 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
               isLight ? 'bg-[#F3F8FF] text-[#05050F]' : 'bg-[#05050F] text-white'
             }`}
           />
+          <select
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            className={`rounded-xl border border-[#00D4FF]/35 px-3.5 py-2.5 text-xs outline-none ${
+              isLight ? 'bg-[#F3F8FF] text-[#05050F]' : 'bg-[#05050F] text-white'
+            }`}
+          >
+            {PRODUCT_CATEGORIES.map((category) => (
+              <option key={category.id} value={category.id}>{category.name}</option>
+            ))}
+          </select>
           <select
             value={sportId}
             onChange={(e) => setSportId(e.target.value)}
@@ -3837,6 +3881,7 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
                         setTitle(p.title);
                         setBrand(p.brand || '');
                         setSportId(p.sportId || '');
+                        setCategoryId(p.categoryId || 'hoodies');
                         setGender(p.gender || 'unisex');
                         setBasePrice(String(p.basePrice));
                         setDescription(p.description || '');
