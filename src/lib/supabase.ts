@@ -39,6 +39,54 @@ async function request(path, options = {}, token = null) {
   return data;
 }
 
+const CUSTOMER_SESSION_KEY = "remontada_customer_session";
+
+export function readCustomerSession() {
+  try {
+    return JSON.parse(localStorage.getItem(CUSTOMER_SESSION_KEY) || "null");
+  } catch {
+    return null;
+  }
+}
+
+export function saveCustomerSession(session) {
+  if (session) localStorage.setItem(CUSTOMER_SESSION_KEY, JSON.stringify(session));
+  else localStorage.removeItem(CUSTOMER_SESSION_KEY);
+}
+
+export async function signInCustomerWithGoogle() {
+  if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error("إعدادات تسجيل الدخول غير مكتملة");
+  const redirectTo = window.location.origin + window.location.pathname;
+  const authorizeUrl = new URL(`${SUPABASE_URL}/auth/v1/authorize`);
+  authorizeUrl.searchParams.set("provider", "google");
+  authorizeUrl.searchParams.set("redirect_to", redirectTo);
+  window.location.assign(authorizeUrl.toString());
+}
+
+export async function getCurrentCustomer(session) {
+  if (!session?.access_token) throw new Error("لا توجد جلسة عميل");
+  let activeSession = session;
+  const expiresAt = Number(activeSession.expires_at || 0);
+  if (activeSession.refresh_token && expiresAt && expiresAt <= Math.floor(Date.now() / 1000) + 30) {
+    activeSession = await request("/auth/v1/token?grant_type=refresh_token", {
+      method: "POST",
+      body: JSON.stringify({ refresh_token: activeSession.refresh_token }),
+    });
+    activeSession.expires_at = activeSession.expires_at || Math.floor(Date.now() / 1000) + Number(activeSession.expires_in || 3600);
+    saveCustomerSession(activeSession);
+  }
+  const user = await request("/auth/v1/user", { method: "GET" }, activeSession.access_token);
+  return { user, session: activeSession };
+}
+
+export async function signOutCustomer(session) {
+  try {
+    if (session?.access_token) await request("/auth/v1/logout", { method: "POST" }, session.access_token);
+  } finally {
+    saveCustomerSession(null);
+  }
+}
+
 export async function signInAdmin(email, password) {
   const session = await request("/auth/v1/token?grant_type=password", {
     method: "POST",
