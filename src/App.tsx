@@ -320,18 +320,22 @@ const RemontadaOfficialLogo = ({ variant = 'header', customImage = '', isLight =
   const isHero = variant === 'hero';
   return (
     <div className={`inline-flex select-none items-center ${isHero ? 'flex-col' : ''}`}>
-      <div
-        role="img"
-        aria-label="Remontada Store"
-        className={`shrink-0 bg-no-repeat ${isHero ? 'h-28 w-[350px] max-w-full' : 'h-[54px] w-[220px] max-w-[42vw]'}`}
-        style={{
-          backgroundImage: "url('https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/IMG-20261124-WA0002.jpg')",
-          backgroundSize: '768px 512px',
-          backgroundPosition: '-24px -25px',
-          backgroundColor: '#f8fafc',
-          borderRadius: '8px',
-        }}
-      />
+      {customImage ? (
+        <img src={customImage} alt="REMONTADA STORE" className={`shrink-0 rounded-lg object-contain ${isHero ? 'h-28 max-w-full' : 'h-[54px] w-[220px] max-w-[42vw]'}`} />
+      ) : (
+        <div
+          role="img"
+          aria-label="Remontada Store"
+          className={`shrink-0 bg-no-repeat ${isHero ? 'h-28 w-[350px] max-w-full' : 'h-[54px] w-[220px] max-w-[42vw]'}`}
+          style={{
+            backgroundImage: "url('https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/IMG-20261124-WA0002.jpg')",
+            backgroundSize: '768px 512px',
+            backgroundPosition: '-24px -25px',
+            backgroundColor: '#f8fafc',
+            borderRadius: '8px',
+          }}
+        />
+      )}
     </div>
   );
 };
