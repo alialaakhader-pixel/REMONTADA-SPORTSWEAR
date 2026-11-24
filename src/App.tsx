@@ -8,7 +8,7 @@ import {
   Lock, KeyRound, Camera, CheckSquare, Copy, Download,
   AlertTriangle, Clock, Footprints, Shirt, UserCheck, FileUp
 } from 'lucide-react';
-import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStoreState, saveStoreState, changeAdminPassword, reserveOnlineInventory, releaseOnlineInventory, setInventoryVariantStock } from './lib/supabase';
+import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, readCustomerSession, signInCustomerWithGoogle, getCurrentCustomer, signOutCustomer, saveCustomerSession, loadStoreState, saveStoreState, changeAdminPassword, reserveOnlineInventory, releaseOnlineInventory, setInventoryVariantStock } from './lib/supabase';
 import { IMG } from './lib/img';
 
 // ============================================================================
@@ -354,9 +354,54 @@ export default function App() {
     return INITIAL_STATE;
   });
   const [adminSession, setAdminSession] = useState(() => readAdminSession());
+  const [customerSession, setCustomerSession] = useState(() => readCustomerSession());
+  const [customerUser, setCustomerUser] = useState(null);
+  const [customerAuthLoading, setCustomerAuthLoading] = useState(false);
   const [adminUser, setAdminUser] = useState(null);
   const [dbReady, setDbReady] = useState(false);
   const [adminUnlocked, setAdminUnlocked] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const accessToken = params.get('access_token');
+    if (!accessToken) return;
+    const expiresIn = Number(params.get('expires_in') || 3600);
+    const session = {
+      access_token: accessToken,
+      refresh_token: params.get('refresh_token') || '',
+      token_type: params.get('token_type') || 'bearer',
+      expires_in: expiresIn,
+      expires_at: Math.floor(Date.now() / 1000) + expiresIn,
+    };
+    saveCustomerSession(session);
+    setCustomerSession(session);
+    window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    if (!customerSession?.access_token) {
+      setCustomerUser(null);
+      return () => { active = false; };
+    }
+    (async () => {
+      try {
+        const result = await getCurrentCustomer(customerSession);
+        if (active) {
+          setCustomerSession(result.session);
+          setCustomerUser(result.user);
+        }
+      } catch (error) {
+        console.error('تعذر استعادة جلسة العميل:', error);
+        saveCustomerSession(null);
+        if (active) {
+          setCustomerSession(null);
+          setCustomerUser(null);
+        }
+      }
+    })();
+    return () => { active = false; };
+  }, [customerSession?.access_token]);
 
   useEffect(() => {
     try {
@@ -453,6 +498,26 @@ export default function App() {
     setAdminSession(session);
     setAdminUser(user);
     return user;
+  };
+
+  const handleCustomerGoogleLogin = async () => {
+    setCustomerAuthLoading(true);
+    try {
+      await signInCustomerWithGoogle();
+    } catch (error) {
+      setCustomerAuthLoading(false);
+      notify(error?.message || 'تعذر بدء تسجيل الدخول بحساب Google');
+    }
+  };
+
+  const handleCustomerLogout = async () => {
+    try {
+      await signOutCustomer(customerSession);
+    } finally {
+      setCustomerSession(null);
+      setCustomerUser(null);
+      notify('تم تسجيل الخروج من حساب العميل');
+    }
   };
 
   const handleAdminLogout = async () => {
@@ -946,6 +1011,10 @@ export default function App() {
             isLight={isLight}
             onViewReceipt={(ord) => setReceiptOrder(ord)}
             notify={notify}
+            customerUser={customerUser}
+            customerAuthLoading={customerAuthLoading}
+            onGoogleSignIn={handleCustomerGoogleLogin}
+            onCustomerSignOut={handleCustomerLogout}
           />
         )}
 
@@ -2422,7 +2491,7 @@ function CartDrawer({
 
 const ORDER_STEPS = ['جديد', 'قيد التجهيز', 'تم الشحن', 'تم التسليم'];
 
-function AccountAndRatingView({ store, setStore, isLight, onViewReceipt, notify }) {
+function AccountAndRatingView({ store, setStore, isLight, onViewReceipt, notify, customerUser, customerAuthLoading, onGoogleSignIn, onCustomerSignOut }) {
   const [ratingDrafts, setRatingDrafts] = useState({});
 
   const handleConfirmReceipt = (orderId) => {
@@ -2484,6 +2553,31 @@ function AccountAndRatingView({ store, setStore, isLight, onViewReceipt, notify 
           تابع مراحل طلبك، أكّد الاستلام من داخل التطبيق، ثم قيّم المنتجات التي اشتريتها.
         </p>
       </div>
+
+      <section className={`rounded-3xl border border-[#0066FF]/35 p-5 ${isLight ? 'bg-white' : 'bg-[#0A192F]/70'}`}>
+        {customerUser ? (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-sm font-black text-[#0066FF]">أهلاً بيك في ريمونتادا</div>
+              <div className="mt-1 truncate text-xs text-[#A0AEC0]">{customerUser.email || customerUser.user_metadata?.full_name || 'تم تسجيل الدخول بحساب Google'}</div>
+            </div>
+            <button type="button" onClick={onCustomerSignOut} className="rounded-xl border border-[#0066FF]/40 px-4 py-2.5 text-xs font-bold text-[#0066FF]">
+              تسجيل الخروج
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3 text-center">
+            <div>
+              <h2 className="text-base font-black">سجّل دخولك لحساب العميل</h2>
+              <p className="mt-1 text-xs text-[#A0AEC0]">استخدم حساب Google لتسجيل الدخول بسهولة وأمان.</p>
+            </div>
+            <button type="button" onClick={onGoogleSignIn} disabled={customerAuthLoading} className="inline-flex w-full max-w-sm items-center justify-center gap-3 rounded-xl bg-white px-5 py-3 text-sm font-black text-[#202124] shadow-lg transition hover:bg-slate-100 disabled:opacity-60">
+              <span className="text-xl font-black text-[#4285F4]">G</span>
+              {customerAuthLoading ? 'جاري التحويل إلى Google...' : 'المتابعة باستخدام Google'}
+            </button>
+          </div>
+        )}
+      </section>
 
       {store.orders.length === 0 ? (
         <div className={`rounded-3xl border border-dashed border-[#0066FF]/35 p-12 text-center text-xs text-[#A0AEC0] ${isLight ? 'bg-white' : 'bg-[#0A192F]/35'}`}>
