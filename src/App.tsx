@@ -590,6 +590,9 @@ export default function App() {
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterGender, setFilterGender] = useState('all');
   const [filterDiscountOnly, setFilterDiscountOnly] = useState(false);
+  const [filterSize, setFilterSize] = useState('all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [sortBy, setSortBy] = useState('newest');
 
   const notify = (msg) => {
@@ -732,6 +735,10 @@ export default function App() {
         if (filterSport !== 'all' && p.sportId !== filterSport) return false;
         if (filterCategory !== 'all' && (p.categoryId || 'other') !== filterCategory) return false;
         if (filterGender !== 'all' && p.gender !== filterGender) return false;
+        if (filterSize !== 'all' && !(p.variants || []).some((variant) => String(variant.size) === String(filterSize) && Number(variant.stockQty) > 0)) return false;
+        const effectivePrice = getEffectivePrice(p.basePrice, p.id, p.sportId, store.promotions).finalPrice;
+        if (minPrice !== '' && effectivePrice < Number(minPrice)) return false;
+        if (maxPrice !== '' && effectivePrice > Number(maxPrice)) return false;
         if (filterDiscountOnly) {
           const pr = getEffectivePrice(p.basePrice, p.id, p.sportId, store.promotions);
           if (!pr.hasDiscount) return false;
@@ -751,7 +758,7 @@ export default function App() {
         }
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
-  }, [store.products, store.promotions, store.reviews, searchQuery, filterSport, filterCategory, filterGender, filterDiscountOnly, sortBy]);
+  }, [store.products, store.promotions, store.reviews, searchQuery, filterSport, filterCategory, filterGender, filterDiscountOnly, filterSize, minPrice, maxPrice, sortBy]);
 
   return (
     <div
@@ -1007,6 +1014,12 @@ export default function App() {
             setFilterGender={setFilterGender}
             filterDiscountOnly={filterDiscountOnly}
             setFilterDiscountOnly={setFilterDiscountOnly}
+            filterSize={filterSize}
+            setFilterSize={setFilterSize}
+            minPrice={minPrice}
+            setMinPrice={setMinPrice}
+            maxPrice={maxPrice}
+            setMaxPrice={setMaxPrice}
             sortBy={sortBy}
             setSortBy={setSortBy}
             onOpenProduct={(p) => setSelectedProductModal(p)}
@@ -1405,6 +1418,12 @@ function ShopView({
   setFilterGender,
   filterDiscountOnly,
   setFilterDiscountOnly,
+  filterSize,
+  setFilterSize,
+  minPrice,
+  setMinPrice,
+  maxPrice,
+  setMaxPrice,
   sortBy,
   setSortBy,
   onOpenProduct,
@@ -1416,6 +1435,7 @@ function ShopView({
   onToggleCompare,
   onGoAdmin,
 }) {
+  const availableSizes = [...new Set(products.flatMap((product) => (product.variants || []).map((variant) => variant.size).filter(Boolean)))].sort();
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
@@ -1521,6 +1541,21 @@ function ShopView({
             </select>
           </div>
 
+
+          <div>
+            <label className="mb-1.5 block text-xs font-bold">المقاس</label>
+            <select value={filterSize} onChange={(e) => setFilterSize(e.target.value)} className={`w-full rounded-xl border border-[#0066FF]/35 px-3 py-2 text-xs outline-none ${isLight ? 'bg-[#F3F8FF] text-[#0A192F]' : 'bg-[#0A192F] text-white'}`}>
+              <option value="all">كل المقاسات</option>
+              {availableSizes.map((size) => <option key={size} value={size}>{size}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-bold">نطاق السعر (جنيه)</label>
+            <div className="grid grid-cols-2 gap-2">
+              <input type="number" min="0" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} placeholder="من" className={`min-w-0 w-full rounded-xl border border-[#0066FF]/35 px-2 py-2 text-xs outline-none ${isLight ? 'bg-[#F3F8FF] text-[#0A192F]' : 'bg-[#0A192F] text-white'}`} />
+              <input type="number" min="0" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} placeholder="إلى" className={`min-w-0 w-full rounded-xl border border-[#0066FF]/35 px-2 py-2 text-xs outline-none ${isLight ? 'bg-[#F3F8FF] text-[#0A192F]' : 'bg-[#0A192F] text-white'}`} />
+            </div>
+          </div>
           <label className="flex cursor-pointer items-center gap-2 pt-1 text-xs font-bold">
             <input
               type="checkbox"
