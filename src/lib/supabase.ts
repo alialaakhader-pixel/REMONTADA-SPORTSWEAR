@@ -34,7 +34,9 @@ async function request(path, options = {}, token = null) {
   try { data = body ? JSON.parse(body) : null; } catch { data = body; }
   if (!response.ok) {
     const message = data?.msg || data?.message || data?.error_description || data?.error || "تعذر الاتصال بقاعدة البيانات";
-    throw new Error(message);
+    const error = new Error(message);
+    error.status = response.status;
+    throw error;
   }
   return data;
 }
@@ -66,17 +68,36 @@ export async function signInCustomerWithGoogle() {
 export async function getCurrentCustomer(session) {
   if (!session?.access_token) throw new Error("لا توجد جلسة عميل");
   let activeSession = session;
-  const expiresAt = Number(activeSession.expires_at || 0);
-  if (activeSession.refresh_token && expiresAt && expiresAt <= Math.floor(Date.now() / 1000) + 30) {
-    activeSession = await request("/auth/v1/token?grant_type=refresh_token", {
+
+  const refreshCustomerSession = async () => {
+    if (!activeSession.refresh_token) throw new Error("انتهت جلسة الدخول؛ سجّل الدخول بحساب Google مرة أخرى");
+    const refreshed = await request("/auth/v1/token?grant_type=refresh_token", {
       method: "POST",
       body: JSON.stringify({ refresh_token: activeSession.refresh_token }),
     });
-    activeSession.expires_at = activeSession.expires_at || Math.floor(Date.now() / 1000) + Number(activeSession.expires_in || 3600);
+    activeSession = {
+      ...activeSession,
+      ...refreshed,
+      expires_at: refreshed.expires_at || Math.floor(Date.now() / 1000) + Number(refreshed.expires_in || 3600),
+    };
     saveCustomerSession(activeSession);
+  };
+
+  const expiresAt = Number(activeSession.expires_at || 0);
+  if (activeSession.refresh_token && expiresAt && expiresAt <= Math.floor(Date.now() / 1000) + 60) {
+    await refreshCustomerSession();
   }
-  const user = await request("/auth/v1/user", { method: "GET" }, activeSession.access_token);
-  return { user, session: activeSession };
+
+  try {
+    const user = await request("/auth/v1/user", { method: "GET" }, activeSession.access_token);
+    return { user, session: activeSession };
+  } catch (error) {
+    // Retry once with the rotating refresh token if the access token was rejected.
+    if (![400, 401].includes(error?.status) || !activeSession.refresh_token) throw error;
+    await refreshCustomerSession();
+    const user = await request("/auth/v1/user", { method: "GET" }, activeSession.access_token);
+    return { user, session: activeSession };
+  }
 }
 
 export async function signOutCustomer(session) {
