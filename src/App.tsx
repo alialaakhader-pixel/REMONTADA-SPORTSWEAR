@@ -6,7 +6,8 @@ import {
   SlidersHorizontal, Image as ImageIcon, Upload, Sparkles,
   CheckCircle2, Sun, Moon, User, Scale, Eye, Ruler, Star,
   Lock, KeyRound, Camera, CheckSquare, Copy, Download,
-  AlertTriangle, Clock, Footprints, Shirt, UserCheck, FileUp
+  AlertTriangle, Clock, Footprints, Shirt, UserCheck, FileUp,
+  Headphones, MessageCircle, RefreshCw
 } from 'lucide-react';
 import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStoreState, saveStoreState, changeAdminPassword, reserveOnlineInventory, releaseOnlineInventory, setInventoryVariantStock } from './lib/supabase';
 
@@ -15,6 +16,9 @@ import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStore
 // ============================================================================
 
 const STORAGE_KEY = 'remontada_sportswear_pro_v6';
+const STORE_WHATSAPP = '201221855469';
+const STORE_WHATSAPP_LOCAL = '01221855469';
+const DEFAULT_LOGO_SRC = '/brand/logo-store.jpg';
 
 const DEFAULT_SPORTS = [
   { id: 'sport-football', name: 'كرة القدم', visible: true },
@@ -741,6 +745,14 @@ export default function App() {
       });
   }, [store.products, store.promotions, store.reviews, searchQuery, filterSport, filterGender, filterDiscountOnly, sortBy]);
 
+  // عناصر الهيدر الجديد (نفس الوظائف السابقة بتصميم المتجر الجديد)
+  const headerIconBtn = `relative rounded-xl border p-2.5 transition ${
+    isLight
+      ? 'border-[#DFE6F5] bg-white text-[#0B1533] hover:bg-[#F3F6FC]'
+      : 'border-[#00D4FF]/35 bg-[#0A1A3A]/60 text-[#00D4FF] hover:border-[#00D4FF]'
+  }`;
+  const headerSports = (store.sports || []).filter((sp) => sp.visible !== false).slice(0, 3);
+
   return (
     <div
       dir="rtl"
@@ -779,47 +791,54 @@ export default function App() {
         )
       )}
 
+      {/* شريط المعلومات العلوي */}
+      <div className="bg-[#07122E] text-[11px] font-bold text-white sm:text-xs">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+            <span className="inline-flex items-center gap-1.5">
+              <Truck className="h-4 w-4 text-[#3D9BFF]" />
+              شحن لجميع المحافظات
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Star className="h-4 w-4 fill-[#FFC53D] text-[#FFC53D]" />
+              جودة أصلية مضمونة
+            </span>
+            <span className="hidden items-center gap-1.5 sm:inline-flex">
+              <Headphones className="h-4 w-4 text-[#3D9BFF]" />
+              خدمة عملاء مميزة
+            </span>
+          </div>
+          <a
+            href={`https://wa.me/${STORE_WHATSAPP}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            dir="ltr"
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] px-3 py-1 font-extrabold text-[#052A14] transition hover:brightness-110"
+          >
+            <MessageCircle className="h-3.5 w-3.5" />
+            {STORE_WHATSAPP_LOCAL}
+          </a>
+        </div>
+      </div>
+
       {/* الهيدر الثابت */}
       <header
-        className={`sticky top-0 z-40 border-b border-[#00D4FF]/25 backdrop-blur-xl ${
-          isLight ? 'bg-[#F3F8FF]/90' : 'bg-[#05050F]/90'
+        className={`sticky top-0 z-40 shadow-[0_6px_20px_rgba(7,18,46,0.18)] ${
+          isLight ? 'bg-white' : 'bg-[#0B1424]'
         }`}
       >
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3.5">
-          <button onClick={() => setActivePage('home')} className="text-right focus:outline-none">
-            <RemontadaOfficialLogo
-              variant="header"
-              customImage={store.settings.customHeroImage}
-              isLight={isLight}
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 lg:flex-nowrap lg:gap-6">
+          <button onClick={() => setActivePage('home')} className="shrink-0 focus:outline-none" aria-label="الرئيسية">
+            <img
+              src={store.settings.customHeroImage || DEFAULT_LOGO_SRC}
+              alt="Remontada Store"
+              className="h-12 w-auto max-w-[210px] rounded-lg bg-white object-contain sm:h-14 lg:h-[68px] lg:max-w-[300px]"
             />
           </button>
 
-          <nav className="hidden items-center gap-1.5 lg:flex">
-            {[
-              { id: 'home', label: 'الواجهة الرئيسية' },
-              { id: 'shop', label: 'المتجر' },
-              { id: 'account', label: 'طلباتي وتقييمي' },
-              { id: 'courier', label: 'عامل التوصيل' },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActivePage(item.id)}
-                className={`rounded-xl px-3.5 py-2 text-xs font-extrabold transition ${
-                  activePage === item.id
-                    ? 'bg-[#00B4FF] text-[#05050F] shadow-[0_0_20px_rgba(0,212,255,0.5)]'
-                    : isLight
-                    ? 'text-[#3B5278] hover:bg-[#00B4FF]/15 hover:text-[#05050F]'
-                    : 'text-[#A0AEC0] hover:bg-[#0A1A3A] hover:text-white'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
-
           {/* شريط البحث الذكي */}
-          <div className="relative order-3 w-full sm:order-none sm:w-52 xl:w-64">
-            <Search className="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#00D4FF]" />
+          <div className="relative order-3 w-full lg:order-none lg:max-w-2xl lg:flex-1">
+            <Search className="pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 text-[#1677FF]" />
             <input
               type="text"
               value={searchQuery}
@@ -827,70 +846,50 @@ export default function App() {
                 setSearchQuery(e.target.value);
                 if (activePage === 'home' && e.target.value.trim()) setActivePage('shop');
               }}
-              placeholder="ابحث عن منتج أو ماركة..."
-              className={`w-full rounded-xl border border-[#00D4FF]/35 py-2 pr-10 pl-4 text-xs outline-none transition focus:border-[#00D4FF] ${
+              placeholder="ابحث عن منتجك المفضل..."
+              className={`h-12 w-full rounded-full border border-transparent pr-11 pl-5 text-sm outline-none transition focus:border-[#1677FF] ${
                 isLight
-                  ? 'bg-white text-[#05050F] placeholder-[#5A7194]'
-                  : 'bg-[#0A1A3A]/55 text-white placeholder-[#A0AEC0]'
+                  ? 'bg-[#EEF1F7] text-[#0B1533] placeholder-[#6A7594]'
+                  : 'bg-[#0A1A3A]/70 text-white placeholder-[#A0AEC0]'
               }`}
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ltr:ml-auto rtl:mr-auto">
             <button
               onClick={() => setIsSizeFinderOpen(true)}
-              className={`inline-flex items-center gap-1.5 rounded-xl border border-[#00D4FF]/40 px-3 py-2 text-xs font-extrabold text-[#00D4FF] transition hover:border-[#00D4FF] ${
-                isLight ? 'bg-white' : 'bg-[#0A1A3A]/70'
+              className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-extrabold transition ${
+                isLight
+                  ? 'border-[#DFE6F5] bg-white text-[#1677FF] hover:bg-[#F3F6FC]'
+                  : 'border-[#00D4FF]/40 bg-[#0A1A3A]/70 text-[#00D4FF] hover:border-[#00D4FF]'
               }`}
               title="حاسبة المقاس (ملابس وأحذية)"
             >
-              <Ruler className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">حاسبة المقاس</span>
+              <Ruler className="h-4 w-4" />
+              <span className="hidden xl:inline">حاسبة المقاس</span>
             </button>
 
             {compareIds.length > 0 && (
-              <button
-                onClick={() => setIsCompareOpen(true)}
-                className="relative rounded-xl border border-[#00D4FF]/45 bg-[#0A1A3A] p-2.5 text-[#00D4FF]"
-                title="مقارنة المنتجات"
-              >
+              <button onClick={() => setIsCompareOpen(true)} className={headerIconBtn} title="مقارنة المنتجات">
                 <Scale className="h-4 w-4" />
-                <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#00D4FF] text-[10px] font-black text-[#05050F]">
+                <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#1677FF] text-[10px] font-black text-white">
                   {compareIds.length}
                 </span>
               </button>
             )}
 
-            <button
-              onClick={toggleTheme}
-              className={`rounded-xl border border-[#00D4FF]/35 p-2.5 text-[#00D4FF] transition hover:border-[#00D4FF] ${
-                isLight ? 'bg-white' : 'bg-[#0A1A3A]/60'
-              }`}
-              title={isLight ? 'الوضع الليلي' : 'الوضع النهاري'}
-            >
+            <button onClick={toggleTheme} className={headerIconBtn} title={isLight ? 'الوضع الليلي' : 'الوضع النهاري'}>
               {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </button>
 
-            <button
-              onClick={() => setActivePage('account')}
-              className={`rounded-xl border border-[#00D4FF]/35 p-2.5 text-[#00D4FF] transition hover:border-[#00D4FF] ${
-                isLight ? 'bg-white' : 'bg-[#0A1A3A]/60'
-              }`}
-              title="طلباتي وتأكيد الاستلام"
-            >
+            <button onClick={() => setActivePage('account')} className={headerIconBtn} title="طلباتي وتأكيد الاستلام">
               <User className="h-4 w-4" />
             </button>
 
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className={`relative rounded-xl border border-[#00D4FF]/35 p-2.5 text-[#00D4FF] transition hover:border-[#00D4FF] ${
-                isLight ? 'bg-white' : 'bg-[#0A1A3A]/60'
-              }`}
-              title="سلة المشتريات"
-            >
+            <button onClick={() => setIsCartOpen(true)} className={headerIconBtn} title="سلة المشتريات">
               <ShoppingBag className="h-4 w-4" />
               {totalCartCount > 0 && (
-                <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#00D4FF] text-[10px] font-black text-[#05050F]">
+                <span className="absolute -top-1.5 -left-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#E5303B] text-[10px] font-black text-white">
                   {totalCartCount}
                 </span>
               )}
@@ -900,14 +899,14 @@ export default function App() {
               onClick={() => setActivePage('admin')}
               className={`relative inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2.5 text-xs font-black transition ${
                 activePage === 'admin'
-                  ? 'bg-white text-[#05050F] shadow-[0_0_24px_rgba(255,255,255,0.6)]'
-                  : 'bg-[#00B4FF] text-[#05050F] shadow-[0_0_22px_rgba(0,212,255,0.55)] hover:bg-[#00D4FF]'
+                  ? 'bg-[#07122E] text-white'
+                  : 'bg-[#1677FF] text-white hover:bg-[#2A86FF]'
               }`}
             >
               <Shield className="h-4 w-4" />
-              <span>الإدارة</span>
+              <span className="hidden sm:inline">الإدارة</span>
               {lowStockAlerts.length > 0 && (
-                <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-[#05050F] bg-[#00D4FF] text-[10px] font-black text-[#05050F]">
+                <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-[#E5303B] text-[10px] font-black text-white">
                   {lowStockAlerts.length}
                 </span>
               )}
@@ -915,18 +914,59 @@ export default function App() {
           </div>
         </div>
 
+        {/* شريط التنقل الرئيسي (كمبيوتر وتابلت) */}
+        <nav className="hidden bg-[#07122E] text-white lg:block">
+          <div className="mx-auto flex max-w-7xl items-center gap-1.5 px-4 py-2">
+            {[
+              { id: 'home', label: 'الرئيسية' },
+              { id: 'shop', label: 'المتجر' },
+              { id: 'account', label: 'طلباتي وتقييمي' },
+              { id: 'courier', label: 'عامل التوصيل' },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActivePage(item.id)}
+                className={`rounded-lg px-4 py-2.5 text-sm font-extrabold transition ${
+                  activePage === item.id ? 'bg-[#1677FF] text-white' : 'text-white/90 hover:bg-white/10'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+            {headerSports.map((sp) => (
+              <button
+                key={sp.id}
+                onClick={() => {
+                  setFilterSport(sp.id);
+                  setActivePage('shop');
+                }}
+                className="rounded-lg px-4 py-2.5 text-sm font-extrabold text-white/90 transition hover:bg-white/10"
+              >
+                {sp.name}
+              </button>
+            ))}
+            <button
+              onClick={() => setActivePage('shop')}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#1677FF] px-6 py-2.5 text-sm font-black text-white transition hover:bg-[#2A86FF] ltr:ml-auto rtl:mr-auto"
+            >
+              <span>تسوق الآن</span>
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+          </div>
+        </nav>
+
         {/* شريط تنقل سريع للموبايل */}
-        <div className="flex items-center justify-around border-t border-[#00D4FF]/15 px-2 py-2 lg:hidden text-[11px] font-bold">
-          <button onClick={() => setActivePage('home')} className={activePage === 'home' ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
+        <div className="flex items-center justify-around bg-[#07122E] px-2 py-2.5 text-[12px] font-bold text-white lg:hidden">
+          <button onClick={() => setActivePage('home')} className={activePage === 'home' ? 'text-[#3D9BFF]' : 'text-white/80'}>
             الرئيسية
           </button>
-          <button onClick={() => setActivePage('shop')} className={activePage === 'shop' ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
+          <button onClick={() => setActivePage('shop')} className={activePage === 'shop' ? 'text-[#3D9BFF]' : 'text-white/80'}>
             المتجر
           </button>
-          <button onClick={() => setActivePage('account')} className={activePage === 'account' ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
+          <button onClick={() => setActivePage('account')} className={activePage === 'account' ? 'text-[#3D9BFF]' : 'text-white/80'}>
             طلباتي وتقييمي
           </button>
-          <button onClick={() => setActivePage('courier')} className={activePage === 'courier' ? 'text-[#00D4FF]' : 'text-[#A0AEC0]'}>
+          <button onClick={() => setActivePage('courier')} className={activePage === 'courier' ? 'text-[#3D9BFF]' : 'text-white/80'}>
             عامل التوصيل
           </button>
         </div>
@@ -1041,6 +1081,16 @@ export default function App() {
             <Truck className="h-4 w-4" />
             <span>التوصيل مدفوع لجميع المحافظات المصرية — الأسعار بالجنيه المصري (ج.م)</span>
           </div>
+          <a
+            href={`https://wa.me/${STORE_WHATSAPP}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            dir="ltr"
+            className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-sm font-black text-[#052A14] transition hover:brightness-110"
+          >
+            <MessageCircle className="h-4 w-4" />
+            اطلب عبر واتساب {STORE_WHATSAPP_LOCAL}
+          </a>
           <div className={`text-xs ${isLight ? 'text-[#475F84]' : 'text-[#A0AEC0]'}`}>
             © {new Date().getFullYear()} REMONTADA SPORTSWEAR
           </div>
@@ -1148,79 +1198,122 @@ function HomeView({
 
   return (
     <div>
-      {/* Hero Section باللوجو الرسمي للوعل الأزرق الكهربائي النيوني */}
-      <section
-        className={`relative overflow-hidden border-b border-[#00D4FF]/25 py-16 lg:py-24 ${
-          isLight
-            ? 'bg-gradient-to-b from-[#DCEBFF] via-[#EAF3FF] to-[#F3F8FF]'
-            : 'bg-[radial-gradient(ellipse_at_top,#0A1A3A_0%,#05050F_70%)]'
-        }`}
-      >
-        <div className="pointer-events-none absolute -top-32 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#00D4FF]/20 blur-[140px]" />
-
-        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 lg:grid-cols-12">
-          <div className="space-y-6 lg:col-span-7">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#00D4FF]/45 bg-[#0A1A3A] px-4 py-1.5 text-xs font-extrabold text-[#00D4FF] shadow-[0_0_20px_rgba(0,212,255,0.3)]">
-              <Zap className="h-3.5 w-3.5" />
-              <span>REMONTADA SPORTSWEAR — EGYPT</span>
-            </div>
-
-            <h1
-              style={{ fontFamily: "'Chakra Petch', 'Cairo', sans-serif" }}
-              className={`text-4xl font-black leading-tight sm:text-6xl ${
-                isLight ? 'text-[#05050F]' : 'text-white drop-shadow-[0_0_28px_rgba(0,212,255,0.55)]'
-              }`}
-            >
-              {store.settings.heroTitle}
-            </h1>
-
-            <p
-              className={`max-w-2xl text-sm leading-relaxed sm:text-base ${
-                isLight ? 'text-[#3B5278]' : 'text-[#A0AEC0]'
-              }`}
-            >
-              {store.settings.heroSubtitle}
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <button
-                onClick={() => onNavigate('shop')}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#00B4FF] px-6 py-3.5 text-sm font-black text-[#05050F] shadow-[0_0_30px_rgba(0,212,255,0.6)] transition hover:bg-[#00D4FF]"
-              >
-                <span>{store.settings.heroCtaText || 'استكشف التشكيلة'}</span>
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-
-              <button
-                onClick={onOpenSizeFinder}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#00D4FF]/55 bg-[#0A1A3A] px-5 py-3.5 text-sm font-extrabold text-[#00D4FF] transition hover:border-[#00D4FF] hover:bg-[#001F4D]"
-              >
-                <Ruler className="h-4 w-4" />
-                <span>اعرف مقاسك (ملابس / أحذية)</span>
-              </button>
-
-              <button
-                onClick={() => onGoAdminTab('products')}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#00D4FF]/40 bg-[#0A1A3A] px-5 py-3.5 text-sm font-bold text-white transition hover:border-[#00D4FF]"
-              >
-                <Plus className="h-4 w-4 text-[#00D4FF]" />
-                <span>إضافة منتجات</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="flex justify-center lg:col-span-5">
-            <RemontadaOfficialLogo
-              variant="hero"
-              customImage={store.settings.customHeroImage}
-              isLight={isLight}
+      {/* الهيرو الجديد */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#061223] to-[#0B192C]">
+        <div className="relative mx-auto aspect-[1025/445] w-full max-w-[1536px] md:aspect-[1536/447]">
+          <div className="pointer-events-none absolute inset-y-0 right-0 left-[52%] hidden bg-[radial-gradient(60%_90%_at_70%_40%,rgba(22,119,255,0.55),transparent_70%),linear-gradient(115deg,transparent_0_30%,rgba(22,119,255,0.55)_30%_36%,transparent_36%_52%,rgba(22,119,255,0.3)_52%_56%,transparent_56%)] md:block" />
+          <div className="absolute inset-y-0 left-0 w-full md:w-[66.73%]">
+            <img
+              src="/brand/hero-store.webp"
+              alt="Remontada Store — Wear the Passion"
+              className="h-full w-full object-cover object-left"
             />
           </div>
+          {/* ضع صورة اللاعبين هنا: public/brand/players.png (PNG بخلفية شفافة) */}
+          <img
+            src="/brand/players.png"
+            alt=""
+            onError={(e) => e.currentTarget.remove()}
+            className="pointer-events-none absolute right-0 bottom-0 hidden h-full w-[44%] object-contain object-right-bottom md:block"
+          />
+          <button
+            onClick={() => onNavigate('shop')}
+            aria-label="تسوق الآن"
+            className="absolute top-[82.5%] left-[62.5%] h-[14.6%] w-[23.4%] rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-[#7FC0FF] md:left-[41.7%] md:w-[15.6%]"
+          />
+        </div>
+      </section>
+
+      {/* مميزات المتجر */}
+      <section className={`border-b ${isLight ? 'border-[#DFE6F5] bg-white' : 'border-white/10 bg-[#0B1424]'}`}>
+        <div className="mx-auto grid max-w-7xl grid-cols-2 lg:grid-cols-4">
+          {[
+            { Icon: Shield, a: 'منتجات أصلية', b: '100%' },
+            { Icon: RefreshCw, a: 'إرجاع واستبدال', b: 'سهل' },
+            { Icon: CreditCard, a: 'دفع آمن', b: 'ومتعدد الطرق' },
+            { Icon: Truck, a: 'شحن سريع', b: 'لجميع المحافظات' },
+          ].map(({ Icon, a, b }, i) => (
+            <div
+              key={a}
+              className={`flex flex-col items-center justify-center gap-2 px-3 py-5 text-center text-sm font-extrabold sm:flex-row sm:gap-4 ${
+                i > 0 ? (isLight ? 'lg:border-r lg:border-[#DFE6F5]' : 'lg:border-r lg:border-white/10') : ''
+              } ${i >= 2 ? (isLight ? 'border-t border-[#DFE6F5] lg:border-t-0' : 'border-t border-white/10 lg:border-t-0') : ''}`}
+            >
+              <Icon className={`h-9 w-9 shrink-0 sm:h-11 sm:w-11 ${isLight ? 'text-[#0B1533]' : 'text-[#3D9BFF]'}`} />
+              <span className="leading-snug">
+                {a}
+                <br />
+                {b}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* أقسام بالصور */}
+      <section className="mx-auto max-w-7xl px-4 pt-8">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-6 lg:grid-cols-5 lg:gap-4">
+          {[
+            { img: '/brand/tile1.jpg', label: 'قمصان كرة القدم', go: () => onSelectSport('sport-football') },
+            { img: '/brand/tile2.jpg', label: 'هوديز', go: () => onSelectSport('sport-apparel') },
+            { img: '/brand/tile3.jpg', label: 'ترنجات', go: () => onSelectSport('sport-apparel') },
+            { img: '/brand/tile4.jpg', label: 'تيشيرتات', go: () => onSelectSport('sport-apparel') },
+            {
+              img: '/brand/tile5.jpg',
+              label: 'عروض خاصة',
+              go: () => document.getElementById('special-offers')?.scrollIntoView({ behavior: 'smooth' }),
+            },
+          ].map((t, i) => (
+            <button
+              key={t.label}
+              onClick={t.go}
+              aria-label={t.label}
+              className={`group overflow-hidden rounded-[20px] shadow-[0_6px_18px_rgba(7,18,46,0.18)] transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(7,18,46,0.28)] ${
+                i < 3
+                  ? 'md:col-span-2 lg:col-span-1'
+                  : i === 3
+                  ? 'md:col-span-3 lg:col-span-1'
+                  : 'col-span-2 md:col-span-3 lg:col-span-1'
+              }`}
+            >
+              <img
+                src={t.img}
+                alt={t.label}
+                loading="lazy"
+                className={`block h-full w-full object-cover ${i === 4 ? 'max-md:aspect-[287/140]' : ''}`}
+              />
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={onOpenSizeFinder}
+            className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-extrabold transition ${
+              isLight
+                ? 'border-[#DFE6F5] bg-white text-[#1677FF] hover:bg-[#F3F6FC]'
+                : 'border-[#00D4FF]/55 bg-[#0A1A3A] text-[#00D4FF] hover:bg-[#001F4D]'
+            }`}
+          >
+            <Ruler className="h-4 w-4" />
+            <span>اعرف مقاسك (ملابس / أحذية)</span>
+          </button>
+          <button
+            onClick={() => onGoAdminTab('products')}
+            className={`inline-flex items-center gap-2 rounded-xl border px-5 py-3 text-sm font-bold transition ${
+              isLight
+                ? 'border-[#DFE6F5] bg-white text-[#0B1533] hover:bg-[#F3F6FC]'
+                : 'border-[#00D4FF]/40 bg-[#0A1A3A] text-white hover:border-[#00D4FF]'
+            }`}
+          >
+            <Plus className="h-4 w-4 text-[#1677FF]" />
+            <span>إضافة منتجات</span>
+          </button>
         </div>
       </section>
 
       {/* قسم مخصص: عروض خاصة (Special Offers) */}
-      <section className="mx-auto max-w-7xl px-4 pt-14">
+      <section id="special-offers" className="mx-auto max-w-7xl px-4 pt-14">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#00B4FF] text-[#05050F] shadow-[0_0_18px_rgba(0,212,255,0.5)]">
