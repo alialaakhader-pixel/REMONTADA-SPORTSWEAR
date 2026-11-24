@@ -1086,17 +1086,16 @@ function HomeView({
   const visibleProducts = (store.products || []).filter((p) => p.isActive);
   const heroSlides = [
     { title: 'WEAR THE PASSION', subtitle: 'عيش الشغف مع كل قطعة', image: 'https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/456515738_1795534317548662.jpg', cta: 'تسوق الآن', category: 'all' },
-    { title: 'YOUR GAME. YOUR STYLE.', subtitle: 'اختار إطلالتك الرياضية من ريمونتادا', image: IMG.cta, cta: 'اكتشف التشكيلة', category: 'tshirts' },
-    { title: 'BUILT FOR EVERY MOVE', subtitle: 'راحة وأناقة في كل تمرينة', image: IMG.journal, cta: 'شاهد المنتجات', category: 'pants-shorts' },
+    { title: 'YOUR GAME. YOUR STYLE.', subtitle: 'اختار التيشيرت الرياضي المناسب ليومك', image: IMG.jersey, cta: 'اكتشف التيشيرتات', category: 'tshirts' },
+    { title: 'BUILT FOR EVERY MOVE', subtitle: 'هوديز مريحة لإطلالة رياضية متكاملة', image: IMG.hoodie, cta: 'اكتشف الهوديز', category: 'hoodies' },
   ];
   const activeSlide = heroSlides[heroIndex];
-  // أربع بطاقات رئيسية للملابس، وكل بطاقة تفتح القسم الحقيقي بفلتر المنتجات.
-  // الأحذية والإكسسوارات تظل متاحة من صفحة المتجر والفلاتر.
+  // كل صورة هنا مرتبطة مباشرة بالقسم الذي تصفه، دون صور جيم أو جري عشوائية.
   const categoryTiles = [
-    { id: 'football-kits', title: 'أطقم كرة القدم', subtitle: 'أطقم الأندية والمنتخبات', image: IMG.football, icon: '⚽' },
+    { id: 'football-kits', title: 'أطقم كرة القدم', subtitle: 'تيشيرتات وأطقم الأندية والمنتخبات', image: IMG.jersey, icon: '⚽' },
     { id: 'hoodies', title: 'هوديز وسويت شيرت', subtitle: 'قطع مريحة للتمرين والخروج', image: IMG.hoodie, icon: '♟' },
-    { id: 'pants-shorts', title: 'ترنجات وبناطيل', subtitle: 'ملابس رياضية للحركة اليومية', image: IMG.gym, icon: '✦' },
-    { id: 'tshirts', title: 'تيشيرتات', subtitle: 'تيشيرتات رياضية وكاجوال', image: IMG.jersey, icon: '▣' },
+    { id: 'shoes', title: 'أحذية رياضية', subtitle: 'أحذية للجري والتدريب والحركة', image: IMG.shoe, icon: '👟' },
+    { id: 'accessories', title: 'شنط وإكسسوارات', subtitle: 'شنط رياضية ومستلزمات يومك', image: IMG.bag, icon: '🎒' },
   ];
   const featureItems = [
     { icon: <Shield className="h-7 w-7" />, title: 'منتجات أصلية', detail: 'اختيارات بجودة مميزة' },
@@ -1132,8 +1131,8 @@ function HomeView({
             <button key={slide.title} aria-label={`الشريحة ${index + 1}`} onClick={() => setHeroIndex(index)} className={`h-2.5 rounded-full transition-all ${heroIndex === index ? 'w-9 bg-sky-400' : 'w-2.5 bg-white/60'}`} />
           ))}
         </div>
-        <button aria-label="الشريحة السابقة" onClick={() => setHeroIndex((heroIndex + heroSlides.length - 1) % heroSlides.length)} className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-[#061026]/65 text-2xl text-white backdrop-blur transition hover:bg-blue-600">‹</button>
-        <button aria-label="الشريحة التالية" onClick={() => setHeroIndex((heroIndex + 1) % heroSlides.length)} className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-[#061026]/65 text-2xl text-white backdrop-blur transition hover:bg-blue-600">›</button>
+        <button aria-label="الشريحة السابقة" onClick={() => setHeroIndex((heroIndex + heroSlides.length - 1) % heroSlides.length)} className="absolute left-3 top-1/2 flex items-center gap-2 rounded-full border border-white/25 bg-[#061026]/75 px-3 py-2.5 text-xs font-black text-white shadow-xl backdrop-blur-md transition hover:-translate-x-1 hover:border-sky-300 hover:bg-blue-700 sm:left-6 sm:px-4"><span className="text-xl leading-none">‹</span><span className="hidden sm:inline">السابق</span></button>
+        <button aria-label="الشريحة التالية" onClick={() => setHeroIndex((heroIndex + 1) % heroSlides.length)} className="absolute right-3 top-1/2 flex items-center gap-2 rounded-full border border-white/25 bg-[#061026]/75 px-3 py-2.5 text-xs font-black text-white shadow-xl backdrop-blur-md transition hover:translate-x-1 hover:border-sky-300 hover:bg-blue-700 sm:right-6 sm:px-4"><span className="hidden sm:inline">التالي</span><span className="text-xl leading-none">›</span></button>
       </section>
 
       <section className={`border-b ${isLight ? 'border-slate-200 bg-white' : 'border-white/10 bg-[#f8fafc] text-[#101a2c]'}`}>
@@ -1165,7 +1164,10 @@ function HomeView({
                 <span className="absolute inset-x-3 bottom-3 text-white">
                   <strong className="block text-base font-black sm:text-lg">{tile.title}</strong>
                   <small className="mt-1 block text-[10px] text-white/80 sm:text-xs">{tile.subtitle}</small>
-                  <span className="mt-2 flex items-center justify-between text-[10px] font-bold text-sky-300"><span>{count} منتج</span><span className="rounded-full bg-white p-1.5 text-[#061026] transition group-hover:bg-sky-400">←</span></span>
+                  <span className="mt-3 flex items-center justify-between gap-2 text-[10px] font-bold text-sky-200">
+                    <span className="rounded-full border border-white/25 bg-white/10 px-2.5 py-1.5 backdrop-blur-sm">{count} منتج متاح</span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-500 px-3 py-2 font-black text-white shadow-lg shadow-sky-950/40 transition duration-300 group-hover:-translate-x-1 group-hover:bg-blue-400">اكتشف القسم <span aria-hidden="true">←</span></span>
+                  </span>
                 </span>
               </button>
             );
