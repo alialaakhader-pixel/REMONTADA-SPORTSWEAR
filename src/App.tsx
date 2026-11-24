@@ -961,7 +961,7 @@ export default function App() {
               setFilterCategory(categoryId);
               setFilterSport('all');
               setSearchQuery('');
-              setActivePage('shop');
+              setActivePage(`category-${categoryId}`);
             }}
             onOpenProduct={(p) => setSelectedProductModal(p)}
             onAddToCart={handleAddToCart}
@@ -973,7 +973,7 @@ export default function App() {
           />
         )}
 
-        {activePage === 'shop' && (
+        {(activePage === 'shop' || activePage.startsWith('category-')) && (
           <ShopView
             store={store}
             isLight={isLight}
@@ -981,7 +981,16 @@ export default function App() {
             filterSport={filterSport}
             setFilterSport={setFilterSport}
             filterCategory={filterCategory}
-            setFilterCategory={setFilterCategory}
+            setFilterCategory={(categoryId) => {
+              setFilterCategory(categoryId);
+              setActivePage(categoryId === 'all' ? 'shop' : `category-${categoryId}`);
+            }}
+            onSelectCategory={(categoryId) => {
+              setFilterCategory(categoryId);
+              setFilterSport('all');
+              setSearchQuery('');
+              setActivePage(categoryId === 'all' ? 'shop' : `category-${categoryId}`);
+            }}
             filterGender={filterGender}
             setFilterGender={setFilterGender}
             filterDiscountOnly={filterDiscountOnly}
@@ -1177,7 +1186,7 @@ function HomeView({
           <div className="space-y-6 lg:col-span-7">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#00D4FF]/45 bg-[#0A1A3A] px-4 py-1.5 text-xs font-extrabold text-[#00D4FF] shadow-[0_0_20px_rgba(0,212,255,0.3)]">
               <Zap className="h-3.5 w-3.5" />
-              <span>REMONTADA SPORTSWEAR — EGYPT</span>
+              <span>ريمونتادا — ملابس رياضية في مصر</span>
             </div>
 
             <h1
@@ -1606,6 +1615,7 @@ function ShopView({
   setFilterSport,
   filterCategory,
   setFilterCategory,
+  onSelectCategory,
   filterGender,
   setFilterGender,
   filterDiscountOnly,
@@ -1653,6 +1663,18 @@ function ShopView({
           </select>
         </div>
       </div>
+
+      <section className={`mb-7 rounded-2xl border border-[#00D4FF]/25 p-4 ${isLight ? 'bg-white' : 'bg-[#0A1A3A]/45'}`}>
+        <div className="mb-3 text-sm font-black text-[#00B4FF]">تصفح أقسام المتجر</div>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => onSelectCategory('all')} className={`rounded-xl px-4 py-2 text-xs font-extrabold transition ${filterCategory === 'all' ? 'bg-[#00B4FF] text-[#05050F]' : 'border border-[#00D4FF]/30'}`}>كل المنتجات</button>
+          {PRODUCT_CATEGORIES.map((category) => (
+            <button key={category.id} onClick={() => onSelectCategory(category.id)} className={`rounded-xl px-4 py-2 text-xs font-extrabold transition ${filterCategory === category.id ? 'bg-[#00B4FF] text-[#05050F]' : 'border border-[#00D4FF]/30'}`}>
+              {category.name}
+            </button>
+          ))}
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
         <aside
@@ -2904,7 +2926,7 @@ function DeliveryAgentView({ store, setStore, isLight, notify }) {
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-10">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#00D4FF]/25 pb-5">
         <div>
-          <span className="text-xs font-extrabold text-[#00D4FF]">DELIVERY AGENT PORTAL</span>
+          <span className="text-xs font-extrabold text-[#00D4FF]">بوابة مندوب التوصيل</span>
           <h1 style={{ fontFamily: "'Chakra Petch', 'Cairo', sans-serif" }} className="text-3xl font-black">
             واجهة عامل التوصيل
           </h1>
@@ -3150,7 +3172,7 @@ function AdminGateAndDashboard({
     <div className="mx-auto max-w-7xl px-4 py-10">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-[#00D4FF]/25 pb-5">
         <div>
-          <span className="text-xs font-bold text-[#00B4FF]">REMONTADA ADMIN PANEL</span>
+          <span className="text-xs font-bold text-[#00B4FF]">لوحة إدارة ريمونتادا</span>
           <h1 style={{ fontFamily: "'Chakra Petch', 'Cairo', sans-serif" }} className="text-2xl font-black sm:text-3xl">
             لوحة تحكم المتجر
           </h1>
