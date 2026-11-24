@@ -808,14 +808,18 @@ export default function App() {
 
           <nav className="hidden items-center gap-1.5 lg:flex">
             {[
-              { id: 'home', label: 'الواجهة الرئيسية' },
-              { id: 'shop', label: 'المتجر' },
-              { id: 'account', label: 'طلباتي وتقييمي' },
-              { id: 'courier', label: 'عامل التوصيل' },
+              { id: 'home', label: 'الرئيسية' },
+              { id: 'shop', label: 'كل المنتجات' },
+              ...PRODUCT_CATEGORIES.map((category) => ({ id: 'category-' + category.id, label: category.name })),
+              { id: 'account', label: 'طلباتي' },
             ].map((item) => (
               <button
                 key={item.id}
-                onClick={() => { if (item.id === 'shop') setFilterCategory('all'); setActivePage(item.id); }}
+                onClick={() => {
+                  if (item.id === 'shop') setFilterCategory('all');
+                  if (item.id.startsWith('category-')) setFilterCategory(item.id.slice('category-'.length));
+                  setActivePage(item.id);
+                }}
                 className={`rounded-xl px-3.5 py-2 text-xs font-extrabold transition ${
                   activePage === item.id
                     ? 'bg-[#00B4FF] text-[#05050F] shadow-[0_0_20px_rgba(0,212,255,0.5)]'
