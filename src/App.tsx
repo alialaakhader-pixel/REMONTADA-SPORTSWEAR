@@ -1014,6 +1014,11 @@ export default function App() {
           store={store}
           onClose={() => setSelectedProductModal(null)}
           onAddToCart={handleAddToCart}
+          onRequestNamePrint={(prodId, varId, qty) => {
+            handleAddToCart(prodId, varId, qty);
+            setSelectedProductModal(null);
+            setIsCartOpen(true);
+          }}
           onOpenSizeFinder={() => {
             setSelectedProductModal(null);
             setIsSizeFinderOpen(true);
@@ -1758,7 +1763,7 @@ function SizeFinderModal({ onClose, notify }) {
 // 9. نافذة تفاصيل المنتج (معرض صور + تكبير + اختيار المقاس واللون + التقييمات الحقيقية)
 // ============================================================================
 
-function ProductDetailModal({ product, store, onClose, onAddToCart, onOpenSizeFinder, onBuyNow }) {
+function ProductDetailModal({ product, store, onClose, onAddToCart, onRequestNamePrint, onOpenSizeFinder, onBuyNow }) {
   const [activeImg, setActiveImg] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const [selectedVariantId, setSelectedVariantId] = useState(product.variants[0]?.id || '');
@@ -1899,6 +1904,26 @@ function ProductDetailModal({ product, store, onClose, onAddToCart, onOpenSizeFi
                 })}
               </div>
             </div>
+
+            {product.supportsNamePrinting && (
+              <div className="rounded-2xl border border-[#0066FF]/45 bg-[#0066FF]/10 p-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <div className="text-sm font-black text-[#0066FF]">عايز تطبع اسمك على المنتج؟</div>
+                    <p className="mt-1 text-[11px] text-[#A0AEC0]">أضف المنتج للسلة واضغط على خيار طباعة الاسم واكتب الاسم المطلوب لكل قطعة.</p>
+                    <p className="mt-1 text-[11px] font-bold text-white">رسوم الطباعة: {formatEGP(store.settings?.namePrintingFee || 0)} للقطعة</p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={maxStock <= 0}
+                    onClick={() => onRequestNamePrint(product.id, selectedVariant?.id, qty)}
+                    className="shrink-0 rounded-xl bg-[#0066FF] px-4 py-2.5 text-xs font-black text-[#0A192F] disabled:opacity-40"
+                  >
+                    اطلب طباعة اسمك
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-3 pt-2">
               <div className="flex items-center rounded-xl border border-[#0066FF]/40 bg-[#0A192F]">
