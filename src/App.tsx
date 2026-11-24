@@ -1159,7 +1159,7 @@ function HomeView({
   const [heroIndex, setHeroIndex] = useState(0);
   const visibleProducts = (store.products || []).filter((p) => p.isActive);
   const heroSlides = [
-    { title: 'WEAR THE PASSION', subtitle: 'عيش الشغف مع كل قطعة', image: 'https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/456515738_1795534317548662.jpg', cta: 'تسوق الآن', category: 'all' },
+    { title: '', subtitle: '', image: 'https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/456515738_1795534317548662.jpg', cta: 'SHOP NOW', category: 'all' },
     { title: 'YOUR GAME. YOUR STYLE.', subtitle: 'اختار التيشيرت الرياضي المناسب ليومك', image: IMG.jersey, cta: 'اكتشف التيشيرتات', category: 'tshirts' },
     { title: 'BUILT FOR EVERY MOVE', subtitle: 'هوديز مريحة لإطلالة رياضية متكاملة', image: IMG.hoodie, cta: 'اكتشف الهوديز', category: 'hoodies' },
   ];
@@ -1184,17 +1184,19 @@ function HomeView({
   return (
     <div dir="rtl" className={`min-h-screen overflow-hidden ${isLight ? 'bg-[#f4f7fc] text-[#0A192F]' : 'bg-[#061026] text-white'}`}>
       <section className="relative isolate min-h-[390px] overflow-hidden sm:min-h-[470px] lg:min-h-[520px]">
-        <img key={activeSlide.image} src={activeSlide.image} alt={`واجهة ريمونتادا الرياضية - ${activeSlide.title}`} className="absolute inset-0 -z-20 h-full w-full object-cover object-center transition-opacity duration-700" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-l from-[#061026]/95 via-[#061026]/65 to-[#061026]/15" />
+        <img key={activeSlide.image} src={activeSlide.image} alt={`واجهة ريمونتادا الرياضية - ${activeSlide.title}`} className="absolute inset-0 -z-20 h-full w-full object-cover object-center brightness-110 saturate-110 contrast-110 transition-opacity duration-700" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-l from-[#061026]/35 via-[#061026]/15 to-transparent" />
         <div className="mx-auto flex min-h-[390px] max-w-7xl items-center px-5 py-14 sm:min-h-[470px] lg:min-h-[520px]">
           <div className="max-w-2xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#1687ff]/50 bg-[#061026]/65 px-4 py-2 text-xs font-black tracking-wider text-sky-300 backdrop-blur">
               <Sparkles className="h-4 w-4" /> REMONTADA SPORTSWEAR
             </div>
-            <h1 className="text-4xl font-black leading-tight sm:text-6xl lg:text-7xl" style={{fontFamily:"'Chakra Petch','Cairo',sans-serif"}}>
-              {activeSlide.title}
-            </h1>
-            <p className="mt-4 max-w-xl text-base font-bold leading-8 text-white/90 sm:text-xl">{activeSlide.subtitle}</p>
+            {activeSlide.title && (
+              <h1 className="text-4xl font-black leading-tight sm:text-6xl lg:text-7xl" style={{fontFamily:"'Chakra Petch','Cairo',sans-serif"}}>
+                {activeSlide.title}
+              </h1>
+            )}
+            {activeSlide.subtitle && <p className="mt-4 max-w-xl text-base font-bold leading-8 text-white/90 sm:text-xl">{activeSlide.subtitle}</p>}
             <button onClick={() => goCategory(activeSlide.category)} className="mt-8 inline-flex items-center gap-3 rounded-xl bg-[#087cf0] px-7 py-4 text-sm font-black text-white shadow-lg shadow-blue-950/40 transition hover:-translate-y-1 hover:bg-[#1592ff]">
               <ShoppingBag className="h-5 w-5" /> {activeSlide.cta} <span aria-hidden="true">←</span>
             </button>
