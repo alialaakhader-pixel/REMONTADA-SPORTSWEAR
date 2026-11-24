@@ -1166,10 +1166,10 @@ function HomeView({
   const activeSlide = heroSlides[heroIndex];
   // كل صورة هنا مرتبطة مباشرة بالقسم الذي تصفه، دون صور جيم أو جري عشوائية.
   const categoryTiles = [
-    { id: 'football-kits', title: 'أطقم كرة القدم', subtitle: 'تيشيرتات وأطقم الأندية والمنتخبات', image: IMG.jersey, icon: '⚽' },
-    { id: 'hoodies', title: 'هوديز وسويت شيرت', subtitle: 'قطع مريحة للتمرين والخروج', image: IMG.hoodie, icon: '♟' },
-    { id: 'shoes', title: 'أحذية رياضية', subtitle: 'أحذية للجري والتدريب والحركة', image: IMG.shoe, icon: '👟' },
-    { id: 'accessories', title: 'شنط وإكسسوارات', subtitle: 'شنط رياضية ومستلزمات يومك', image: IMG.bag, icon: '🎒' },
+    { id: 'football-kits', title: 'أطقم كرة القدم', subtitle: 'تيشيرتات وأطقم الأندية والمنتخبات', image: IMG.jersey, icon: '⚽', tint: 'from-blue-950/95 via-blue-900/35', glow: 'bg-sky-400/25' },
+    { id: 'hoodies', title: 'هوديز وسويت شيرت', subtitle: 'قطع مريحة للتمرين والخروج', image: IMG.hoodie, icon: '♟', tint: 'from-indigo-950/95 via-indigo-900/35', glow: 'bg-violet-400/25' },
+    { id: 'shoes', title: 'أحذية رياضية', subtitle: 'أحذية للجري والتدريب والحركة', image: IMG.shoe, icon: '👟', tint: 'from-cyan-950/95 via-cyan-900/35', glow: 'bg-cyan-300/25' },
+    { id: 'accessories', title: 'شنط وإكسسوارات', subtitle: 'شنط رياضية ومستلزمات يومك', image: IMG.bag, icon: '🎒', tint: 'from-slate-950/95 via-slate-800/40', glow: 'bg-blue-400/25' },
   ];
   const featureItems = [
     { icon: <Shield className="h-7 w-7" />, title: 'منتجات أصلية', detail: 'اختيارات بجودة مميزة' },
@@ -1231,10 +1231,14 @@ function HomeView({
               ? visibleProducts.filter((p) => getEffectivePrice(p.basePrice, p.id, p.sportId, store.promotions).hasDiscount).length
               : visibleProducts.filter((p) => p.categoryId === tile.id).length;
             return (
-              <button key={tile.id} onClick={() => goCategory(tile.id)} className="group relative min-h-[190px] overflow-hidden rounded-2xl text-right shadow-lg shadow-black/20 sm:min-h-[230px]">
-                <img src={tile.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#061026] via-[#061026]/25 to-transparent" />
-                <span className="absolute right-3 top-3 rounded-lg border border-white/25 bg-[#061026]/55 px-2 py-1 text-xs text-white backdrop-blur">{tile.icon}</span>
+              <button key={tile.id} onClick={() => goCategory(tile.id)} className="group relative min-h-[205px] overflow-hidden rounded-2xl border border-white/10 bg-[#07162d] text-right shadow-xl shadow-black/25 transition duration-300 hover:-translate-y-1 hover:border-sky-300/50 hover:shadow-sky-950/40 sm:min-h-[250px]">
+                <img src={tile.image} alt={tile.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110 group-hover:saturate-125" />
+                <div className={`absolute inset-0 bg-gradient-to-t ${tile.tint} to-transparent opacity-95`} />
+                <div className={`absolute -right-8 -top-8 h-36 w-36 rounded-full blur-3xl ${tile.glow}`} />
+                <div className="absolute left-3 top-3 origin-top-left scale-[0.48] opacity-90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition duration-300 group-hover:scale-[0.52]">
+                  <RemontadaOfficialLogo variant="header" />
+                </div>
+                <span className="absolute right-3 top-3 rounded-xl border border-white/25 bg-[#061026]/65 px-3 py-2 text-sm text-white shadow-lg backdrop-blur-md">{tile.icon}</span>
                 <span className="absolute inset-x-3 bottom-3 text-white">
                   <strong className="block text-base font-black sm:text-lg">{tile.title}</strong>
                   <small className="mt-1 block text-[10px] text-white/80 sm:text-xs">{tile.subtitle}</small>
