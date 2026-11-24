@@ -6,7 +6,7 @@ import {
   SlidersHorizontal, Image as ImageIcon, Upload, Sparkles,
   CheckCircle2, Sun, Moon, User, Scale, Eye, Ruler, Star,
   Lock, KeyRound, Camera, CheckSquare, Copy, Download,
-  AlertTriangle, Clock, Footprints, Shirt, UserCheck, FileUp
+  AlertTriangle, Clock, Footprints, Shirt, UserCheck, FileUp, Instagram, Facebook, Youtube
 } from 'lucide-react';
 import { readAdminSession, signInAdmin, signOutAdmin, getCurrentAdmin, loadStoreState, saveStoreState, changeAdminPassword, reserveOnlineInventory, releaseOnlineInventory, setInventoryVariantStock } from './lib/supabase';
 import { IMG } from './lib/img';
@@ -798,7 +798,12 @@ export default function App() {
         )
       )}
 
-      <div className="bg-[#0A192F] px-4 py-2 text-white"><div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 text-[11px] font-bold sm:text-xs"><span>توصيل سريع لجميع أنحاء مصر　|　جودة أصلية 100%　|　دعم فني متواصل</span><span className="hidden text-white/70 sm:inline">تابع ريمونتادا على منصات التواصل</span></div></div>
+      <div className="bg-[#0A192F] px-4 py-2 text-white"><div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 text-[11px] font-bold sm:text-xs"><span>توصيل سريع لجميع أنحاء مصر　|　جودة أصلية 100%　|　دعم فني متواصل</span><div className="flex items-center gap-3 text-white/80">
+            <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" aria-label="إنستغرام" className="hover:text-[#0066FF]"><Instagram className="h-4 w-4" /></a>
+            <a href="https://www.tiktok.com/" target="_blank" rel="noreferrer" aria-label="تيك توك" className="text-[10px] font-black hover:text-[#0066FF]">TikTok</a>
+            <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" aria-label="فيسبوك" className="hover:text-[#0066FF]"><Facebook className="h-4 w-4" /></a>
+            <a href="https://www.youtube.com/" target="_blank" rel="noreferrer" aria-label="يوتيوب" className="hover:text-[#0066FF]"><Youtube className="h-4 w-4" /></a>
+          </div></div></div>
 
       {/* الهيدر الثابت */}
       <header
@@ -1435,7 +1440,7 @@ function ShopView({
   onToggleCompare,
   onGoAdmin,
 }) {
-  const availableSizes = [...new Set(products.flatMap((product) => (product.variants || []).map((variant) => variant.size).filter(Boolean)))].sort();
+  const availableSizes = [...new Set(store.products.filter((product) => product.isActive && (filterCategory === 'all' || product.categoryId === filterCategory)).flatMap((product) => (product.variants || []).map((variant) => variant.size).filter(Boolean)))].sort();
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
