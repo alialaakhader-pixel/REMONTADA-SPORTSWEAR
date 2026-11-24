@@ -1252,6 +1252,11 @@ function ProductCard({
           )}
 
           <div className="absolute top-3 right-3 flex flex-col gap-1.5">
+            {totalStock > 0 && (
+              <span className="rounded-lg border border-emerald-400/40 bg-[#0A192F]/90 px-2.5 py-1 text-[10px] font-bold text-emerald-300">
+                متاح {totalStock} قطعة
+              </span>
+            )}
             {pricing.hasDiscount && (
               <span
                 style={{ fontFamily: "'Chakra Petch', sans-serif" }}
@@ -3517,7 +3522,10 @@ function AdminProductsWithFileUpload({ store, setStore, isLight, notify }) {
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black text-[#0066FF]">المقاسات والألوان والمخزون وحد التنبيه</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-black text-[#0066FF]">المقاسات والألوان والمخزون وحد التنبيه</span>
+              <span className="text-[11px] font-bold text-emerald-500">إجمالي القطع في هذا المنتج: {variants.reduce((sum, item) => sum + Math.max(0, Number(item.stockQty || 0)), 0)} قطعة</span>
+            </div>
             <button
               type="button"
               onClick={() =>
