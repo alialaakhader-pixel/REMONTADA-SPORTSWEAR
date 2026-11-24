@@ -224,7 +224,7 @@ export async function setInventoryVariantStock(session, product, variant, quanti
   return nextQty;
 }
 
-export async function reserveOnlineInventory(orderId, items) {
+export async function reserveOnlineInventory(orderId, items, orderData = null) {
   return request("/rest/v1/rpc/inventory_reserve_online_order", {
     method: "POST",
     body: JSON.stringify({
@@ -235,6 +235,7 @@ export async function reserveOnlineInventory(orderId, items) {
         quantity: Number(item.qty),
         product_title: String(item.productTitle || ""),
       })),
+      p_order_data: orderData,
     }),
   });
 }
