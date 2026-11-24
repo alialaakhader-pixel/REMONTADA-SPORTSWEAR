@@ -323,7 +323,7 @@ const RemontadaOfficialLogo = ({ variant = 'header', customImage = '', isLight =
       <div
         role="img"
         aria-label="Remontada Store"
-        className={`shrink-0 bg-no-repeat ${isHero ? 'h-28 w-[350px] max-w-full' : 'h-[54px] w-[220px] max-w-[42vw]'}`}
+        className={`shrink-0 bg-no-repeat ${isHero ? 'h-28 w-[350px] max-w-full' : 'h-[54px] w-[220px] max-w-[65vw]'}`}
         style={{
           backgroundImage: "url('https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/remontada-header-reference-1.webp')",
           backgroundSize: '768px 110px',
@@ -1197,7 +1197,7 @@ function HomeView({
               </h1>
             )}
             {activeSlide.subtitle && <p className="mt-4 max-w-xl text-base font-bold leading-8 text-white/90 sm:text-xl">{activeSlide.subtitle}</p>}
-            <button onClick={() => goCategory(activeSlide.category)} className="mt-8 inline-flex items-center gap-3 rounded-xl bg-[#087cf0] px-7 py-4 text-sm font-black text-white shadow-lg shadow-blue-950/40 transition hover:-translate-y-1 hover:bg-[#1592ff]">
+            <button onClick={() => goCategory(activeSlide.category)} className={`${activeSlide.cta === 'SHOP NOW' ? 'absolute bottom-16 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#087cf0] px-9 py-4 text-base font-black tracking-wider text-white shadow-[0_8px_30px_rgba(0,112,255,0.55)] ring-2 ring-white/70 transition hover:scale-105 hover:bg-[#1592ff] sm:bottom-20' : 'mt-8 inline-flex items-center gap-3 rounded-xl bg-[#087cf0] px-7 py-4 text-sm font-black text-white shadow-lg shadow-blue-950/40 transition hover:-translate-y-1 hover:bg-[#1592ff]'}}`}>
               <ShoppingBag className="h-5 w-5" /> {activeSlide.cta} <span aria-hidden="true">←</span>
             </button>
           </div>
