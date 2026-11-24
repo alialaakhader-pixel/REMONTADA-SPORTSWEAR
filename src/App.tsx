@@ -325,10 +325,10 @@ const RemontadaOfficialLogo = ({ variant = 'header', customImage = '', isLight =
         aria-label="Remontada Store"
         className={`shrink-0 bg-no-repeat ${isHero ? 'h-28 w-[350px] max-w-full' : 'h-[54px] w-[220px] max-w-[42vw]'}`}
         style={{
-          backgroundImage: "url('https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/IMG-20261124-WA0002.jpg')",
-          backgroundSize: '768px 512px',
-          backgroundPosition: '-24px -25px',
-          backgroundColor: '#f8fafc',
+          backgroundImage: "url('https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/remontada-header-reference-1.webp')",
+          backgroundSize: '768px 110px',
+          backgroundPosition: '-50px -22px',
+          backgroundColor: 'transparent',
           borderRadius: '8px',
         }}
       />
@@ -1085,19 +1085,18 @@ function HomeView({
   const [heroIndex, setHeroIndex] = useState(0);
   const visibleProducts = (store.products || []).filter((p) => p.isActive);
   const heroSlides = [
-    { title: 'WEAR THE PASSION', subtitle: 'عيش الشغف مع كل قطعة', image: 'https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/IMG-20261124-WA0002.jpg', cta: 'تسوق الآن', category: 'all' },
+    { title: 'WEAR THE PASSION', subtitle: 'عيش الشغف مع كل قطعة', image: 'https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/456515738_1795534317548662.jpg', cta: 'تسوق الآن', category: 'all' },
     { title: 'YOUR GAME. YOUR STYLE.', subtitle: 'اختار إطلالتك الرياضية من ريمونتادا', image: IMG.cta, cta: 'اكتشف التشكيلة', category: 'tshirts' },
     { title: 'BUILT FOR EVERY MOVE', subtitle: 'راحة وأناقة في كل تمرينة', image: IMG.journal, cta: 'شاهد المنتجات', category: 'pants-shorts' },
   ];
   const activeSlide = heroSlides[heroIndex];
+  // أربع بطاقات رئيسية للملابس، وكل بطاقة تفتح القسم الحقيقي بفلتر المنتجات.
+  // الأحذية والإكسسوارات تظل متاحة من صفحة المتجر والفلاتر.
   const categoryTiles = [
-    { id: 'football-kits', title: 'Football Kits', subtitle: 'أطقم الأندية والمنتخبات', image: IMG.football, icon: '⚽' },
-    { id: 'hoodies', title: 'Hoodies', subtitle: 'هوديز وسويت شيرت', image: IMG.hoodie, icon: '♟' },
-    { id: 'pants-shorts', title: 'Tracksuits', subtitle: 'ترنجات وبناطيل رياضية', image: IMG.gym, icon: '✦' },
-    { id: 'tshirts', title: 'T-Shirts', subtitle: 'تيشيرتات رياضية وكاجوال', image: IMG.jersey, icon: '▣' },
-    { id: 'shoes', title: 'Sports Shoes', subtitle: 'أحذية رياضية للجري والتدريب', image: IMG.shoe, icon: '👟' },
-    { id: 'accessories', title: 'Accessories', subtitle: 'شنط وجوارب وإكسسوارات رياضية', image: IMG.bag, icon: '🎒' },
-    { id: 'offers', title: 'Special Offers', subtitle: 'أحدث العروض والخصومات', image: IMG.cta, icon: '★' },
+    { id: 'football-kits', title: 'أطقم كرة القدم', subtitle: 'أطقم الأندية والمنتخبات', image: IMG.football, icon: '⚽' },
+    { id: 'hoodies', title: 'هوديز وسويت شيرت', subtitle: 'قطع مريحة للتمرين والخروج', image: IMG.hoodie, icon: '♟' },
+    { id: 'pants-shorts', title: 'ترنجات وبناطيل', subtitle: 'ملابس رياضية للحركة اليومية', image: IMG.gym, icon: '✦' },
+    { id: 'tshirts', title: 'تيشيرتات', subtitle: 'تيشيرتات رياضية وكاجوال', image: IMG.jersey, icon: '▣' },
   ];
   const featureItems = [
     { icon: <Shield className="h-7 w-7" />, title: 'منتجات أصلية', detail: 'اختيارات بجودة مميزة' },
@@ -1153,7 +1152,7 @@ function HomeView({
           <div><p className="text-xs font-black uppercase tracking-[.22em] text-sky-500">SHOP BY CATEGORY</p><h2 className="mt-2 text-2xl font-black sm:text-3xl">تسوق حسب القسم</h2><p className={`mt-1 text-sm ${mutedClass}`}>اختار القسم وشوف المنتجات المتاحة فيه</p></div>
           <button onClick={() => onNavigate('shop')} className="shrink-0 text-xs font-black text-sky-500 hover:text-sky-300">كل المنتجات ←</button>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 lg:gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {categoryTiles.map((tile) => {
             const count = tile.id === 'offers'
               ? visibleProducts.filter((p) => getEffectivePrice(p.basePrice, p.id, p.sportId, store.promotions).hasDiscount).length
