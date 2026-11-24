@@ -1085,7 +1085,7 @@ function HomeView({
   const [heroIndex, setHeroIndex] = useState(0);
   const visibleProducts = (store.products || []).filter((p) => p.isActive);
   const heroSlides = [
-    { title: 'WEAR THE PASSION', subtitle: 'عيش الشغف مع كل قطعة', image: IMG.hero, cta: 'تسوق الآن', category: 'all' },
+    { title: 'WEAR THE PASSION', subtitle: 'عيش الشغف مع كل قطعة', image: 'https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/IMG-20261124-WA0002.jpg', cta: 'تسوق الآن', category: 'all' },
     { title: 'YOUR GAME. YOUR STYLE.', subtitle: 'اختار إطلالتك الرياضية من ريمونتادا', image: IMG.cta, cta: 'اكتشف التشكيلة', category: 'tshirts' },
     { title: 'BUILT FOR EVERY MOVE', subtitle: 'راحة وأناقة في كل تمرينة', image: IMG.journal, cta: 'شاهد المنتجات', category: 'pants-shorts' },
   ];
