@@ -1110,7 +1110,7 @@ function HomeView({
   return (
     <div dir="rtl" className={`min-h-screen overflow-hidden ${isLight ? 'bg-[#f4f7fc] text-[#0A192F]' : 'bg-[#061026] text-white'}`}>
       <section className="relative isolate min-h-[390px] overflow-hidden sm:min-h-[470px] lg:min-h-[520px]">
-        <img src="https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/IMG-20261124-WA0002.jpg" alt="واجهة ريمونتادا الرياضية" className="absolute inset-0 -z-20 h-full w-full object-cover object-[center_36%] sm:object-[center_36%]" />
+        <img key={activeSlide.image} src={activeSlide.image} alt={`واجهة ريمونتادا الرياضية - ${activeSlide.title}`} className="absolute inset-0 -z-20 h-full w-full object-cover object-center transition-opacity duration-700" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-l from-[#061026]/95 via-[#061026]/65 to-[#061026]/15" />
         <div className="mx-auto flex min-h-[390px] max-w-7xl items-center px-5 py-14 sm:min-h-[470px] lg:min-h-[520px]">
           <div className="max-w-2xl">
