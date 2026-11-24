@@ -393,9 +393,12 @@ export default function App() {
         }
       } catch (error) {
         console.error('تعذر استعادة جلسة العميل:', error);
-        saveCustomerSession(null);
+        // Keep the saved session through temporary network/server failures.
+        // Clear it only when Supabase explicitly rejects the stored credentials.
+        const invalidSession = [400, 401, 403].includes(error?.status);
+        if (invalidSession) saveCustomerSession(null);
         if (active) {
-          setCustomerSession(null);
+          if (invalidSession) setCustomerSession(null);
           setCustomerUser(null);
         }
       }
