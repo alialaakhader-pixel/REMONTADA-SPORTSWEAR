@@ -45,6 +45,15 @@ export default function Home() {
 
   return (
     <div>
+      {/* Exact original storefront image from the repository. */}
+      <section aria-label="واجهة ريمونتادا الأصلية" className="w-full overflow-hidden bg-[#061026]">
+        <img
+          src="https://raw.githubusercontent.com/alialaakhader-pixel/REMONTADA-SPORTSWEAR/main/IMG-20261124-WA0002.jpg"
+          alt="واجهة متجر ريمونتادا الأصلية"
+          className="block h-auto w-full"
+          fetchPriority="high"
+        />
+      </section>
       {/* ============ HERO ============ */}
       <section className="relative isolate overflow-hidden">
         <div className="absolute inset-0">
