@@ -2298,7 +2298,7 @@ function CartDrawer({
                       {item.product.supportsNamePrinting && (
                         <div className="mt-2 space-y-2 rounded-xl border border-[#0066FF]/25 bg-[#0A192F]/60 p-2">
                           <label className="flex items-center gap-2 text-[11px] font-bold text-[#0066FF]">
-                            <input type="checkbox" checked={Boolean(getPrintOption(item).enabled)} onChange={(e) => { if (e.target.checked && namePrintingFee <= 0) { notify('الإدارة لم تحدد سعر طباعة الاسم بعد'); return; } setPrintOptions((prev) => { const key = `${item.productId}-${item.variantId}`; const current = prev[key] || { names: Array.from({ length: item.qty }, () => '') }; return { ...prev, [key]: { ...current, enabled: e.target.checked, names: Array.from({ length: item.qty }, (_, i) => current.names?.[i] || '') } }; }); }} className="accent-[#0066FF]" />
+                            <input type="checkbox" checked={Boolean(getPrintOption(item).enabled)} onChange={(e) => { setPrintOptions((prev) => { const key = `${item.productId}-${item.variantId}`; const current = prev[key] || { names: Array.from({ length: item.qty }, () => '') }; return { ...prev, [key]: { ...current, enabled: e.target.checked, names: Array.from({ length: item.qty }, (_, i) => current.names?.[i] || '') } }; }); }} className="accent-[#0066FF]" />
                             <span>طباعة اسم على التيشيرت (+{formatEGP(namePrintingFee)} للقطعة)</span>
                           </label>
                           {getPrintOption(item).enabled && Array.from({ length: item.qty }, (_, i) => (
