@@ -2277,7 +2277,7 @@ function CartDrawer({
         variantId: d.variant.id,
         productTitle: d.product.title,
         qty: d.qty,
-      })));
+      })), newOrder);
     } catch (error) {
       notify(error?.message || 'تعذر تأكيد الكمية من المخزون المركزي. حاول مرة أخرى.');
       return;
